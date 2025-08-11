@@ -1,0 +1,27 @@
+# Obsidian
+.obsidian/
+.smart-env/
+
+# Cartelle private
+00_Memex Core/
+01_Conoscenza*/
+02_Trails/
+03_Fonti/
+04_Progetti/
+05_Templates/
+99_Archivio/Backup*/
+99_Archivio/*.pdf
+99_Archivio/*.png
+99_Archivio/*.md
+
+# File privati
+GPT-5.md
+GP5.md
+GP-5.md
+
+# Claude
+.claude/
+
+# Mantieni solo i file per GitHub Pages
+!99_Archivio/Claude Artifacts GIT/
+!99_Archivio/*.html

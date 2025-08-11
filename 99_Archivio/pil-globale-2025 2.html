@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIL Globale 2025 - Analisi Gerarchica</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .current-view {
+            text-align: center;
+            padding: 10px;
+            background: #edf2f7;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .stat-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease;
+        }
+        .stat-card:hover {
+            transform: translateX(5px);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-top: 5px;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #14532d;
+        }
+        .eu-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 2px 8px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PIL Globale 2025</h1>
+        <div class="subtitle">Distribuzione del Prodotto Interno Lordo mondiale con analisi gerarchica</div>
+        
+        <div class="controls">
+            <button id="globalView">Vista Globale</button>
+            <button id="euDetail" disabled>Dettaglio UE</button>
+        </div>
+        
+        <div class="current-view" id="viewIndicator">
+            Vista attuale: GLOBALE (click su "Unione Europea" nel grafico per espandere)
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="pilChart"></canvas>
+        </div>
+        
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-label">PIL Totale Mondiale</div>
+                <div class="stat-value">~$112T</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top 3 Economie</div>
+                <div class="stat-value">59.4%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">UE (27 paesi)</div>
+                <div class="stat-value">16.3%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">BRICS+</div>
+                <div class="stat-value">~35%</div>
+            </div>
+        </div>
+        
+        <div class="note">
+            <strong>Navigazione interattiva:</strong> Clicca su "Unione Europea" nel grafico per visualizzare il dettaglio dei 27 stati membri. L'UE è rappresentata come blocco economico unitario (mercato unico, unione doganale) ma esplorabile nei suoi componenti nazionali.
+        </div>
+    </div>
+
+    <script>
+        let currentChart = null;
+        let currentView = 'global';
+        
+        // Dati globali con UE come blocco
+        const globalData = {
+            labels: [
+                'Stati Uniti',
+                'Cina',
+                'Unione Europea',
+                'India',
+                'Giappone',
+                'Regno Unito',
+                'Brasile',
+                'Canada',
+                'Russia',
+                'Corea del Sud',
+                'Australia',
+                'Messico',
+                'Indonesia',
+                'Arabia Saudita',
+                'Turchia',
+                'Svizzera',
+                'Taiwan',
+                'Altri Paesi'
+            ],
+            datasets: [{
+                data: [
+                    25.7,  // USA
+                    17.3,  // Cina
+                    16.3,  // UE (blocco)
+                    4.2,   // India
+                    3.8,   // Giappone
+                    3.2,   // Regno Unito
+                    2.1,   // Brasile
+                    2.1,   // Canada
+                    1.9,   // Russia
+                    1.8,   // Corea del Sud
+                    1.6,   // Australia
+                    1.6,   // Messico
+                    1.4,   // Indonesia
+                    0.9,   // Arabia Saudita
+                    0.9,   // Turchia
+                    0.8,   // Svizzera
+                    0.7,   // Taiwan
+                    13.7   // Altri
+                ],
+                backgroundColor: [
+                    '#4C51BF',  // USA
+                    '#EF4444',  // Cina
+                    '#3B82F6',  // UE - Blu EU
+                    '#F59E0B',  // India
+                    '#8B5CF6',  // Giappone
+                    '#EC4899',  // UK
+                    '#84CC16',  // Brasile
+                    '#F97316',  // Canada
+                    '#DC2626',  // Russia
+                    '#A855F7',  // Corea
+                    '#14B8A6',  // Australia
+                    '#FACC15',  // Messico
+                    '#22C55E',  // Indonesia
+                    '#A78BFA',  // Arabia
+                    '#F472B6',  // Turchia
+                    '#6366F1',  // Svizzera
+                    '#F87171',  // Taiwan
+                    '#9CA3AF'   // Altri
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+        
+        // Dati dettagliati UE
+        const euData = {
+            labels: [
+                'Germania',
+                'Francia', 
+                'Italia',
+                'Spagna',
+                'Paesi Bassi',
+                'Polonia',
+                'Belgio',
+                'Svezia',
+                'Irlanda',
+                'Austria',
+                'Danimarca',
+                'Romania',
+                'Finlandia',
+                'Repubblica Ceca',
+                'Portogallo',
+                'Grecia',
+                'Ungheria',
+                'Altri UE (10 paesi)'
+            ],
+            datasets: [{
+                data: [
+                    24.5,  // Germania (% del PIL UE)
+                    17.2,  // Francia
+                    12.3,  // Italia
+                    8.6,   // Spagna
+                    6.1,   // Paesi Bassi
+                    4.3,   // Polonia
+                    3.5,   // Belgio
+                    3.4,   // Svezia
+                    3.2,   // Irlanda
+                    2.9,   // Austria
+                    2.3,   // Danimarca
+                    2.0,   // Romania
+                    1.7,   // Finlandia
+                    1.9,   // Repubblica Ceca
+                    1.6,   // Portogallo
+                    1.3,   // Grecia
+                    1.2,   // Ungheria
+                    4.0    // Altri 10 stati membri
+                ],
+                backgroundColor: [
+                    '#10B981',  // Germania - Verde
+                    '#06B6D4',  // Francia - Ciano
+                    '#0EA5E9',  // Italia - Azzurro
+                    '#FB923C',  // Spagna - Arancio chiaro
+                    '#6366F1',  // Paesi Bassi - Indigo
+                    '#DC2626',  // Polonia - Rosso (colori nazionali)
+                    '#FACC15',  // Belgio - Giallo
+                    '#3B82F6',  // Svezia - Blu
+                    '#22C55E',  // Irlanda - Verde chiaro
+                    '#EF4444',  // Austria - Rosso
+                    '#DC2626',  // Danimarca - Rosso
+                    '#1E40AF',  // Romania - Blu scuro
+                    '#60A5FA',  // Finlandia - Blu chiaro
+                    '#2563EB',  // Repubblica Ceca - Blu
+                    '#84CC16',  // Portogallo - Verde lime
+                    '#3B82F6',  // Grecia - Blu
+                    '#059669',  // Ungheria - Verde scuro
+                    '#9CA3AF'   // Altri
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+        
+        function createChart(data, isEuView = false) {
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            
+            const ctx = document.getElementById('pilChart').getContext('2d');
+            currentChart = new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0 && !isEuView) {
+                            const index = elements[0].index;
+                            const label = data.labels[index];
+                            if (label === 'Unione Europea') {
+                                showEuDetail();
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        const dataset = data.datasets[0];
+                                        return data.labels.map((label, i) => {
+                                            const value = dataset.data[i];
+                                            let displayLabel = `${label}: ${value}%`;
+                                            if (!isEuView && label === 'Unione Europea') {
+                                                displayLabel += ' 🔍';
+                                            }
+                                            return {
+                                                text: displayLabel,
+                                                fillStyle: dataset.backgroundColor[i],
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    if (isEuView) {
+                                        const euPil = 18.3; // PIL UE in trilioni
+                                        const countryPil = (value * euPil / 100).toFixed(2);
+                                        return `${label}: ${value}% del PIL UE (~$${countryPil}T)`;
+                                    } else {
+                                        const globalPil = (value * 112 / 100).toFixed(1);
+                                        return `${label}: ${value}% (~$${globalPil}T)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function showGlobalView() {
+            currentView = 'global';
+            createChart(globalData, false);
+            document.getElementById('globalView').disabled = true;
+            document.getElementById('euDetail').disabled = false;
+            document.getElementById('viewIndicator').innerHTML = 
+                'Vista attuale: GLOBALE (click su "Unione Europea" nel grafico per espandere)';
+            updateStats('global');
+        }
+        
+        function showEuDetail() {
+            currentView = 'eu';
+            createChart(euData, true);
+            document.getElementById('globalView').disabled = false;
+            document.getElementById('euDetail').disabled = true;
+            document.getElementById('viewIndicator').innerHTML = 
+                'Vista attuale: DETTAGLIO UNIONE EUROPEA <span class="eu-indicator">27 Stati Membri</span>';
+            updateStats('eu');
+        }
+        
+        function updateStats(view) {
+            const container = document.getElementById('statsContainer');
+            if (view === 'eu') {
+                container.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-label">PIL Totale UE</div>
+                        <div class="stat-value">~$18.3T</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Top 4 Economie UE</div>
+                        <div class="stat-value">62.6%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Germania (% UE)</div>
+                        <div class="stat-value">24.5%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Stati Membri</div>
+                        <div class="stat-value">27</div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-label">PIL Totale Mondiale</div>
+                        <div class="stat-value">~$112T</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Top 3 Economie</div>
+                        <div class="stat-value">59.3%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">UE (27 paesi)</div>
+                        <div class="stat-value">16.3%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">BRICS+</div>
+                        <div class="stat-value">~35%</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('globalView').addEventListener('click', showGlobalView);
+        document.getElementById('euDetail').addEventListener('click', showEuDetail);
+        
+        // Inizializza con vista globale
+        showGlobalView();
+    </script>
+</body>
+</html>
