@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidità Globale - Analisi Critica Stratificata</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 2px solid #00ff88;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.1em;
+        }
+        
+        .warning-banner {
+            background: linear-gradient(90deg, #ff6b6b, #ff8787);
+            color: #000;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: #1a1a2e;
+            border: 2px solid #333;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .tab:hover {
+            border-color: #00ff88;
+            color: #fff;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            color: #000;
+            border-color: transparent;
+        }
+        
+        .content-panel {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .content-panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #1a1a2e, #0f1419);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+        
+        .card-title {
+            font-size: 1.2em;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        .metric {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #fff, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .uncertainty {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #ff6b6b;
+            color: #000;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .chart-container {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+            height: 400px;
+        }
+        
+        .strata-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        
+        .stratum {
+            background: linear-gradient(90deg, var(--color), transparent);
+            padding: 20px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .stratum:hover {
+            transform: translateX(10px);
+        }
+        
+        .stratum-title {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .stratum-value {
+            font-size: 1.5em;
+            margin: 5px 0;
+        }
+        
+        .stratum-desc {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        
+        .paradox-box {
+            background: linear-gradient(135deg, #2a0845, #1a0530);
+            border: 2px solid #9333ea;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .paradox-title {
+            color: #a855f7;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        .critical-note {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .hierarchy-visual {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 300px;
+            margin: 30px 0;
+        }
+        
+        .currency-bar {
+            width: 100px;
+            background: linear-gradient(180deg, var(--color), transparent);
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .currency-bar:hover {
+            transform: translateY(-10px);
+        }
+        
+        .currency-label {
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        
+        .shadow-zone {
+            background: repeating-linear-gradient(
+                45deg,
+                #1a1a2e,
+                #1a1a2e 10px,
+                #2a2a3e 10px,
+                #2a2a3e 20px
+            );
+            border: 2px dashed #666;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .shadow-zone::before {
+            content: "ZONA D'OMBRA";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #0f0f23;
+            padding: 0 10px;
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .grid { grid-template-columns: 1fr; }
+            .tabs { flex-direction: column; }
+            .tab { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Liquidità Globale: $130-250+ Trilioni</h1>
+        <div class="subtitle">Anatomia critica di un sistema stratificato e opaco</div>
+    </div>
+    
+    <div class="warning-banner">
+        ⚠️ AVVERTENZA EPISTEMOLOGICA: Ogni stima nasconde presupposti sulla natura del denaro e del valore
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('stratification')">Stratificazione</div>
+            <div class="tab" onclick="switchTab('composition')">Composizione</div>
+            <div class="tab" onclick="switchTab('shadow')">Sistema Ombra</div>
+            <div class="tab" onclick="switchTab('paradoxes')">Paradossi</div>
+            <div class="tab" onclick="switchTab('critical')">Inversione Critica</div>
+        </div>
+        
+        <!-- STRATIFICAZIONE -->
+        <div id="stratification" class="content-panel active">
+            <h2 style="margin-bottom: 20px; color: #00ff88;">La Piramide della Liquidità</h2>
+            
+            <div class="strata-visual">
+                <div class="stratum" style="--color: #00ff88;" onclick="expandStratum(this)">
+                    <div class="stratum-title">M0 - Base Monetaria</div>
+                    <div class="stratum-value">~$40 Trilioni</div>
+                    <div class="stratum-desc">Cash fisico + Riserve delle banche centrali. Il "denaro vero" del sistema.</div>
+                </div>
+                
+                <div class="stratum" style="--color: #00ccff;" onclick="expandStratum(this)">
+                    <div class="stratum-title">M1 - Liquidità Immediata</div>
+                    <div class="stratum-value">~$55 Trilioni</div>
+                    <div class="stratum-desc">M0 + Depositi a vista. Spendibile istantaneamente.</div>
+                </div>
+                
+                <div class="stratum" style="--color: #3b82f6;" onclick="expandStratum(this)">
+                    <div class="stratum-title">M2 - Broad Money</div>
+                    <div class="stratum-value">~$130-150 Trilioni</div>
+                    <div class="stratum-desc">M1 + Depositi a termine + Money market funds. La metrica "standard".</div>
+                    <span class="uncertainty">±20T incertezza</span>
+                </div>
+                
+                <div class="stratum" style="--color: #8b5cf6;" onclick="expandStratum(this)">
+                    <div class="stratum-title">Shadow Banking</div>
+                    <div class="stratum-value">~$200-250+ Trilioni</div>
+                    <div class="stratum-desc">Repo, Eurodollars, Collateral chains. La liquidità fantasma.</div>
+                    <span class="uncertainty">Largely unmeasured</span>
+                </div>
+            </div>
+            
+            <div class="critical-note">
+                <strong>Nota Critica:</strong> Questa stratificazione naturalizza una gerarchia del potere monetario. 
+                Chi ha accesso a M0 (banche centrali) può creare liquidità ex nihilo. Chi dipende da M2+ è soggetto alla scarsità artificiale.
+            </div>
+        </div>
+        
+        <!-- COMPOSIZIONE -->
+        <div id="composition" class="content-panel">
+            <h2 style="margin-bottom: 20px; color: #00ff88;">Gerarchia Valutaria Globale</h2>
+            
+            <div class="hierarchy-visual">
+                <div class="currency-bar" style="--color: #4ade80; height: 60%;">
+                    <div style="font-size: 2em;">60%</div>
+                    <div class="currency-label">USD</div>
+                </div>
+                <div class="currency-bar" style="--color: #3b82f6; height: 20%;">
+                    <div style="font-size: 1.5em;">20%</div>
+                    <div class="currency-label">EUR</div>
+                </div>
+                <div class="currency-bar" style="--color: #eab308; height: 6%;">
+                    <div>6%</div>
+                    <div class="currency-label">JPY</div>
+                </div>
+                <div class="currency-bar" style="--color: #f87171; height: 5%;">
+                    <div>5%</div>
+                    <div class="currency-label">GBP</div>
+                </div>
+                <div class="currency-bar" style="--color: #ef4444; height: 3%;">
+                    <div>3%</div>
+                    <div class="currency-label">CNY</div>
+                </div>
+                <div class="currency-bar" style="--color: #9ca3af; height: 6%;">
+                    <div>6%</div>
+                    <div class="currency-label">Altri</div>
+                </div>
+            </div>
+            
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Egemonia del Dollaro</div>
+                    <p>Il 60% delle riserve globali in USD crea un "privilegio esorbitante": 
+                    gli USA possono stampare la valuta di riserva mondiale.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Yuan Paradox</div>
+                    <p>La Cina è la 2° economia ma CNY è solo 3% delle riserve. 
+                    Controllo dei capitali vs ambizioni di internazionalizzazione.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Crypto Wild Card</div>
+                    <p>~$2T di market cap crypto. Liquidità parallela, volatile, 
+                    fuori dal controllo delle banche centrali... per ora.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SISTEMA OMBRA -->
+        <div id="shadow" class="content-panel">
+            <h2 style="margin-bottom: 20px; color: #00ff88;">Il Sistema Ombra: Dove la Liquidità Diventa Opaca</h2>
+            
+            <div class="shadow-zone">
+                <h3 style="color: #ff6b6b; margin-bottom: 15px;">Eurodollar System</h3>
+                <div class="metric">$15-25 Trilioni</div>
+                <p style="margin-top: 10px;">Dollari creati fuori dagli USA, fuori dal controllo della Fed. 
+                Un sistema monetario parallelo che nessuno controlla completamente.</p>
+            </div>
+            
+            <div class="shadow-zone">
+                <h3 style="color: #ff6b6b; margin-bottom: 15px;">Repo Markets</h3>
+                <div class="metric">$10-15 Trilioni/giorno</div>
+                <p style="margin-top: 10px;">Prestiti overnight collateralizzati. La "plumbing" del sistema che 
+                quasi collassò nel settembre 2019, richiedendo intervento Fed.</p>
+            </div>
+            
+            <div class="shadow-zone">
+                <h3 style="color: #ff6b6b; margin-bottom: 15px;">Rehypothecation Chains</h3>
+                <div class="metric">Leva 10-40x</div>
+                <p style="margin-top: 10px;">Lo stesso collaterale riusato multiple volte. 
+                Crea liquidità "sintetica" che evapora in crisi.</p>
+            </div>
+            
+            <div class="shadow-zone">
+                <h3 style="color: #ff6b6b; margin-bottom: 15px;">Derivati OTC</h3>
+                <div class="metric">$600+ Trilioni (nozionale)</div>
+                <p style="margin-top: 10px;">Valore nozionale dei derivati. Non è "vera" liquidità ma 
+                funziona come tale... finché la musica non si ferma.</p>
+            </div>
+        </div>
+        
+        <!-- PARADOSSI -->
+        <div id="paradoxes" class="content-panel">
+            <h2 style="margin-bottom: 20px; color: #00ff88;">I Paradossi della Liquidità</h2>
+            
+            <div class="paradox-box">
+                <div class="paradox-title">🔄 Paradosso della Misurazione</div>
+                <p>Più precisamente misuriamo la liquidità, meno catturiamo la sua natura sociale. 
+                È simultaneamente oggettiva (numeri in database) e intersoggettiva (fiducia collettiva).</p>
+            </div>
+            
+            <div class="paradox-box">
+                <div class="paradox-title">♾️ Paradosso della Scarsità</div>
+                <p>La liquidità è infinitamente creabile (QE, credit creation) ma artificialmente scarsa 
+                per chi non ha accesso al sistema bancario centrale.</p>
+            </div>
+            
+            <div class="paradox-box">
+                <div class="paradox-title">⚡ Paradosso della Velocità</div>
+                <p>$1 che circola 100 volte = $100 di attività economica. 
+                La velocità del denaro (ora ai minimi storici) rende la quantità quasi irrilevante.</p>
+            </div>
+            
+            <div class="paradox-box">
+                <div class="paradox-title">🌍 Paradosso Globale/Locale</div>
+                <p>La liquidità è globale negli effetti (crisi 2008) ma gerarchica nell'accesso 
+                (Fed swap lines solo per alleati geopolitici).</p>
+            </div>
+            
+            <div class="paradox-box">
+                <div class="paradox-title">💀 Paradosso Zombie</div>
+                <p>Troppa liquidità (ZIRP/NIRP) crea aziende zombie e asset bubbles. 
+                La medicina diventa veleno.</p>
+            </div>
+        </div>
+        
+        <!-- INVERSIONE CRITICA -->
+        <div id="critical" class="content-panel">
+            <h2 style="margin-bottom: 20px; color: #00ff88;">Inversione Critica: Cosa NON Vediamo</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Liquidità Negativa</div>
+                    <div class="metric">-$300T</div>
+                    <p>Il debito globale è anti-liquidità che richiede liquidità futura per essere servito. 
+                    Un buco nero monetario in crescita.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Liquidità Ecologica</div>
+                    <div class="metric">???</div>
+                    <p>Quanta liquidità può esistere prima di superare i limiti planetari? 
+                    La crescita infinita incontra la fisica finita.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Liquidità Sociale</div>
+                    <div class="metric">Non Monetizzata</div>
+                    <p>Economia del dono, lavoro di cura, commons digitali. 
+                    Valore reale invisibile al sistema di contabilità.</p>
+                </div>
+            </div>
+            
+            <div class="critical-note" style="background: rgba(0, 255, 136, 0.1); border-color: #00ff88;">
+                <strong>Inversione Fondamentale:</strong> E se la "liquidità" fosse il problema, non la soluzione? 
+                Un sistema che richiede crescita monetaria infinita per non collassare è intrinsecamente insostenibile.
+            </div>
+            
+            <div class="critical-note">
+                <strong>Blind Spot Post-Inversione:</strong> Anche questa critica opera dentro il paradigma monetario. 
+                Non riusciamo a immaginare valore senza prezzo, ricchezza senza denaro, prosperità senza crescita.
+            </div>
+            
+            <h3 style="margin-top: 30px; color: #a855f7;">Domande che l'Inversione Genera:</h3>
+            <ul style="line-height: 2; margin-left: 20px;">
+                <li>Perché accettiamo che 26 individui controllino ricchezza equivalente a 3.8 miliardi di persone?</li>
+                <li>Come mai la "crisi di liquidità" colpisce sempre i poveri ma mai le banche?</li>
+                <li>Se possiamo creare trilioni per salvare banche (2008) o per pandemic response (2020), 
+                    perché non per clima o povertà?</li>
+                <li>La blockchain elimina davvero gli intermediari o crea nuove gerarchie (miners, exchanges, whales)?</li>
+                <li>Cosa succederebbe se misurassimo successo economico in benessere anziché in PIL?</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function switchTab(tabName) {
+            // Rimuovi active da tutti i tabs e panels
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+            
+            // Attiva il tab cliccato
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        function expandStratum(element) {
+            // Toggle expansion animation
+            if (element.style.transform === 'scale(1.05)') {
+                element.style.transform = 'scale(1)';
+            } else {
+                // Reset all first
+                document.querySelectorAll('.stratum').forEach(s => s.style.transform = 'scale(1)');
+                element.style.transform = 'scale(1.05)';
+            }
+        }
+        
+        // Animazione numeri on scroll (se implementata)
+        const observerOptions = {
+            threshold: 0.5
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Osserva tutti i card
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
