@@ -1,0 +1,2657 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processo Produttivo Terre Rare - Analisi Dettagliata</title>
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #dc2626;
+            --accent-color: #16a34a;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .phase-navigation {
+            display: flex;
+            background: var(--dark-bg);
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .phase-nav-item {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .phase-nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .phase-nav-item.active {
+            background: var(--primary-color);
+        }
+
+        .phase-nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-color);
+        }
+
+        .phase-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .phase-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s;
+        }
+
+        .phase-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phase-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--border-color);
+        }
+
+        .phase-header h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .phase-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .overview-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .overview-card h3 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .overview-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .overview-card .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .process-diagram {
+            background: var(--light-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .process-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .process-step::after {
+            content: '';
+            position: absolute;
+            top: 35px;
+            right: -50%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            z-index: -1;
+        }
+
+        .process-step:last-child::after {
+            display: none;
+        }
+
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            background: white;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 150px;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--light-bg);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+
+        .info-box {
+            background: var(--light-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .info-box h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-card .label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .metric-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .metric-card .unit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .warning-box {
+            background: #fef2f2;
+            border: 2px solid var(--danger-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            color: var(--danger-color);
+            margin-bottom: 10px;
+        }
+
+        .success-box {
+            background: #f0fdf4;
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .success-box h4 {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .technology-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .technology-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .technology-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--light-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease;
+        }
+
+        @media (max-width: 768px) {
+            .phase-navigation {
+                flex-direction: column;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .process-step::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>🏭 Processo Produttivo Terre Rare</h1>
+            <p>Analisi Dettagliata delle 6 Fasi Critiche della Catena del Valore</p>
+        </div>
+
+        <div class="phase-navigation">
+            <div class="phase-nav-item active" onclick="showPhase(1)">
+                <div class="phase-number">1</div>
+                <div>Estrazione</div>
+            </div>
+            <div class="phase-nav-item" onclick="showPhase(2)">
+                <div class="phase-number">2</div>
+                <div>Concentrazione</div>
+            </div>
+            <div class="phase-nav-item" onclick="showPhase(3)">
+                <div class="phase-number">3</div>
+                <div>Separazione</div>
+            </div>
+            <div class="phase-nav-item" onclick="showPhase(4)">
+                <div class="phase-number">4</div>
+                <div>Raffinazione</div>
+            </div>
+            <div class="phase-nav-item" onclick="showPhase(5)">
+                <div class="phase-number">5</div>
+                <div>Produzione Metalli</div>
+            </div>
+            <div class="phase-nav-item" onclick="showPhase(6)">
+                <div class="phase-number">6</div>
+                <div>Manufacturing</div>
+            </div>
+        </div>
+
+        <!-- FASE 1: ESTRAZIONE -->
+        <div id="phase1" class="phase-content active">
+            <div class="phase-header">
+                <h2>Fase 1: Estrazione Mineraria</h2>
+                <p>Il primo e più critico passaggio nella catena del valore delle terre rare</p>
+            </div>
+
+            <div class="phase-overview">
+                <div class="overview-card" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <h3>Produzione Globale</h3>
+                    <div class="value">383,000</div>
+                    <div class="subtitle">Tonnellate/Anno (2024)</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <h3>Dominio Cinese</h3>
+                    <div class="value">70%</div>
+                    <div class="subtitle">Quota Mining Globale</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <h3>Miniere Attive</h3>
+                    <div class="value">38</div>
+                    <div class="subtitle">Siti Operativi Globali</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <h3>Investimenti</h3>
+                    <div class="value">$18.5B</div>
+                    <div class="subtitle">CAPEX 2023-2025</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⛏️ Processo di Estrazione</h3>
+                <div class="process-diagram">
+                    <div class="process-flow">
+                        <div class="process-step">
+                            <div class="step-icon">🔍</div>
+                            <div class="step-title">Esplorazione</div>
+                            <div class="step-description">Identificazione depositi con concentrazione >5% REO</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">💥</div>
+                            <div class="step-title">Blasting</div>
+                            <div class="step-description">Esplosioni controllate per frammentazione roccia</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🚛</div>
+                            <div class="step-title">Trasporto</div>
+                            <div class="step-description">Movimentazione materiale grezzo agli impianti</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">⚙️</div>
+                            <div class="step-title">Crushing</div>
+                            <div class="step-description">Frantumazione primaria a <10cm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🌍 Principali Miniere Globali</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Miniera</th>
+                                <th>Paese</th>
+                                <th>Produzione (t/anno)</th>
+                                <th>Minerali Principali</th>
+                                <th>Grado REO</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bayan Obo</strong></td>
+                                <td>🇨🇳 Cina (Inner Mongolia)</td>
+                                <td>120,000</td>
+                                <td>Bastnäsite, Monazite</td>
+                                <td>6-7%</td>
+                                <td><span class="badge badge-success">Operativa</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mountain Pass</strong></td>
+                                <td>🇺🇸 USA (California)</td>
+                                <td>45,000</td>
+                                <td>Bastnäsite</td>
+                                <td>8-9%</td>
+                                <td><span class="badge badge-success">Operativa</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mount Weld</strong></td>
+                                <td>🇦🇺 Australia</td>
+                                <td>24,000</td>
+                                <td>Monazite, Xenotime</td>
+                                <td>10-25%</td>
+                                <td><span class="badge badge-success">Operativa</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Weishan</strong></td>
+                                <td>🇨🇳 Cina (Shandong)</td>
+                                <td>65,000</td>
+                                <td>Bastnäsite</td>
+                                <td>4-5%</td>
+                                <td><span class="badge badge-success">Operativa</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Maoniuping</strong></td>
+                                <td>🇨🇳 Cina (Sichuan)</td>
+                                <td>35,000</td>
+                                <td>Bastnäsite</td>
+                                <td>3-4%</td>
+                                <td><span class="badge badge-success">Operativa</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Myanmar Mines</strong></td>
+                                <td>🇲🇲 Myanmar</td>
+                                <td>31,000</td>
+                                <td>Ion-adsorption clays</td>
+                                <td>0.05-0.2%</td>
+                                <td><span class="badge badge-danger">Semi-illegale</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chavara</strong></td>
+                                <td>🇮🇳 India</td>
+                                <td>2,900</td>
+                                <td>Monazite (beach sands)</td>
+                                <td>0.3-0.5%</td>
+                                <td><span class="badge badge-warning">Limitata</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lovozero</strong></td>
+                                <td>🇷🇺 Russia</td>
+                                <td>2,500</td>
+                                <td>Loparite</td>
+                                <td>1%</td>
+                                <td><span class="badge badge-warning">Sanzionata</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⚡ Parametri Tecnici Critici</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Tipologie di Depositi</h4>
+                        <table>
+                            <tr>
+                                <td><strong>Carbonatiti</strong></td>
+                                <td>40% produzione globale</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ion-adsorption clays</strong></td>
+                                <td>35% (Heavy REE)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Placers/Beach sands</strong></td>
+                                <td>15%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Altri depositi</strong></td>
+                                <td>10%</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Metriche di Estrazione</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="label">Strip Ratio</div>
+                                <div class="value">8:1</div>
+                                <div class="unit">Media globale</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Recovery Rate</div>
+                                <div class="value">65-85%</div>
+                                <div class="unit">Del minerale</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Cut-off Grade</div>
+                                <div class="value">2-3%</div>
+                                <div class="unit">REO minimo</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Costo Estrazione</div>
+                                <div class="value">$15-45</div>
+                                <div class="unit">per kg REO</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🚨 Problematiche Ambientali</h3>
+                <div class="warning-box">
+                    <h4>⚠️ Impatti Critici dell'Estrazione</h4>
+                    <ul>
+                        <li><strong>Radioattività:</strong> Presenza di Torio (Th) e Uranio (U) nei minerali REE - fino a 2,100 kg Th per tonnellata REE estratta</li>
+                        <li><strong>Deforestazione:</strong> 2,300 km² di habitat distrutti globalmente</li>
+                        <li><strong>Contaminazione Acque:</strong> Acidi e metalli pesanti rilasciati nelle falde acquifere</li>
+                        <li><strong>Emissioni CO₂:</strong> 15-20 tonnellate CO₂ per tonnellata REO prodotta</li>
+                        <li><strong>Tailings:</strong> 156 milioni di tonnellate di scarti tossici accumulati</li>
+                    </ul>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h4>Consumo Risorse per Tonnellata REO</h4>
+                        <table>
+                            <tr>
+                                <td>💧 Acqua</td>
+                                <td><strong>2,340 litri/kg</strong></td>
+                            </tr>
+                            <tr>
+                                <td>⚡ Energia</td>
+                                <td><strong>38 MWh</strong></td>
+                            </tr>
+                            <tr>
+                                <td>🧪 Reagenti Chimici</td>
+                                <td><strong>1.5 tonnellate</strong></td>
+                            </tr>
+                            <tr>
+                                <td>💥 Esplosivi</td>
+                                <td><strong>200 kg</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Gestione Rifiuti Radioattivi</h4>
+                        <div class="info-box">
+                            <p><strong>Thorium Management:</strong></p>
+                            <ul>
+                                <li>Bayan Obo: 252,000 t/anno rifiuti radioattivi</li>
+                                <li>Mountain Pass: 8,100 t/anno (gestione controllata)</li>
+                                <li>Myanmar: 55,800 t/anno (non gestiti)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔬 Innovazioni Tecnologiche</h3>
+                <div class="grid">
+                    <div class="technology-card">
+                        <h4>🤖 Automazione Mining</h4>
+                        <p><strong>Tecnologie:</strong> Droni per survey, camion autonomi, AI per ottimizzazione</p>
+                        <p><strong>Benefici:</strong> -30% costi operativi, +25% sicurezza</p>
+                        <p><strong>Adozione:</strong> 15% miniere globali</p>
+                    </div>
+                    
+                    <div class="technology-card">
+                        <h4>🌱 Bio-mining</h4>
+                        <p><strong>Tecnologie:</strong> Batteri per lisciviazione, funghi per assorbimento</p>
+                        <p><strong>Benefici:</strong> -60% impatto ambientale, -40% consumo acqua</p>
+                        <p><strong>Status:</strong> Fase pilota in 3 siti</p>
+                    </div>
+                    
+                    <div class="technology-card">
+                        <h4>📡 Sensing Remoto</h4>
+                        <p><strong>Tecnologie:</strong> Satelliti iperspettrali, analisi AI</p>
+                        <p><strong>Benefici:</strong> Identificazione depositi +45% accuratezza</p>
+                        <p><strong>Investimenti:</strong> $450M (2023-2025)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 2: CONCENTRAZIONE -->
+        <div id="phase2" class="phase-content">
+            <div class="phase-header">
+                <h2>Fase 2: Concentrazione del Minerale</h2>
+                <p>Processo di arricchimento per aumentare la concentrazione di REO dal 2-10% al 60-70%</p>
+            </div>
+
+            <div class="phase-overview">
+                <div class="overview-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <h3>Efficienza Media</h3>
+                    <div class="value">85%</div>
+                    <div class="subtitle">Recovery Rate REE</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">
+                    <h3>Concentrato Output</h3>
+                    <div class="value">60-70%</div>
+                    <div class="subtitle">REO nel concentrato</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #ec4899, #db2777);">
+                    <h3>Riduzione Volume</h3>
+                    <div class="value">95%</div>
+                    <div class="subtitle">Materiale scartato</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">
+                    <h3>Costo Processo</h3>
+                    <div class="value">$25-40</div>
+                    <div class="subtitle">per kg REO</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⚙️ Fasi del Processo di Concentrazione</h3>
+                <div class="process-diagram">
+                    <div class="process-flow">
+                        <div class="process-step">
+                            <div class="step-icon">🔨</div>
+                            <div class="step-title">Crushing Secondario</div>
+                            <div class="step-description">Riduzione a 1-2 mm per liberazione minerali</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">⚙️</div>
+                            <div class="step-title">Grinding</div>
+                            <div class="step-description">Macinazione fine a 75-150 μm</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🌊</div>
+                            <div class="step-title">Flotation</div>
+                            <div class="step-description">Separazione per proprietà superficiali</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🧲</div>
+                            <div class="step-title">Magnetic Separation</div>
+                            <div class="step-description">Rimozione minerali ferromagnetici</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">⚡</div>
+                            <div class="step-title">Gravity Separation</div>
+                            <div class="step-description">Concentrazione per densità</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔬 Tecnologie di Concentrazione</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Flotation Process</h4>
+                        <div class="info-box">
+                            <p><strong>Principio:</strong> Sfrutta le differenze di idrofobicità dei minerali</p>
+                            <ul>
+                                <li><strong>Reagenti Collectors:</strong> Acidi grassi, idrossamati</li>
+                                <li><strong>pH ottimale:</strong> 8.5-10.5</li>
+                                <li><strong>Temperatura:</strong> 25-35°C</li>
+                                <li><strong>Tempo residenza:</strong> 15-25 minuti</li>
+                                <li><strong>Recovery:</strong> 85-95% per Light REE</li>
+                            </ul>
+                        </div>
+                        
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Parametro</th>
+                                    <th>Valore Ottimale</th>
+                                    <th>Range Operativo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Densità Pulp</td>
+                                    <td>30-35%</td>
+                                    <td>25-40%</td>
+                                </tr>
+                                <tr>
+                                    <td>Aerazione</td>
+                                    <td>150 L/min/m³</td>
+                                    <td>100-200 L/min/m³</td>
+                                </tr>
+                                <tr>
+                                    <td>Agitazione</td>
+                                    <td>1200 rpm</td>
+                                    <td>1000-1500 rpm</td>
+                                </tr>
+                                <tr>
+                                    <td>Collector Dosage</td>
+                                    <td>800 g/t</td>
+                                    <td>500-1200 g/t</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Magnetic Separation</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="label">Campo Magnetico</div>
+                                <div class="value">1.5-2.0</div>
+                                <div class="unit">Tesla</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Efficienza</div>
+                                <div class="value">92%</div>
+                                <div class="unit">Rimozione Fe</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Throughput</div>
+                                <div class="value">50-100</div>
+                                <div class="unit">t/h</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Consumo Energia</div>
+                                <div class="value">15-25</div>
+                                <div class="unit">kWh/t</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📊 Performance per Tipo di Minerale</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Minerale</th>
+                                <th>Input Grade</th>
+                                <th>Concentrato Grade</th>
+                                <th>Recovery</th>
+                                <th>Metodo Primario</th>
+                                <th>Sfide Specifiche</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Bastnäsite</strong></td>
+                                <td>3-10% REO</td>
+                                <td>60-70% REO</td>
+                                <td>85-92%</td>
+                                <td>Flotation</td>
+                                <td>Presenza barite, calcite</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Monazite</strong></td>
+                                <td>0.5-5% REO</td>
+                                <td>55-65% REO</td>
+                                <td>80-88%</td>
+                                <td>Gravity + Magnetic</td>
+                                <td>Alto contenuto Th/U</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Xenotime</strong></td>
+                                <td>0.1-2% REO</td>
+                                <td>30-40% REO</td>
+                                <td>70-80%</td>
+                                <td>Gravity + Flotation</td>
+                                <td>Grani fini, Heavy REE</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ion-adsorption clays</strong></td>
+                                <td>0.05-0.3% REO</td>
+                                <td>2-8% REO</td>
+                                <td>60-75%</td>
+                                <td>Heap leaching</td>
+                                <td>Basso grado, argille</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🧪 Reagenti Chimici Utilizzati</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Collectors per Flotation</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Reagente</th>
+                                    <th>Dosaggio (g/t)</th>
+                                    <th>Funzione</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Sodium Oleate</td>
+                                    <td>500-800</td>
+                                    <td>Collector primario</td>
+                                </tr>
+                                <tr>
+                                    <td>Hydroxamic Acid</td>
+                                    <td>200-400</td>
+                                    <td>Collector selettivo</td>
+                                </tr>
+                                <tr>
+                                    <td>Sodium Silicate</td>
+                                    <td>1000-1500</td>
+                                    <td>Depressant gangue</td>
+                                </tr>
+                                <tr>
+                                    <td>Pine Oil</td>
+                                    <td>50-100</td>
+                                    <td>Frother</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Consumo e Costi Reagenti</h4>
+                        <div class="warning-box">
+                            <h4>⚠️ Impatto Economico</h4>
+                            <p>I reagenti rappresentano il 35-45% dei costi operativi della concentrazione</p>
+                            <ul>
+                                <li>Costo medio reagenti: $1,200-1,800/t concentrato</li>
+                                <li>Consumo totale: 15-25 kg/t minerale processato</li>
+                                <li>Recupero reagenti: Solo 20-30% recuperabile</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>💧 Gestione Acque e Tailings</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Bilancio Idrico</h4>
+                        <table>
+                            <tr>
+                                <td><strong>Consumo fresco</strong></td>
+                                <td>1,890 L/kg REO</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ricircolo</strong></td>
+                                <td>65-75% possibile</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Perdite evaporazione</strong></td>
+                                <td>15-20%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Acqua in tailings</strong></td>
+                                <td>35-40% umidità</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Tailings Management</h4>
+                        <div class="info-box">
+                            <p><strong>Volume Generato:</strong> 15-20 t tailings per t concentrato</p>
+                            <ul>
+                                <li><strong>Composizione:</strong> Silicati, carbonati, solfati</li>
+                                <li><strong>pH:</strong> 8-11 (alcalino da flotation)</li>
+                                <li><strong>Metalli pesanti:</strong> Pb, As, Cd presenti</li>
+                                <li><strong>Radioattività:</strong> 200-500 Bq/kg (Th, U residui)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🚀 Ottimizzazioni e Innovazioni</h3>
+                <div class="technology-card">
+                    <h4>🤖 AI Process Control</h4>
+                    <p><strong>Applicazioni:</strong> Ottimizzazione real-time flotation, predictive maintenance</p>
+                    <p><strong>Benefici:</strong> +8-12% recovery, -15% reagenti</p>
+                    <p><strong>ROI:</strong> 18-24 mesi</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 35%;">35% Adozione</div>
+                    </div>
+                </div>
+
+                <div class="technology-card">
+                    <h4>🔬 Column Flotation</h4>
+                    <p><strong>Vantaggi:</strong> Migliore selettività, minor footprint</p>
+                    <p><strong>Performance:</strong> +5% grade, -20% reagenti</p>
+                    <p><strong>Investimento:</strong> $2-5M per unità</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%;">25% Implementazione</div>
+                    </div>
+                </div>
+
+                <div class="technology-card">
+                    <h4>💧 Dry Processing</h4>
+                    <p><strong>Tecnologia:</strong> Separazione elettrostatica, air classification</p>
+                    <p><strong>Benefici:</strong> Zero consumo acqua, no tailings pond</p>
+                    <p><strong>Limitazioni:</strong> Solo per depositi specifici</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 10%;">10% R&D Phase</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 3: SEPARAZIONE -->
+        <div id="phase3" class="phase-content">
+            <div class="phase-header">
+                <h2>Fase 3: Separazione degli Elementi</h2>
+                <p>Il processo più complesso e costoso: separazione dei 17 elementi REE individuali</p>
+            </div>
+
+            <div class="phase-overview">
+                <div class="overview-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                    <h3>Complessità</h3>
+                    <div class="value">1000+</div>
+                    <div class="subtitle">Stadi di separazione</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                    <h3>Purezza Output</h3>
+                    <div class="value">99.9%</div>
+                    <div class="subtitle">REO individuali</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #059669, #047857);">
+                    <h3>Tempo Processo</h3>
+                    <div class="value">15-30</div>
+                    <div class="subtitle">Giorni completi</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+                    <h3>Costo Separazione</h3>
+                    <div class="value">$50-150</div>
+                    <div class="subtitle">per kg REO puro</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔄 Processo di Separazione Multi-Stadio</h3>
+                <div class="process-diagram">
+                    <div class="process-flow">
+                        <div class="process-step">
+                            <div class="step-icon">🧪</div>
+                            <div class="step-title">Dissoluzione</div>
+                            <div class="step-description">Attacco acido HCl/H₂SO₄ concentrato</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">⚗️</div>
+                            <div class="step-title">Estrazione Solvente</div>
+                            <div class="step-description">Separazione in fase organica</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🔁</div>
+                            <div class="step-title">Scrubbing</div>
+                            <div class="step-description">Purificazione fase organica</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">💧</div>
+                            <div class="step-title">Stripping</div>
+                            <div class="step-description">Recupero in fase acquosa</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🏭</div>
+                            <div class="step-title">Precipitazione</div>
+                            <div class="step-description">Cristallizzazione ossidi puri</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⚡ Tecnologie di Separazione</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Solvent Extraction (SX)</h4>
+                        <div class="info-box">
+                            <p><strong>Principio:</strong> Distribuzione selettiva tra fasi acquosa e organica</p>
+                            <ul>
+                                <li><strong>Extractants:</strong> D2EHPA, PC88A, Cyanex 272</li>
+                                <li><strong>Numero stadi:</strong> 200-500 per elemento</li>
+                                <li><strong>Fattore separazione:</strong> 1.5-3.0 tra elementi adiacenti</li>
+                                <li><strong>Efficienza stadio:</strong> 95-98%</li>
+                            </ul>
+                        </div>
+
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Gruppo REE</th>
+                                    <th>Extractant</th>
+                                    <th>pH Ottimale</th>
+                                    <th>Selettività</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Light REE (La-Nd)</td>
+                                    <td>D2EHPA</td>
+                                    <td>1.5-2.5</td>
+                                    <td>Alta</td>
+                                </tr>
+                                <tr>
+                                    <td>Middle REE (Sm-Gd)</td>
+                                    <td>PC88A</td>
+                                    <td>2.0-3.0</td>
+                                    <td>Media</td>
+                                </tr>
+                                <tr>
+                                    <td>Heavy REE (Tb-Lu)</td>
+                                    <td>Cyanex 272</td>
+                                    <td>3.0-4.0</td>
+                                    <td>Bassa</td>
+                                </tr>
+                                <tr>
+                                    <td>Y separation</td>
+                                    <td>EHEHPA</td>
+                                    <td>1.0-2.0</td>
+                                    <td>Molto alta</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Ion Exchange Chromatography</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="label">Resine utilizzate</div>
+                                <div class="value">Chelating</div>
+                                <div class="unit">EDTA-based</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Capacità</div>
+                                <div class="value">50-150</div>
+                                <div class="unit">g REO/L resina</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Cicli vita</div>
+                                <div class="value">500-1000</div>
+                                <div class="unit">rigenerazioni</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Purezza</div>
+                                <div class="value">99.99%</div>
+                                <div class="unit">REO puro</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📊 Sequenza di Separazione Standard</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Step</th>
+                                <th>Elementi Separati</th>
+                                <th>Metodo</th>
+                                <th>Difficoltà</th>
+                                <th>Yield</th>
+                                <th>Durata</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td>Ce da altri REE</td>
+                                <td>Ossidazione + precipitazione</td>
+                                <td><span class="badge badge-success">Facile</span></td>
+                                <td>95-98%</td>
+                                <td>2-4 ore</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td>La, Pr, Nd gruppo</td>
+                                <td>SX con D2EHPA</td>
+                                <td><span class="badge badge-warning">Media</span></td>
+                                <td>92-95%</td>
+                                <td>24-48 ore</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td>Pr da Nd</td>
+                                <td>SX multi-stadio (300+ stadi)</td>
+                                <td><span class="badge badge-danger">Molto difficile</span></td>
+                                <td>85-90%</td>
+                                <td>5-7 giorni</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4</strong></td>
+                                <td>Sm, Eu, Gd</td>
+                                <td>SX + Ion exchange</td>
+                                <td><span class="badge badge-warning">Media</span></td>
+                                <td>90-93%</td>
+                                <td>3-5 giorni</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5</strong></td>
+                                <td>Heavy REE (Tb-Lu)</td>
+                                <td>SX con Cyanex 272</td>
+                                <td><span class="badge badge-danger">Difficile</span></td>
+                                <td>88-92%</td>
+                                <td>7-10 giorni</td>
+                            </tr>
+                            <tr>
+                                <td><strong>6</strong></td>
+                                <td>Y isolamento</td>
+                                <td>SX selettivo</td>
+                                <td><span class="badge badge-success">Facile</span></td>
+                                <td>94-97%</td>
+                                <td>1-2 giorni</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🧪 Consumo Reagenti e Utilities</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Consumo per Tonnellata REO Separato</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Risorsa</th>
+                                    <th>Quantità</th>
+                                    <th>Costo Unitario</th>
+                                    <th>Costo Totale</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>HCl (37%)</td>
+                                    <td>8-12 t</td>
+                                    <td>$150/t</td>
+                                    <td>$1,200-1,800</td>
+                                </tr>
+                                <tr>
+                                    <td>H₂SO₄ (98%)</td>
+                                    <td>3-5 t</td>
+                                    <td>$100/t</td>
+                                    <td>$300-500</td>
+                                </tr>
+                                <tr>
+                                    <td>Solventi organici</td>
+                                    <td>200-400 kg</td>
+                                    <td>$5/kg</td>
+                                    <td>$1,000-2,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Extractants</td>
+                                    <td>50-100 kg</td>
+                                    <td>$50/kg</td>
+                                    <td>$2,500-5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Acqua processo</td>
+                                    <td>3,450 m³</td>
+                                    <td>$0.5/m³</td>
+                                    <td>$1,725</td>
+                                </tr>
+                                <tr>
+                                    <td>Energia</td>
+                                    <td>45 MWh</td>
+                                    <td>$60/MWh</td>
+                                    <td>$2,700</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Gestione Effluenti</h4>
+                        <div class="warning-box">
+                            <h4>⚠️ Problematiche Ambientali</h4>
+                            <ul>
+                                <li><strong>Volume effluenti:</strong> 50-80 m³/t REO</li>
+                                <li><strong>pH effluenti:</strong> 0.5-2.0 (fortemente acido)</li>
+                                <li><strong>Metalli disciolti:</strong> Fe, Al, Th, U presenti</li>
+                                <li><strong>Solventi residui:</strong> 50-200 ppm organici</li>
+                                <li><strong>Costo trattamento:</strong> $15-25/m³</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🏭 Impianti di Separazione Globali</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Impianto</th>
+                                <th>Località</th>
+                                <th>Capacità (t/anno)</th>
+                                <th>Tecnologia</th>
+                                <th>Prodotti</th>
+                                <th>Market Share</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Ganzhou Rare Earth</strong></td>
+                                <td>🇨🇳 Jiangxi, Cina</td>
+                                <td>50,000</td>
+                                <td>SX (1500+ stadi)</td>
+                                <td>Tutti i REO</td>
+                                <td>25%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Baotou HEFA</strong></td>
+                                <td>🇨🇳 Inner Mongolia</td>
+                                <td>40,000</td>
+                                <td>SX + IX</td>
+                                <td>Light REE focus</td>
+                                <td>20%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lynas Malaysia</strong></td>
+                                <td>🇲🇾 Kuantan</td>
+                                <td>22,000</td>
+                                <td>SX moderna</td>
+                                <td>NdPr, La, Ce</td>
+                                <td>12%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Solvay La Rochelle</strong></td>
+                                <td>🇫🇷 Francia</td>
+                                <td>3,000</td>
+                                <td>SX high-purity</td>
+                                <td>Eu, Tb, Y</td>
+                                <td>5%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shin-Etsu Chemical</strong></td>
+                                <td>🇯🇵 Giappone</td>
+                                <td>2,000</td>
+                                <td>IX + SX</td>
+                                <td>Ultra-pure REO</td>
+                                <td>3%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🚀 Innovazioni nella Separazione</h3>
+                <div class="technology-card">
+                    <h4>🧬 Molecular Recognition Technology (MRT)</h4>
+                    <p><strong>Sviluppatore:</strong> Ucore Rare Metals</p>
+                    <p><strong>Vantaggi:</strong> 99% separazione in 1-3 stadi vs 100+ tradizionali</p>
+                    <p><strong>Status:</strong> Commercializzazione 2025</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;">60% Development</div>
+                    </div>
+                </div>
+
+                <div class="technology-card">
+                    <h4>🔄 Continuous Ion Exchange</h4>
+                    <p><strong>Tecnologia:</strong> Colonne rotanti continue</p>
+                    <p><strong>Benefici:</strong> -50% footprint, -30% reagenti</p>
+                    <p><strong>Investimento:</strong> $15-20M per impianto</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%;">40% Pilot Scale</div>
+                    </div>
+                </div>
+
+                <div class="technology-card">
+                    <h4>💎 Membrane Separation</h4>
+                    <p><strong>Tipo:</strong> Nanofiltrazione selettiva</p>
+                    <p><strong>Performance:</strong> 95% purezza in singolo passaggio</p>
+                    <p><strong>Limitazioni:</strong> Solo per specifiche coppie REE</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%;">25% R&D</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 4: RAFFINAZIONE -->
+        <div id="phase4" class="phase-content">
+            <div class="phase-header">
+                <h2>Fase 4: Raffinazione e Purificazione</h2>
+                <p>Produzione di ossidi ultra-puri (99.99%+) per applicazioni high-tech</p>
+            </div>
+
+            <div class="phase-overview">
+                <div class="overview-card" style="background: linear-gradient(135deg, #0891b2, #0e7490);">
+                    <h3>Purezza Target</h3>
+                    <div class="value">99.999%</div>
+                    <div class="subtitle">5N Grade REO</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+                    <h3>Impurità Max</h3>
+                    <div class="value"><10 ppm</div>
+                    <div class="subtitle">Totale contaminanti</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+                    <h3>Yield Raffinazione</h3>
+                    <div class="value">85-95%</div>
+                    <div class="subtitle">Recovery finale</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #059669, #047857);">
+                    <h3>Valore Aggiunto</h3>
+                    <div class="value">300-500%</div>
+                    <div class="subtitle">vs ossidi standard</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⚗️ Processo di Raffinazione Multi-Step</h3>
+                <div class="process-diagram">
+                    <div class="process-flow">
+                        <div class="process-step">
+                            <div class="step-icon">🧪</div>
+                            <div class="step-title">Dissoluzione Selettiva</div>
+                            <div class="step-description">Solubilizzazione in acidi ultra-puri</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🔬</div>
+                            <div class="step-title">Precipitazione Frazionata</div>
+                            <div class="step-description">Controllo pH precisione 0.01</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">💎</div>
+                            <div class="step-title">Cristallizzazione</div>
+                            <div class="step-description">Crescita cristalli controllata</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🔥</div>
+                            <div class="step-title">Calcinazione</div>
+                            <div class="step-description">900-1200°C atmosfera controllata</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">✨</div>
+                            <div class="step-title">Finishing</div>
+                            <div class="step-description">Macinazione, classificazione</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📊 Specifiche di Purezza per Applicazione</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Elemento</th>
+                                <th>Grado Standard</th>
+                                <th>Grado High-Tech</th>
+                                <th>Applicazione Critica</th>
+                                <th>Prezzo Premium</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Nd₂O₃</strong></td>
+                                <td>99.5% (2N5)</td>
+                                <td>99.99% (4N)</td>
+                                <td>Magneti NdFeB aerospace</td>
+                                <td>+150%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Eu₂O₃</strong></td>
+                                <td>99.9% (3N)</td>
+                                <td>99.999% (5N)</td>
+                                <td>Phosphors LED/display</td>
+                                <td>+300%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tb₄O₇</strong></td>
+                                <td>99.9% (3N)</td>
+                                <td>99.995% (4N5)</td>
+                                <td>Magneti alta temperatura</td>
+                                <td>+200%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Y₂O₃</strong></td>
+                                <td>99.99% (4N)</td>
+                                <td>99.9999% (6N)</td>
+                                <td>YAG laser, ceramiche</td>
+                                <td>+400%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>La₂O₃</strong></td>
+                                <td>99.5% (2N5)</td>
+                                <td>99.995% (4N5)</td>
+                                <td>Optical glass, catalysts</td>
+                                <td>+100%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CeO₂</strong></td>
+                                <td>99.5% (2N5)</td>
+                                <td>99.99% (4N)</td>
+                                <td>CMP semiconductor</td>
+                                <td>+250%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔬 Tecniche di Purificazione Avanzate</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Zone Refining</h4>
+                        <div class="info-box">
+                            <p><strong>Principio:</strong> Segregazione impurità mediante fusione zonale</p>
+                            <ul>
+                                <li><strong>Purezza raggiungibile:</strong> 99.9999% (6N)</li>
+                                <li><strong>Velocità zona:</strong> 1-5 mm/h</li>
+                                <li><strong>Numero passaggi:</strong> 10-30</li>
+                                <li><strong>Applicazioni:</strong> Y, Gd, Lu per semiconduttori</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h4>Sublimazione sotto Vuoto</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="label">Pressione</div>
+                                <div class="value">10⁻⁶</div>
+                                <div class="unit">Torr</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Temperatura</div>
+                                <div class="value">1400-1800</div>
+                                <div class="unit">°C</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Purezza</div>
+                                <div class="value">99.999%</div>
+                                <div class="unit">5N grade</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Yield</div>
+                                <div class="value">70-80%</div>
+                                <div class="unit">Recovery</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⚡ Controllo Qualità e Analisi</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Tecniche Analitiche</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tecnica</th>
+                                    <th>Parametro</th>
+                                    <th>Sensibilità</th>
+                                    <th>Tempo Analisi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>ICP-MS</td>
+                                    <td>Impurità metalliche</td>
+                                    <td>0.001 ppm</td>
+                                    <td>30 min</td>
+                                </tr>
+                                <tr>
+                                    <td>XRF</td>
+                                    <td>Composizione bulk</td>
+                                    <td>0.01%</td>
+                                    <td>5 min</td>
+                                </tr>
+                                <tr>
+                                    <td>XRD</td>
+                                    <td>Fase cristallina</td>
+                                    <td>1%</td>
+                                    <td>60 min</td>
+                                </tr>
+                                <tr>
+                                    <td>GDMS</td>
+                                    <td>Ultra-trace impurità</td>
+                                    <td>0.0001 ppm</td>
+                                    <td>120 min</td>
+                                </tr>
+                                <tr>
+                                    <td>Particle Size Analysis</td>
+                                    <td>Distribuzione granulometrica</td>
+                                    <td>0.1 μm</td>
+                                    <td>15 min</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Standard di Certificazione</h4>
+                        <div class="info-box">
+                            <p><strong>Certificazioni Richieste:</strong></p>
+                            <ul>
+                                <li><strong>ISO 9001:2015</strong> - Sistema qualità</li>
+                                <li><strong>ISO 14001:2015</strong> - Gestione ambientale</li>
+                                <li><strong>REACH</strong> - Compliance EU chemicals</li>
+                                <li><strong>RoHS</strong> - Restriction hazardous substances</li>
+                                <li><strong>Customer specific</strong> - Apple, Tesla, etc.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🏭 Capacità Globale di Raffinazione</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Azienda</th>
+                                <th>Paese</th>
+                                <th>Capacità (t/anno)</th>
+                                <th>Specializzazione</th>
+                                <th>Grade Max</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>China Minmetals</strong></td>
+                                <td>🇨🇳 Cina</td>
+                                <td>15,000</td>
+                                <td>Full spectrum REO</td>
+                                <td>5N</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shenghe Resources</strong></td>
+                                <td>🇨🇳 Cina</td>
+                                <td>12,000</td>
+                                <td>Light REE focus</td>
+                                <td>4N5</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Neo Performance</strong></td>
+                                <td>🇨🇦 Canada/🇨🇳</td>
+                                <td>5,000</td>
+                                <td>Magnetic materials</td>
+                                <td>4N</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shin-Etsu</strong></td>
+                                <td>🇯🇵 Giappone</td>
+                                <td>1,500</td>
+                                <td>Ultra-high purity</td>
+                                <td>6N</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Less Common Metals</strong></td>
+                                <td>🇬🇧 UK</td>
+                                <td>500</td>
+                                <td>Specialty alloys</td>
+                                <td>4N5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>💰 Economia della Raffinazione</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Struttura Costi (per kg 4N REO)</h4>
+                        <table>
+                            <tr>
+                                <td>Materia prima (3N oxide)</td>
+                                <td>$100-150</td>
+                                <td>40%</td>
+                            </tr>
+                            <tr>
+                                <td>Energia (elettricità, gas)</td>
+                                <td>$30-50</td>
+                                <td>15%</td>
+                            </tr>
+                            <tr>
+                                <td>Reagenti ultra-puri</td>
+                                <td>$40-60</td>
+                                <td>18%</td>
+                            </tr>
+                            <tr>
+                                <td>Manodopera specializzata</td>
+                                <td>$25-35</td>
+                                <td>12%</td>
+                            </tr>
+                            <tr>
+                                <td>QC & Certificazione</td>
+                                <td>$20-30</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td>Overhead & Profit</td>
+                                <td>$15-25</td>
+                                <td>5%</td>
+                            </tr>
+                            <tr style="font-weight: bold;">
+                                <td>TOTALE</td>
+                                <td>$230-350</td>
+                                <td>100%</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>ROI e Payback</h4>
+                        <div class="info-box">
+                            <p><strong>Investimento Impianto 5,000 t/anno:</strong></p>
+                            <ul>
+                                <li><strong>CAPEX:</strong> $150-200M</li>
+                                <li><strong>OPEX annuale:</strong> $80-100M</li>
+                                <li><strong>Revenue potenziale:</strong> $200-300M</li>
+                                <li><strong>EBITDA margin:</strong> 25-35%</li>
+                                <li><strong>Payback period:</strong> 4-6 anni</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 5: PRODUZIONE METALLI -->
+        <div id="phase5" class="phase-content">
+            <div class="phase-header">
+                <h2>Fase 5: Produzione Metalli e Leghe</h2>
+                <p>Conversione degli ossidi in metalli puri e leghe specializzate per applicazioni finali</p>
+            </div>
+
+            <div class="phase-overview">
+                <div class="overview-card" style="background: linear-gradient(135deg, #ea580c, #dc2626);">
+                    <h3>Temperatura Processo</h3>
+                    <div class="value">1000-1500</div>
+                    <div class="subtitle">°C riduzione metalli</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
+                    <h3>Purezza Metalli</h3>
+                    <div class="value">99.5-99.95%</div>
+                    <div class="subtitle">Grade commerciale</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #65a30d, #4d7c0f);">
+                    <h3>Efficienza Conversione</h3>
+                    <div class="value">92-98%</div>
+                    <div class="subtitle">Ossido → Metallo</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #9333ea, #7e22ce);">
+                    <h3>Valore Metallo</h3>
+                    <div class="value">2-10x</div>
+                    <div class="subtitle">vs Ossido</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔥 Processi di Riduzione Metallurgica</h3>
+                <div class="process-diagram">
+                    <div class="process-flow">
+                        <div class="process-step">
+                            <div class="step-icon">⚗️</div>
+                            <div class="step-title">Preparazione</div>
+                            <div class="step-description">Fluorurazione ossidi → fluoruri</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🔥</div>
+                            <div class="step-title">Riduzione</div>
+                            <div class="step-description">Ca/Li metallotermia 1200°C</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">⚡</div>
+                            <div class="step-title">Elettrolisi</div>
+                            <div class="step-description">Fused salt 850°C (alternativa)</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🌡️</div>
+                            <div class="step-title">Raffinazione</div>
+                            <div class="step-description">Vacuum distillation/remelting</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">🎯</div>
+                            <div class="step-title">Alligazione</div>
+                            <div class="step-description">Fusione controllata leghe</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⚙️ Metodi di Produzione per Elemento</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Elemento</th>
+                                <th>Metodo Primario</th>
+                                <th>Temperatura</th>
+                                <th>Agente Riducente</th>
+                                <th>Yield</th>
+                                <th>Applicazioni Principali</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Neodimio</strong></td>
+                                <td>Ca reduction of NdF₃</td>
+                                <td>1100°C</td>
+                                <td>Ca metal</td>
+                                <td>95%</td>
+                                <td>Magneti NdFeB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Disprosio</strong></td>
+                                <td>Ca reduction of DyF₃</td>
+                                <td>1200°C</td>
+                                <td>Ca metal</td>
+                                <td>92%</td>
+                                <td>Magneti high-temp</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Terbio</strong></td>
+                                <td>Ca reduction of TbF₃</td>
+                                <td>1150°C</td>
+                                <td>Ca metal</td>
+                                <td>93%</td>
+                                <td>Magneti, phosphors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Europio</strong></td>
+                                <td>Vacuum reduction Eu₂O₃</td>
+                                <td>1500°C</td>
+                                <td>La metal</td>
+                                <td>88%</td>
+                                <td>LED phosphors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Yttrio</strong></td>
+                                <td>Ca reduction of YF₃</td>
+                                <td>1100°C</td>
+                                <td>Ca metal</td>
+                                <td>96%</td>
+                                <td>Ceramiche, laser</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cerio</strong></td>
+                                <td>Electrolysis CeO₂</td>
+                                <td>850°C</td>
+                                <td>Elettroni</td>
+                                <td>94%</td>
+                                <td>Polishing, catalysts</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lantanio</strong></td>
+                                <td>Electrolysis La₂O₃</td>
+                                <td>900°C</td>
+                                <td>Elettroni</td>
+                                <td>95%</td>
+                                <td>Battery electrodes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔬 Produzione Leghe Specializzate</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>NdFeB (Magneti Permanenti)</h4>
+                        <div class="info-box">
+                            <p><strong>Composizione tipica:</strong> Nd₂Fe₁₄B + additivi</p>
+                            <ul>
+                                <li><strong>Nd:</strong> 27-32% (base magnetica)</li>
+                                <li><strong>Fe:</strong> 64-68% (matrice)</li>
+                                <li><strong>B:</strong> 1.0-1.2% (fase intergranulare)</li>
+                                <li><strong>Dy/Tb:</strong> 0-10% (coercività)</li>
+                                <li><strong>Co:</strong> 0-5% (temperatura Curie)</li>
+                                <li><strong>Altri:</strong> Al, Cu, Ga (ottimizzazione)</li>
+                            </ul>
+                        </div>
+
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>BHmax (MGOe)</th>
+                                    <th>Temp Max (°C)</th>
+                                    <th>Applicazione</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>N35</td>
+                                    <td>35</td>
+                                    <td>80</td>
+                                    <td>Consumer electronics</td>
+                                </tr>
+                                <tr>
+                                    <td>N48H</td>
+                                    <td>48</td>
+                                    <td>120</td>
+                                    <td>Motori EV standard</td>
+                                </tr>
+                                <tr>
+                                    <td>N42UH</td>
+                                    <td>42</td>
+                                    <td>180</td>
+                                    <td>Motori EV premium</td>
+                                </tr>
+                                <tr>
+                                    <td>N38EH</td>
+                                    <td>38</td>
+                                    <td>200</td>
+                                    <td>Turbine eoliche</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Mischmetal e Leghe Battery</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="label">LaNi₅</div>
+                                <div class="value">NiMH</div>
+                                <div class="unit">Battery alloy</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Ce-Mischmetal</div>
+                                <div class="value">50% Ce</div>
+                                <div class="unit">Steel additive</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">La-Mischmetal</div>
+                                <div class="value">25% La</div>
+                                <div class="unit">Catalyst base</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Nd-Fe master</div>
+                                <div class="value">75% Nd</div>
+                                <div class="unit">Magnet precursor</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>⚡ Processo Strip Casting (Magneti)</h3>
+                <div class="card">
+                    <h4>Tecnologia Avanzata per NdFeB</h4>
+                    <div class="process-diagram">
+                        <div class="process-flow">
+                            <div class="process-step">
+                                <div class="step-icon">🔥</div>
+                                <div class="step-title">Melting</div>
+                                <div class="step-description">Fusione vacuum 1450°C</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">💨</div>
+                                <div class="step-title">Strip Casting</div>
+                                <div class="step-description">Solidificazione rapida 10⁶ K/s</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">💥</div>
+                                <div class="step-title">Hydrogen Decrepitation</div>
+                                <div class="step-description">Frantumazione H₂ 2-3 bar</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">⚙️</div>
+                                <div class="step-title">Jet Milling</div>
+                                <div class="step-description">Polvere 3-5 μm N₂ atmosfera</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">🧲</div>
+                                <div class="step-title">Pressing</div>
+                                <div class="step-description">Campo magnetico 2T allineamento</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">🌡️</div>
+                                <div class="step-title">Sintering</div>
+                                <div class="step-description">1080°C vacuum densificazione</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🏭 Capacità Produttiva Globale Metalli</h3>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produttore</th>
+                                <th>Paese</th>
+                                <th>Capacità Metalli (t/anno)</th>
+                                <th>Specializzazione</th>
+                                <th>Integrazione</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>China Northern RE</strong></td>
+                                <td>🇨🇳 Cina</td>
+                                <td>20,000</td>
+                                <td>Full spectrum</td>
+                                <td>Mining → Magneti</td>
+                            </tr>
+                            <tr>
+                                <td><strong>VAC (Vacuumschmelze)</strong></td>
+                                <td>🇩🇪 Germania</td>
+                                <td>3,000</td>
+                                <td>NdFeB magneti</td>
+                                <td>Metalli → Magneti</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shin-Etsu Chemical</strong></td>
+                                <td>🇯🇵 Giappone</td>
+                                <td>2,500</td>
+                                <td>High-grade NdFeB</td>
+                                <td>Separazione → Magneti</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Less Common Metals</strong></td>
+                                <td>🇬🇧 UK</td>
+                                <td>500</td>
+                                <td>Specialty alloys</td>
+                                <td>Metalli → Leghe</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Santoku</strong></td>
+                                <td>🇯🇵 Giappone</td>
+                                <td>800</td>
+                                <td>Battery alloys</td>
+                                <td>Metalli → Battery</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔋 Applicazioni Critiche dei Metalli REE</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Veicoli Elettrici (per auto)</h4>
+                        <table>
+                            <tr>
+                                <td><strong>Motore trazione</strong></td>
+                                <td>1-2 kg NdFeB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Generatore</strong></td>
+                                <td>0.5-1 kg NdFeB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sensori/Attuatori</strong></td>
+                                <td>0.2 kg SmCo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Display/LED</strong></td>
+                                <td>5-10 g Eu, Y, Ce</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Catalizzatore</strong></td>
+                                <td>50-100 g Ce, La</td>
+                            </tr>
+                            <tr style="font-weight: bold;">
+                                <td>TOTALE REE</td>
+                                <td>2-3.5 kg</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Turbina Eolica (3 MW)</h4>
+                        <table>
+                            <tr>
+                                <td><strong>Generatore DD</strong></td>
+                                <td>600-800 kg NdFeB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dy/Tb coating</strong></td>
+                                <td>20-40 kg</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pitch control</strong></td>
+                                <td>5-10 kg NdFeB</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Altri sistemi</strong></td>
+                                <td>5-10 kg vari</td>
+                            </tr>
+                            <tr style="font-weight: bold;">
+                                <td>TOTALE REE</td>
+                                <td>650-860 kg</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>💡 Innovazioni nella Metallurgia REE</h3>
+                <div class="technology-card">
+                    <h4>🔥 Plasma Arc Melting</h4>
+                    <p><strong>Vantaggi:</strong> Purezza 99.99%, controllo atmosfera perfetto</p>
+                    <p><strong>Energia:</strong> -30% vs metodi tradizionali</p>
+                    <p><strong>Status:</strong> Commerciale per high-value REE</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%;">45% Adoption</div>
+                    </div>
+                </div>
+
+                <div class="technology-card">
+                    <h4>🧲 Additive Manufacturing Magneti</h4>
+                    <p><strong>Tecnologia:</strong> 3D printing NdFeB complessi</p>
+                    <p><strong>Benefici:</strong> Zero waste, geometrie impossibili</p>
+                    <p><strong>Applicazioni:</strong> Motori custom, dispositivi medici</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%;">20% Early Stage</div>
+                    </div>
+                </div>
+
+                <div class="technology-card">
+                    <h4>♻️ Direct Recycling Magneti</h4>
+                    <p><strong>Processo:</strong> Rigenerazione diretta senza rifusione</p>
+                    <p><strong>Recovery:</strong> 95% proprietà magnetiche</p>
+                    <p><strong>Costo:</strong> -60% vs produzione virgin</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%;">30% Pilot Plants</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FASE 6: MANUFACTURING -->
+        <div id="phase6" class="phase-content">
+            <div class="phase-header">
+                <h2>Fase 6: Manufacturing e Integrazione</h2>
+                <p>Produzione di componenti finali e integrazione in dispositivi high-tech</p>
+            </div>
+
+            <div class="phase-overview">
+                <div class="overview-card" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <h3>Mercato Globale</h3>
+                    <div class="value">$450B</div>
+                    <div class="subtitle">Componenti REE 2024</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <h3>Crescita CAGR</h3>
+                    <div class="value">12.5%</div>
+                    <div class="subtitle">2024-2030</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <h3>Applicazioni</h3>
+                    <div class="value">5000+</div>
+                    <div class="subtitle">Prodotti finali</div>
+                </div>
+                <div class="overview-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                    <h3>Valore Aggiunto</h3>
+                    <div class="value">100-1000x</div>
+                    <div class="subtitle">vs materia prima</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🏭 Catena Manufacturing per Settore</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>🚗 Automotive EV</h4>
+                        <div class="process-diagram" style="padding: 20px;">
+                            <div class="process-flow">
+                                <div class="process-step">
+                                    <div class="step-icon">🧲</div>
+                                    <div class="step-title">Magneti NdFeB</div>
+                                    <div class="step-description">Sintered/Bonded production</div>
+                                </div>
+                                <div class="process-step">
+                                    <div class="step-icon">⚙️</div>
+                                    <div class="step-title">Motori/Generatori</div>
+                                    <div class="step-description">Assembly & magnetization</div>
+                                </div>
+                                <div class="process-step">
+                                    <div class="step-icon">🚗</div>
+                                    <div class="step-title">Integrazione EV</div>
+                                    <div class="step-description">Powertrain assembly</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Componente</th>
+                                    <th>REE Utilizzati</th>
+                                    <th>Quantità/Veicolo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Motore trazione</td>
+                                    <td>Nd, Pr, Dy, Tb</td>
+                                    <td>1.5-2.5 kg</td>
+                                </tr>
+                                <tr>
+                                    <td>Power steering</td>
+                                    <td>Nd, Pr</td>
+                                    <td>0.2-0.3 kg</td>
+                                </tr>
+                                <tr>
+                                    <td>Sensori ABS</td>
+                                    <td>Sm, Co</td>
+                                    <td>0.05 kg</td>
+                                </tr>
+                                <tr>
+                                    <td>Speakers</td>
+                                    <td>Nd, Pr</td>
+                                    <td>0.1 kg</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>💨 Wind Energy</h4>
+                        <div class="info-box">
+                            <p><strong>Direct Drive Generator (3MW):</strong></p>
+                            <ul>
+                                <li><strong>Magneti totali:</strong> 650-800 kg NdFeB</li>
+                                <li><strong>Configurazione:</strong> 100+ moduli magnetici</li>
+                                <li><strong>Grade richiesto:</strong> N42SH-N48H</li>
+                                <li><strong>Coating:</strong> Dy grain boundary diffusion</li>
+                                <li><strong>Vita utile:</strong> 20-25 anni</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📱 Electronics & Semiconductors</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Smartphone Components</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Componente</th>
+                                    <th>REE Material</th>
+                                    <th>Funzione</th>
+                                    <th>Quantità</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Display</td>
+                                    <td>Y, Eu, Tb phosphors</td>
+                                    <td>Color generation</td>
+                                    <td>0.5-1 g</td>
+                                </tr>
+                                <tr>
+                                    <td>Speaker/Mic</td>
+                                    <td>NdFeB micro-magnets</td>
+                                    <td>Audio transduction</td>
+                                    <td>0.1-0.2 g</td>
+                                </tr>
+                                <tr>
+                                    <td>Vibration motor</td>
+                                    <td>NdFeB magnets</td>
+                                    <td>Haptic feedback</td>
+                                    <td>0.05 g</td>
+                                </tr>
+                                <tr>
+                                    <td>Camera lens</td>
+                                    <td>La glass</td>
+                                    <td>Optical properties</td>
+                                    <td>0.01 g</td>
+                                </tr>
+                                <tr>
+                                    <td>Chips polishing</td>
+                                    <td>CeO₂ slurry</td>
+                                    <td>CMP process</td>
+                                    <td>Trace</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Semiconductor Fab Integration</h4>
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <div class="label">CMP Slurry</div>
+                                <div class="value">CeO₂</div>
+                                <div class="unit">1-5% concentration</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Etch Masks</div>
+                                <div class="value">Y₂O₃</div>
+                                <div class="unit">Plasma resistant</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Dopants</div>
+                                <div class="value">Er, Yb</div>
+                                <div class="unit">Optical amplifiers</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="label">Sputtering Targets</div>
+                                <div class="value">Various</div>
+                                <div class="unit">Thin film deposition</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🔬 Processi Manufacturing Avanzati</h3>
+                <div class="card">
+                    <h4>Produzione Magneti Permanenti - Linea Completa</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fase</th>
+                                <th>Processo</th>
+                                <th>Parametri Critici</th>
+                                <th>QC Check</th>
+                                <th>Yield</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Powder Prep</strong></td>
+                                <td>Jet milling inert atmosphere</td>
+                                <td>3-5 μm, <100 ppm O₂</td>
+                                <td>PSD, oxygen content</td>
+                                <td>98%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Pressing</strong></td>
+                                <td>Isostatic/Die pressing</td>
+                                <td>1-2 T field, 800 MPa</td>
+                                <td>Density, alignment</td>
+                                <td>97%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. Sintering</strong></td>
+                                <td>Vacuum furnace</td>
+                                <td>1080°C, 4h, 10⁻⁴ Pa</td>
+                                <td>Density >7.5 g/cm³</td>
+                                <td>95%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. Heat Treatment</strong></td>
+                                <td>Two-stage annealing</td>
+                                <td>900°C + 500°C</td>
+                                <td>Coercivity</td>
+                                <td>99%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Machining</strong></td>
+                                <td>Diamond grinding</td>
+                                <td>±0.05 mm tolerance</td>
+                                <td>Dimensions</td>
+                                <td>92%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>6. Coating</strong></td>
+                                <td>Ni-Cu-Ni plating</td>
+                                <td>10-20 μm thickness</td>
+                                <td>Adhesion, corrosion</td>
+                                <td>98%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>7. Magnetization</strong></td>
+                                <td>Pulse magnetizer</td>
+                                <td>3-5 T field</td>
+                                <td>BHmax, Br, Hc</td>
+                                <td>100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>💰 Value Chain Economics</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>Moltiplicatore di Valore per Fase</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fase</th>
+                                    <th>Prodotto</th>
+                                    <th>Prezzo ($/kg)</th>
+                                    <th>Moltiplicatore</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mining</td>
+                                    <td>REE ore (5% REO)</td>
+                                    <td>5-10</td>
+                                    <td>1x</td>
+                                </tr>
+                                <tr>
+                                    <td>Concentration</td>
+                                    <td>Concentrate (60% REO)</td>
+                                    <td>30-50</td>
+                                    <td>5x</td>
+                                </tr>
+                                <tr>
+                                    <td>Separation</td>
+                                    <td>Individual oxides</td>
+                                    <td>50-500</td>
+                                    <td>10-50x</td>
+                                </tr>
+                                <tr>
+                                    <td>Metal Production</td>
+                                    <td>Pure metals</td>
+                                    <td>100-2000</td>
+                                    <td>20-200x</td>
+                                </tr>
+                                <tr>
+                                    <td>Magnet Manufacturing</td>
+                                    <td>NdFeB magnets</td>
+                                    <td>150-300</td>
+                                    <td>30-60x</td>
+                                </tr>
+                                <tr>
+                                    <td>Motor Assembly</td>
+                                    <td>EV motor</td>
+                                    <td>5000-10000</td>
+                                    <td>1000x</td>
+                                </tr>
+                                <tr>
+                                    <td>Final Product</td>
+                                    <td>Electric vehicle</td>
+                                    <td>20000-50000</td>
+                                    <td>5000x</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Market Control by Region</h4>
+                        <div class="warning-box">
+                            <h4>⚠️ Concentrazione Manufacturing</h4>
+                            <ul>
+                                <li><strong>Cina:</strong> 85% magneti NdFeB globali</li>
+                                <li><strong>Giappone:</strong> 10% magneti high-grade</li>
+                                <li><strong>Europa:</strong> 3% specialty magnets</li>
+                                <li><strong>USA:</strong> 2% defense applications</li>
+                            </ul>
+                            <p><strong>Rischio:</strong> Single point of failure nella supply chain globale</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>🎯 Applicazioni Emergenti e Future</h3>
+                <div class="grid">
+                    <div class="technology-card">
+                        <h4>🚁 eVTOL & Droni</h4>
+                        <p><strong>REE Demand:</strong> 5-15 kg NdFeB per veicolo</p>
+                        <p><strong>Crescita mercato:</strong> 45% CAGR 2024-2030</p>
+                        <p><strong>Requisiti:</strong> Ultra-light, high-temp resistant</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 25%;">25% Market Maturity</div>
+                        </div>
+                    </div>
+
+                    <div class="technology-card">
+                        <h4>🤖 Robotica Avanzata</h4>
+                        <p><strong>Componenti:</strong> Servomotori, sensori, attuatori</p>
+                        <p><strong>REE per robot:</strong> 2-5 kg mixed REE</p>
+                        <p><strong>Mercato 2030:</strong> $150B</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 40%;">40% Adoption</div>
+                        </div>
+                    </div>
+
+                    <div class="technology-card">
+                        <h4>💻 Quantum Computing</h4>
+                        <p><strong>Materiali:</strong> Er, Yb per qubit isolation</p>
+                        <p><strong>Purezza richiesta:</strong> 99.9999% (6N)</p>
+                        <p><strong>Status:</strong> R&D avanzato</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 15%;">15% Early Stage</div>
+                        </div>
+                    </div>
+
+                    <div class="technology-card">
+                        <h4>🔋 Solid State Batteries</h4>
+                        <p><strong>REE Role:</strong> Electrolyte additives</p>
+                        <p><strong>Elementi:</strong> La, Ce per ionic conductivity</p>
+                        <p><strong>Timeline:</strong> Commercial 2027+</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%;">30% Development</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>♻️ Circular Economy nel Manufacturing</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h4>End-of-Life Recovery Rates</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Prodotto</th>
+                                    <th>REE Content</th>
+                                    <th>Recovery Rate Attuale</th>
+                                    <th>Potenziale 2030</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>EV Motors</td>
+                                    <td>1.5-2.5 kg</td>
+                                    <td>5%</td>
+                                    <td>60%</td>
+                                </tr>
+                                <tr>
+                                    <td>Wind Turbines</td>
+                                    <td>200-800 kg</td>
+                                    <td>10%</td>
+                                    <td>70%</td>
+                                </tr>
+                                <tr>
+                                    <td>Hard Drives</td>
+                                    <td>10-20 g</td>
+                                    <td>1%</td>
+                                    <td>40%</td>
+                                </tr>
+                                <tr>
+                                    <td>Smartphones</td>
+                                    <td>1-2 g</td>
+                                    <td><1%</td>
+                                    <td>30%</td>
+                                </tr>
+                                <tr>
+                                    <td>MRI Machines</td>
+                                    <td>1-2 tons</td>
+                                    <td>50%</td>
+                                    <td>90%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h4>Design for Recycling</h4>
+                        <div class="success-box">
+                            <h4>✅ Best Practices Emergenti</h4>
+                            <ul>
+                                <li><strong>Modular magnets:</strong> Facilita disassembly</li>
+                                <li><strong>RFID tracking:</strong> Identifica composizione REE</li>
+                                <li><strong>Standardized alloys:</strong> Semplifica recycling</li>
+                                <li><strong>Digital passport:</strong> Traccia materiali cradle-to-cradle</li>
+                                <li><strong>Take-back programs:</strong> Incentivi per ritorno EOL</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPhase(phaseNum) {
+            // Hide all phases
+            document.querySelectorAll('.phase-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all nav items
+            document.querySelectorAll('.phase-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected phase
+            document.getElementById('phase' + phaseNum).classList.add('active');
+            
+            // Activate nav item
+            document.querySelectorAll('.phase-nav-item')[phaseNum - 1].classList.add('active');
+        }
+
+        // Initialize with Phase 1
+        document.addEventListener('DOMContentLoaded', function() {
+            showPhase(1);
+        });
+    </script>
+</body>
+</html>

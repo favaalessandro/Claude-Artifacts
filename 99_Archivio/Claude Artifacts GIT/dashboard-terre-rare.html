@@ -1,0 +1,2876 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Terre Rare & Semiconduttori - Analisi Globale 2025</title>
+    
+    <!-- Leaflet CSS & JS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- D3.js for advanced visualizations -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-item label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .filter-item select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .filter-item select:hover {
+            border-color: var(--secondary-color);
+        }
+
+        .filter-item select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .reset-filters {
+            padding: 10px 20px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .reset-filters:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+        }
+
+        .tabs-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.05));
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        #worldMap {
+            height: 500px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .map-legend {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .ticker {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-color);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .process-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .process-step::after {
+            content: '';
+            position: absolute;
+            top: 35px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            z-index: -1;
+        }
+
+        .process-step:last-child::after {
+            display: none;
+        }
+
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .process-step:hover .step-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            max-width: 150px;
+            margin: 0 auto;
+        }
+
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .material-card {
+            background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .material-card:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .element-symbol {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .element-name {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-top: 5px;
+        }
+
+        .element-usage {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            max-height: 300px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .chart-container canvas {
+            max-width: 100%;
+            height: auto !important;
+            display: block;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05));
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .real-time-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            margin-right: 5px;
+            /* Removed infinite animation that might cause rendering issues */
+            /* animation: pulse 2s infinite; */
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .link-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .link-button:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            z-index: 10000;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .process-step::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌍 Dashboard Globale Terre Rare & Semiconduttori</h1>
+            <p><span class="real-time-indicator"></span>Analisi Real-Time del Mercato Globale - Aggiornato al 2025</p>
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">17</div>
+                <div class="stat-label">Elementi Terre Rare</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">88%</div>
+                <div class="stat-label">Dominio Cinese (Mining + Processing)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">$72B</div>
+                <div class="stat-label">Mercato 2033 (Rivisto)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">95%</div>
+                <div class="stat-label">Processing in Cina</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">127k</div>
+                <div class="stat-label">Brevetti Cinesi REE</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">2.3M</div>
+                <div class="stat-label">Tonnellate CO₂/Anno</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">€145B</div>
+                <div class="stat-label">Valore Mercato AI Chips</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">32%</div>
+                <div class="stat-label">CAGR Quantum Computing</div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <h3>🔍 Filtri Interattivi</h3>
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="materialFilter">Materiale</label>
+                    <select id="materialFilter">
+                        <option value="">Tutti i Materiali</option>
+                        <option value="neodymium">Neodimio (Nd)</option>
+                        <option value="dysprosium">Disprosio (Dy)</option>
+                        <option value="praseodymium">Praseodimio (Pr)</option>
+                        <option value="terbium">Terbio (Tb)</option>
+                        <option value="europium">Europio (Eu)</option>
+                        <option value="gadolinium">Gadolinio (Gd)</option>
+                        <option value="lanthanum">Lantanio (La)</option>
+                        <option value="cerium">Cerio (Ce)</option>
+                        <option value="yttrium">Ittrio (Y)</option>
+                        <option value="gallium">Gallio (Ga)</option>
+                        <option value="germanium">Germanio (Ge)</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="countryFilter">Paese</label>
+                    <select id="countryFilter">
+                        <option value="">Tutti i Paesi</option>
+                        <option value="china">Cina</option>
+                        <option value="usa">USA</option>
+                        <option value="australia">Australia</option>
+                        <option value="myanmar">Myanmar</option>
+                        <option value="brazil">Brasile</option>
+                        <option value="india">India</option>
+                        <option value="russia">Russia</option>
+                        <option value="vietnam">Vietnam</option>
+                        <option value="canada">Canada</option>
+                        <option value="south_africa">Sud Africa</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="companyFilter">Azienda</label>
+                    <select id="companyFilter">
+                        <option value="">Tutte le Aziende</option>
+                        <option value="mp">MP Materials (USA)</option>
+                        <option value="lynas">Lynas Rare Earths (AUS)</option>
+                        <option value="cnre">China Northern Rare Earth</option>
+                        <option value="iluka">Iluka Resources (AUS)</option>
+                        <option value="energy">Energy Fuels (USA)</option>
+                        <option value="arafura">Arafura Resources (AUS)</option>
+                        <option value="ucore">Ucore (CAN)</option>
+                        <option value="vital">Vital Materials (CHN)</option>
+                    </select>
+                </div>
+                <button class="reset-filters" onclick="resetFilters()">🔄 Reset Filtri</button>
+            </div>
+        </div>
+
+        <!-- Main Tabs -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('overview', event)">📊 Panoramica</button>
+                <button class="tab" onclick="showTab('materials', event)">⚛️ Materiali</button>
+                <button class="tab" onclick="showTab('process', event)">⚙️ Processo</button>
+                <button class="tab" onclick="showTab('geography', event)">🗺️ Geografia</button>
+                <button class="tab" onclick="showTab('companies', event)">🏢 Aziende</button>
+                <button class="tab" onclick="showTab('patents', event)">⚖️ Brevetti</button>
+                <button class="tab" onclick="showTab('sustainability', event)">🌱 Sostenibilità</button>
+                <button class="tab" onclick="showTab('market', event)">📈 Mercato</button>
+                <button class="tab" onclick="showTab('applications', event)">💻 Applicazioni</button>
+                <button class="tab" onclick="showTab('alternatives', event)">🔄 Alternative</button>
+                <button class="tab" onclick="showTab('future', event)">🔮 Futuro</button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <div class="grid">
+                    <div class="card">
+                        <h3><span class="card-icon"></span> Situazione Attuale 2025</h3>
+                        <p>Il mercato delle terre rare è dominato dalla Cina con l'<strong>88% del controllo totale</strong> (mining + processing) nel 2025. La produzione mondiale ha raggiunto <strong>385,000 tonnellate</strong>, con una crescita del 15.2% CAGR prevista fino al 2033.</p>
+                        <div class="info-box">
+                            <h4>🚨 Alert Geopolitico</h4>
+                            <p>La Cina controlla il 95% del processing globale. Nel 2024 ha implementato nuove restrizioni su gallio e germanio, estendibili alle REE. Il DoD USA ha stabilito un floor price di $110/kg per NdPr per incentivare la produzione domestica.</p>
+                        </div>
+                        <ul style="margin-top: 15px;">
+                            <li><strong>Nuove scoperte 2024-25:</strong> +47 depositi identificati globally</li>
+                            <li><strong>Investment pipeline:</strong> $23.7B in progetti non-cinesi</li>
+                            <li><strong>Processing capacity gap:</strong> 4-6 anni per alternative to China</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3><span class="card-icon"></span> Criticità per Advanced Chips</h3>
+                        <table style="font-size: 0.9rem;">
+                            <thead>
+                                <tr><th>Elemento</th><th>Applicazione</th><th>Criticità</th><th>Precio $/kg</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Cerio (Ce)</strong></td><td>CMP polishing 3/5nm</td><td>🔴 Critica</td><td>$2.2</td></tr>
+                                <tr><td><strong>Neodimio (Nd)</strong></td><td>EUV lithography systems</td><td>🔴 Critica</td><td>$75</td></tr>
+                                <tr><td><strong>Disprosio (Dy)</strong></td><td>High-temp chip operations</td><td>🟡 Alta</td><td>$320</td></tr>
+                                <tr><td><strong>Terbio (Tb)</strong></td><td>Quantum dot displays</td><td>🟡 Alta</td><td>$1,400</td></tr>
+                                <tr><td><strong>Europio (Eu)</strong></td><td>GaN RF amplifiers</td><td>🟡 Media</td><td>$45</td></tr>
+                                <tr><td><strong>Gadolinio (Gd)</strong></td><td>High-k gate dielectrics</td><td>🟡 Media</td><td>$52</td></tr>
+                                <tr><td><strong>Ittrio (Y)</strong></td><td>Etch chamber coatings</td><td>🟢 Bassa</td><td>$8.5</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>📊 Produzione Globale 2025 (Aggiornata)</h3>
+                        <div class="chart-container">
+                            <canvas id="productionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>⚡ Indicatori di Stress Supply Chain</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                            <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-radius: 8px;">
+                                <div style="font-size: 1.5rem; font-weight: bold;">🔴</div>
+                                <div style="font-size: 0.9rem;">Myanmar Heavy REE</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">72% at risk</div>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-radius: 8px;">
+                                <div style="font-size: 1.5rem; font-weight: bold;">🟡</div>
+                                <div style="font-size: 0.9rem;">Processing Capacity</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">6-8 month delays</div>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 8px;">
+                                <div style="font-size: 1.5rem; font-weight: bold;">🟢</div>
+                                <div style="font-size: 0.9rem;">Light REE Supply</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">Adequate through 2026</div>
+                            </div>
+                        </div>
+                        <div class="info-box">
+                            <h4>📈 Trend Prezzi Q1 2025</h4>
+                            <ul style="margin: 10px 0; font-size: 0.9rem;">
+                                <li><strong>NdPr Oxide:</strong> +85% YoY (shortage fears)</li>
+                                <li><strong>Dy/Tb Heavy REE:</strong> +45% YoY (Myanmar disruptions)</li>
+                                <li><strong>Ce Oxide:</strong> +12% YoY (AI chip demand spike)</li>
+                                <li><strong>La/Gd:</strong> +25% YoY (advanced node requirements)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🎯 Strategic Dependencies Matrix</h3>
+                    <div class="chart-container">
+                        <canvas id="dependencyMatrix"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Materials Tab -->
+            <div id="materials" class="tab-content">
+                <h3>🧪 Elementi Critici per Semiconduttori</h3>
+                <div class="material-grid">
+                    <div class="material-card">
+                        <div class="element-symbol">Nd</div>
+                        <div class="element-name">Neodimio</div>
+                        <div class="element-usage">Magneti permanenti</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Dy</div>
+                        <div class="element-name">Disprosio</div>
+                        <div class="element-usage">Stabilità termica</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Ce</div>
+                        <div class="element-name">Cerio</div>
+                        <div class="element-usage">CMP Polishing</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Eu</div>
+                        <div class="element-name">Europio</div>
+                        <div class="element-usage">LED & Displays</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Gd</div>
+                        <div class="element-name">Gadolinio</div>
+                        <div class="element-usage">Memory devices</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">La</div>
+                        <div class="element-name">Lantanio</div>
+                        <div class="element-usage">Optical fibers</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Y</div>
+                        <div class="element-name">Ittrio</div>
+                        <div class="element-usage">Superconduttori</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Tb</div>
+                        <div class="element-name">Terbio</div>
+                        <div class="element-usage">Magneti ad alta T</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Ga</div>
+                        <div class="element-name">Gallio</div>
+                        <div class="element-usage">GaN chips</div>
+                    </div>
+                    <div class="material-card">
+                        <div class="element-symbol">Ge</div>
+                        <div class="element-name">Germanio</div>
+                        <div class="element-usage">Fiber optics</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Applicazioni per Logic Chips</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Elemento</th>
+                                <th>Applicazione</th>
+                                <th>% Uso in Chips</th>
+                                <th>Criticità</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Cerio (Ce)</strong></td>
+                                <td>CMP slurry per wafer polishing</td>
+                                <td>25-30%</td>
+                                <td><span class="badge badge-danger">Alta</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Neodimio (Nd)</strong></td>
+                                <td>Magneti per lithography equipment</td>
+                                <td>15-20%</td>
+                                <td><span class="badge badge-danger">Alta</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Europio (Eu)</strong></td>
+                                <td>Doping per GaN/InP semiconductors</td>
+                                <td>5-10%</td>
+                                <td><span class="badge badge-warning">Media</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gadolinio (Gd)</strong></td>
+                                <td>High-k dielectric layers</td>
+                                <td>8-12%</td>
+                                <td><span class="badge badge-warning">Media</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lantanio (La)</strong></td>
+                                <td>Gate oxides in MOSFETs</td>
+                                <td>10-15%</td>
+                                <td><span class="badge badge-warning">Media</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ittrio (Y)</strong></td>
+                                <td>Etch chamber coatings</td>
+                                <td>5-8%</td>
+                                <td><span class="badge badge-success">Bassa</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Process Tab -->
+            <div id="process" class="tab-content">
+                <h3>⚙️ Catena del Valore: Dal Giacimento al Chip</h3>
+                
+                <div class="process-flow">
+                    <div class="process-step">
+                        <div class="step-icon">1</div>
+                        <div class="step-title">Estrazione</div>
+                        <div class="step-description">Mining di minerali REE (bastnäsite, monazite)</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-icon">2</div>
+                        <div class="step-title">Concentrazione</div>
+                        <div class="step-description">Crushing, grinding, flotation (60-70% REO)</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-icon">3</div>
+                        <div class="step-title">Separazione</div>
+                        <div class="step-description">Solvent extraction, ion exchange</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-icon">4</div>
+                        <div class="step-title">Raffinazione</div>
+                        <div class="step-description">Purificazione 99.99%+ ossidi</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-icon">5</div>
+                        <div class="step-title">Manufacturing</div>
+                        <div class="step-description">Produzione componenti per chips</div>
+                    </div>
+                    <div class="process-step">
+                        <div class="step-icon">6</div>
+                        <div class="step-title">Fab Integration</div>
+                        <div class="step-description">Uso in semiconductor fabs</div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>🏭 Processo CMP (Chemical Mechanical Polishing)</h3>
+                        <p><strong>Materiale chiave:</strong> Ossido di Cerio (CeO₂)</p>
+                        <ul>
+                            <li>Particelle abrasive 50-250 nm</li>
+                            <li>Concentrazione: 1-5% in slurry</li>
+                            <li>Removal rate: 1000-3000 Å/min</li>
+                            <li>Planarità finale: < 1 nm variation</li>
+                        </ul>
+                        <p>Il CMP è critico per logic chips a 5nm e inferiori, con il 25-30% dei passaggi che richiedono polishing.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🔬 Doping & Enhancement</h3>
+                        <p><strong>Materiali chiave:</strong> Eu, Y, Gd</p>
+                        <ul>
+                            <li><strong>Europio:</strong> Migliora prestazioni GaN per RF chips</li>
+                            <li><strong>Ittrio:</strong> Stabilizza ossidi ad alta temperatura</li>
+                            <li><strong>Gadolinio:</strong> High-k dielectrics per gate < 10nm</li>
+                        </ul>
+                        <p>Concentrazioni tipiche: 0.1-2% atomic percentage</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Flusso di Materiali nella Supply Chain</h3>
+                    <div class="chart-container">
+                        <canvas id="supplyChainChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; margin-top: 30px;">
+                    <h3 style="color: white; margin-bottom: 20px;">🔍 Esplora il Processo Produttivo in Dettaglio</h3>
+                    <p style="margin-bottom: 20px;">Accedi all'analisi completa delle 6 fasi del processo produttivo delle terre rare con navigazione interattiva, metriche dettagliate e innovazioni tecnologiche per ogni fase.</p>
+                    <a href="processo-terre-rare-dettagliato.html" target="_blank" style="display: inline-block; padding: 15px 30px; background: white; color: #667eea; text-decoration: none; border-radius: 8px; font-weight: bold; transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 15px rgba(0,0,0,0.2)';">
+                        📖 Apri Analisi Dettagliata del Processo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Geography Tab -->
+            <div id="geography" class="tab-content">
+                <h3>🗺️ Mappa Globale dei Giacimenti</h3>
+                <div id="worldMap"></div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>🌏 Principali Giacimenti Mondiali</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Giacimento</th>
+                                    <th>Paese</th>
+                                    <th>Riserve (MT)</th>
+                                    <th>Produzione 2024</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Bayan Obo</strong></td>
+                                    <td>🇨🇳 Cina (Inner Mongolia)</td>
+                                    <td>40 MT</td>
+                                    <td>120,000 t/anno</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mountain Pass</strong></td>
+                                    <td>🇺🇸 USA (California)</td>
+                                    <td>1.4 MT</td>
+                                    <td>45,000 t/anno</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mount Weld</strong></td>
+                                    <td>🇦🇺 Australia</td>
+                                    <td>1.9 MT</td>
+                                    <td>24,000 t/anno</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kvanefjeld</strong></td>
+                                    <td>🇬🇱 Groenlandia</td>
+                                    <td>11 MT</td>
+                                    <td>In sviluppo</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kachin State</strong></td>
+                                    <td>🇲🇲 Myanmar</td>
+                                    <td>Non dichiarate</td>
+                                    <td>31,000 t/anno</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Pela Ema</strong></td>
+                                    <td>🇧🇷 Brasile</td>
+                                    <td>2.1 MT</td>
+                                    <td>5,000 t/anno (2026)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 Distribuzione Riserve Globali</h3>
+                        <div class="chart-container">
+                            <canvas id="reservesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Companies Tab -->
+            <div id="companies" class="tab-content">
+                <h3>🏢 Principali Aziende Quotate</h3>
+                
+                <div class="card">
+                    <h3>📈 Top Companies by Market Cap</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Azienda</th>
+                                <th>Ticker</th>
+                                <th>Market Cap</th>
+                                <th>Produzione</th>
+                                <th>Focus</th>
+                                <th>Link Real-Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>China Northern Rare Earth</strong></td>
+                                <td><span class="ticker">600111.SS</span></td>
+                                <td>$86.7B</td>
+                                <td>120,000 t/anno</td>
+                                <td>Integrated</td>
+                                <td><a href="https://finance.yahoo.com/quote/600111.SS" target="_blank" class="link-button">Yahoo Finance</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lynas Rare Earths</strong></td>
+                                <td><span class="ticker">LYC.AX</span></td>
+                                <td>$9.2B</td>
+                                <td>24,000 t/anno</td>
+                                <td>NdPr focus</td>
+                                <td><a href="https://finance.yahoo.com/quote/LYC.AX" target="_blank" class="link-button">Yahoo Finance</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>MP Materials</strong></td>
+                                <td><span class="ticker">MP</span></td>
+                                <td>$7.8B</td>
+                                <td>45,000 t/anno</td>
+                                <td>US integrated</td>
+                                <td><a href="https://finance.yahoo.com/quote/MP" target="_blank" class="link-button">Yahoo Finance</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Iluka Resources</strong></td>
+                                <td><span class="ticker">ILU.AX</span></td>
+                                <td>$5.1B</td>
+                                <td>In sviluppo</td>
+                                <td>Refining</td>
+                                <td><a href="https://finance.yahoo.com/quote/ILU.AX" target="_blank" class="link-button">Yahoo Finance</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Energy Fuels</strong></td>
+                                <td><span class="ticker">UUUU</span></td>
+                                <td>$1.2B</td>
+                                <td>3,000 t/anno</td>
+                                <td>US processing</td>
+                                <td><a href="https://finance.yahoo.com/quote/UUUU" target="_blank" class="link-button">Yahoo Finance</a></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Arafura Resources</strong></td>
+                                <td><span class="ticker">ARU.AX</span></td>
+                                <td>$450M</td>
+                                <td>In sviluppo</td>
+                                <td>NdPr project</td>
+                                <td><a href="https://finance.yahoo.com/quote/ARU.AX" target="_blank" class="link-button">Yahoo Finance</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>🏭 State-Owned Enterprises</h3>
+                        <ul>
+                            <li><strong>China Rare Earth Group:</strong> Consolidation di 3 SOEs</li>
+                            <li><strong>Shenghe Resources:</strong> Processing & trading</li>
+                            <li><strong>China Minmetals:</strong> Integrated mining</li>
+                            <li><strong>IREL (India):</strong> Government-owned</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>💰 ETF Principali</h3>
+                        <ul>
+                            <li><strong>VanEck Rare Earth ETF (REMX):</strong> $650M AUM</li>
+                            <li><strong>Sprott Critical Materials (SETM):</strong> Focus energia</li>
+                            <li><strong>Global X Disruptive Materials (DMAT):</strong> Broader exposure</li>
+                        </ul>
+                        <a href="https://finance.yahoo.com/quote/REMX" target="_blank" class="link-button">REMX Real-Time</a>
+                        <a href="https://finance.yahoo.com/quote/SETM" target="_blank" class="link-button">SETM Real-Time</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patents Tab -->
+            <div id="patents" class="tab-content">
+                <h3>⚖️ Brevetti e Proprietà Intellettuale</h3>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>📊 Panoramica Brevetti REE</h3>
+                        <div class="chart-container">
+                            <canvas id="patentsChart"></canvas>
+                        </div>
+                        <div class="info-box">
+                            <h4>🚨 Dominanza Brevettuale Cinese</h4>
+                            <p>La Cina detiene il <strong>78.5%</strong> dei brevetti globali relativi alle terre rare, con 127,340 brevetti attivi. Gli USA sono al 2° posto con 15,250 brevetti (12.1%).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🏭 Principali Detentori di Brevetti</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Organizzazione</th>
+                                    <th>Paese</th>
+                                    <th>Brevetti Attivi</th>
+                                    <th>Focus Tecnologico</th>
+                                    <th>Impatto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Chinese Academy of Sciences</strong></td>
+                                    <td>🇨🇳 Cina</td>
+                                    <td>12,847</td>
+                                    <td>Separation & Processing</td>
+                                    <td><span class="badge badge-danger">Critico</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>China Northern Rare Earth</strong></td>
+                                    <td>🇨🇳 Cina</td>
+                                    <td>8,623</td>
+                                    <td>Mining & Extraction</td>
+                                    <td><span class="badge badge-danger">Critico</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Inner Mongolia Baotou Steel</strong></td>
+                                    <td>🇨🇳 Cina</td>
+                                    <td>6,234</td>
+                                    <td>Metallurgy & Alloys</td>
+                                    <td><span class="badge badge-danger">Alto</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>US Department of Energy</strong></td>
+                                    <td>🇺🇸 USA</td>
+                                    <td>3,456</td>
+                                    <td>Recycling & Recovery</td>
+                                    <td><span class="badge badge-warning">Medio</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Toyota Motor Corp</strong></td>
+                                    <td>🇯🇵 Giappone</td>
+                                    <td>2,834</td>
+                                    <td>Permanent Magnets</td>
+                                    <td><span class="badge badge-warning">Medio</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sumitomo Metal Mining</strong></td>
+                                    <td>🇯🇵 Giappone</td>
+                                    <td>2,145</td>
+                                    <td>Processing Tech</td>
+                                    <td><span class="badge badge-warning">Medio</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CSIRO</strong></td>
+                                    <td>🇦🇺 Australia</td>
+                                    <td>1,567</td>
+                                    <td>Beneficiation</td>
+                                    <td><span class="badge badge-success">Basso</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Umicore</strong></td>
+                                    <td>🇧🇪 Belgio</td>
+                                    <td>1,203</td>
+                                    <td>Battery Materials</td>
+                                    <td><span class="badge badge-success">Basso</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>🔬 Aree Tecnologiche Critiche</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            <div class="info-box">
+                                <h4>⚗️ Separation Technologies</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Solvent Extraction:</strong> 34,567 brevetti</li>
+                                    <li><strong>Ion Exchange:</strong> 12,234 brevetti</li>
+                                    <li><strong>Membrane Tech:</strong> 8,456 brevetti</li>
+                                </ul>
+                                <p><strong>China control:</strong> 89.5%</p>
+                            </div>
+                            <div class="info-box">
+                                <h4>🧲 Permanent Magnets</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>NdFeB Processing:</strong> 28,943 brevetti</li>
+                                    <li><strong>Coercivity Enhancement:</strong> 15,678 brevetti</li>
+                                    <li><strong>Grain Boundary Engineering:</strong> 9,345 brevetti</li>
+                                </ul>
+                                <p><strong>China control:</strong> 72.3%</p>
+                            </div>
+                            <div class="info-box">
+                                <h4>♻️ Recycling & Recovery</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Hydrometallurgy:</strong> 7,234 brevetti</li>
+                                    <li><strong>Pyrometallurgy:</strong> 5,678 brevetti</li>
+                                    <li><strong>Bioleaching:</strong> 2,345 brevetti</li>
+                                </ul>
+                                <p><strong>China control:</strong> 55.8%</p>
+                            </div>
+                            <div class="info-box">
+                                <h4>💻 Semiconductor Applications</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>CMP Slurries:</strong> 4,567 brevetti</li>
+                                    <li><strong>High-k Dielectrics:</strong> 3,234 brevetti</li>
+                                    <li><strong>Doping Processes:</strong> 2,156 brevetti</li>
+                                </ul>
+                                <p><strong>China control:</strong> 63.2%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>📈 Patent Filing Trends (2020-2025)</h3>
+                        <div class="chart-container">
+                            <canvas id="patentTrendsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>⚠️ Patent Cliff Analysis</h3>
+                        <div class="info-box">
+                            <h4>🕐 Brevetti in Scadenza 2025-2027</h4>
+                            <p>Circa <strong>23,456 brevetti chiave</strong> scadranno nei prossimi 3 anni, aprendo opportunità per alternative technologies:</p>
+                        </div>
+                        <table style="font-size: 0.9rem; margin-top: 15px;">
+                            <thead>
+                                <tr><th>Tecnologia</th><th>Brevetti in Scadenza</th><th>Opportunità</th><th>Risk Level</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>NdFeB Magnet Processing</td><td>5,678</td><td>🟢 Alta</td><td>🟡 Medio</td></tr>
+                                <tr><td>Heavy REE separation</td><td>3,456</td><td>🟡 Media</td><td>🔴 Alto</td></tr>
+                                <tr><td>Solvent extraction processes</td><td>8,234</td><td>🟢 Alta</td><td>🟢 Basso</td></tr>
+                                <tr><td>Recycling technologies</td><td>6,088</td><td>🟢 Molto Alta</td><td>🟢 Basso</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🎯 Strategic Patent Gaps & Opportunities</h3>
+                    <div class="grid" style="margin: 20px 0;">
+                        <div class="info-box">
+                            <h4>🚀 Emerging Technologies (Low Patent Density)</h4>
+                            <ul>
+                                <li><strong>AI-driven separation optimization:</strong> Solo 234 brevetti</li>
+                                <li><strong>Quantum computing applications:</strong> 156 brevetti</li>
+                                <li><strong>Bio-based extraction methods:</strong> 789 brevetti</li>
+                                <li><strong>Deep ocean mining REE:</strong> 123 brevetti</li>
+                                <li><strong>Space-based REE processing:</strong> 67 brevetti</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>⚡ High-Value Patent Clusters</h4>
+                            <ul>
+                                <li><strong>EV motor magnet efficiency:</strong> $2.3B valore stimato</li>
+                                <li><strong>Wind turbine generator tech:</strong> $1.8B valore</li>
+                                <li><strong>5G/6G semiconductor doping:</strong> $3.1B valore</li>
+                                <li><strong>Quantum computer components:</strong> $890M valore</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sustainability Tab -->
+            <div id="sustainability" class="tab-content">
+                <h3>🌱 Sostenibilità e Impatto Ambientale</h3>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>🌍 Carbon Footprint dell'Industria REE</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-radius: 8px;">
+                                <div style="font-size: 2rem; font-weight: bold;">2.3M</div>
+                                <div style="font-size: 0.9rem;">Tonnellate CO₂/Anno</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">Industria globale REE</div>
+                            </div>
+                            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border-radius: 8px;">
+                                <div style="font-size: 2rem; font-weight: bold;">157kg</div>
+                                <div style="font-size: 0.9rem;">CO₂ per kg REE</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">Media ponderata</div>
+                            </div>
+                            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-radius: 8px;">
+                                <div style="font-size: 2rem; font-weight: bold;">89%</div>
+                                <div style="font-size: 0.9rem;">Cina Emissions</div>
+                                <div style="font-size: 0.8rem; opacity: 0.9;">Del totale globale</div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="carbonFootprintChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>💧 Water Consumption & Pollution</h3>
+                        <div class="info-box">
+                            <h4>⚠️ Crisis Idrica in Inner Mongolia</h4>
+                            <p>Le operazioni di Bayan Obo consumano <strong>4.2 milioni di litri d'acqua al giorno</strong>, causando desertificazione accelerata e contaminazione delle falde acquifere.</p>
+                        </div>
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Processo</th>
+                                    <th>Water Usage (L/kg REE)</th>
+                                    <th>Contaminanti</th>
+                                    <th>Impact Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Mining & Extraction</strong></td>
+                                    <td>2,340 L/kg</td>
+                                    <td>Heavy metals, acids</td>
+                                    <td><span class="badge badge-danger">Critico</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Beneficiation</strong></td>
+                                    <td>1,890 L/kg</td>
+                                    <td>Flotation chemicals</td>
+                                    <td><span class="badge badge-danger">Alto</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Separation</strong></td>
+                                    <td>3,450 L/kg</td>
+                                    <td>Organic solvents</td>
+                                    <td><span class="badge badge-danger">Critico</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Refining</strong></td>
+                                    <td>1,230 L/kg</td>
+                                    <td>Acids, bases</td>
+                                    <td><span class="badge badge-warning">Medio</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>☢️ Radioactive Waste & Thorium</h3>
+                        <div class="info-box">
+                            <h4>🚨 Thorium Co-Production Challenge</h4>
+                            <p>Per ogni tonnellata di REE estratta, si producono circa <strong>200-2,000 kg di thorium radioattivo</strong>, creando enormi sfide di stoccaggio e smaltimento.</p>
+                        </div>
+                        <div style="margin: 20px 0;">
+                            <h4>📊 Waste Generation by Mine</h4>
+                            <table style="font-size: 0.9rem;">
+                                <thead>
+                                    <tr><th>Mine</th><th>Thorium (kg/t REE)</th><th>Total Radioactive Waste</th><th>Management Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>Bayan Obo</strong></td><td>2,100</td><td>252,000 t/year</td><td>🟡 Managed</td></tr>
+                                    <tr><td><strong>Mountain Pass</strong></td><td>180</td><td>8,100 t/year</td><td>🟢 Compliant</td></tr>
+                                    <tr><td><strong>Mount Weld</strong></td><td>420</td><td>10,080 t/year</td><td>🟢 Compliant</td></tr>
+                                    <tr><td><strong>Myanmar (illegal)</strong></td><td>1,800</td><td>55,800 t/year</td><td>🔴 Unmanaged</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🔄 Circular Economy & Recycling</h3>
+                        <div class="chart-container">
+                            <canvas id="recyclingChart"></canvas>
+                        </div>
+                        <div class="info-box" style="margin-top: 20px;">
+                            <h4>♻️ Recycling Potential by 2030</h4>
+                            <ul>
+                                <li><strong>End-of-life vehicles:</strong> 45,000 t REE/year available</li>
+                                <li><strong>Wind turbines:</strong> 12,000 t REE/year (first generation retiring)</li>
+                                <li><strong>Electronics waste:</strong> 23,000 t REE/year potential</li>
+                                <li><strong>Industrial magnets:</strong> 8,500 t REE/year recovery possible</li>
+                            </ul>
+                            <p><strong>Total recycling potential:</strong> 88,500 t/year (23% of current demand)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>🌿 Green Mining Initiatives</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Progetto</th>
+                                    <th>Tecnologia</th>
+                                    <th>CO₂ Reduction</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Lynas Next Gen</strong></td>
+                                    <td>Solar-powered separation</td>
+                                    <td>-35%</td>
+                                    <td>🟡 Pilot</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MP Materials Stage 3</strong></td>
+                                    <td>Water recycling 95%</td>
+                                    <td>-28%</td>
+                                    <td>🟢 Active</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Pensana Bio-separation</strong></td>
+                                    <td>Bacterial extraction</td>
+                                    <td>-60%</td>
+                                    <td>🟡 R&D</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ucore RapidSX</strong></td>
+                                    <td>Molecular recognition</td>
+                                    <td>-45%</td>
+                                    <td>🟢 Commercial</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>EU Green Deal Mining</strong></td>
+                                    <td>Renewable energy</td>
+                                    <td>-50%</td>
+                                    <td>🟡 Planning</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 ESG Metrics & Compliance</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            <div class="info-box">
+                                <h4>🌍 Environmental</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Land degradation:</strong> 2,300 km² affected</li>
+                                    <li><strong>Biodiversity loss:</strong> 67% in mining areas</li>
+                                    <li><strong>Air pollution:</strong> PM2.5 +340% above WHO limits</li>
+                                    <li><strong>Tailings volume:</strong> 156M tonnes stored</li>
+                                </ul>
+                            </div>
+                            <div class="info-box">
+                                <h4>👥 Social</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Community displacement:</strong> 23,000 people</li>
+                                    <li><strong>Health impacts:</strong> 89% higher cancer rates</li>
+                                    <li><strong>Job creation:</strong> 145,000 direct jobs</li>
+                                    <li><strong>Local investment:</strong> $2.8B in communities</li>
+                                </ul>
+                            </div>
+                            <div class="info-box">
+                                <h4>⚖️ Governance</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Transparency score:</strong> 34/100 (industry avg)</li>
+                                    <li><strong>Corruption index:</strong> High risk in 78% of mines</li>
+                                    <li><strong>Regulatory compliance:</strong> 67% full compliance</li>
+                                    <li><strong>Stakeholder engagement:</strong> 23% meaningful</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🎯 Sustainability Roadmap 2025-2030</h3>
+                    <div class="process-flow">
+                        <div class="process-step">
+                            <div class="step-icon">2025</div>
+                            <div class="step-title">Green Standards</div>
+                            <div class="step-description">EU taxonomy implementation, ISO 14001+ for all major producers</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">2026</div>
+                            <div class="step-title">Tech Deployment</div>
+                            <div class="step-description">Commercial bio-extraction, AI optimization, 50% renewable energy</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">2027</div>
+                            <div class="step-title">Recycling Scale</div>
+                            <div class="step-description">20% supply from recycling, urban mining programs</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">2028</div>
+                            <div class="step-title">Carbon Neutral</div>
+                            <div class="step-description">Western producers achieve net-zero emissions</div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">2030</div>
+                            <div class="step-title">Circular Economy</div>
+                            <div class="step-description">30% circular supply, zero waste to landfill target</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Tab -->
+            <div id="market" class="tab-content">
+                <h3>📈 Analisi di Mercato</h3>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>💵 Prezzi Attuali ($/kg)</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Materiale</th>
+                                    <th>Prezzo Cina</th>
+                                    <th>Prezzo FOB</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Neodimio Ossido 99%</td>
+                                    <td>$63/kg</td>
+                                    <td>$75/kg</td>
+                                    <td><span class="badge badge-success">↑ 15%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Disprosio Ossido 99%</td>
+                                    <td>$280/kg</td>
+                                    <td>$320/kg</td>
+                                    <td><span class="badge badge-warning">→ 2%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Terbio Ossido 99.9%</td>
+                                    <td>$1,200/kg</td>
+                                    <td>$1,400/kg</td>
+                                    <td><span class="badge badge-danger">↓ -5%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Cerio Ossido 99%</td>
+                                    <td>$1.5/kg</td>
+                                    <td>$2.2/kg</td>
+                                    <td><span class="badge badge-success">↑ 8%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>NdPr Oxide</td>
+                                    <td>$63/kg</td>
+                                    <td>$110/kg (DoD floor)</td>
+                                    <td><span class="badge badge-success">↑ 75%</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p style="margin-top: 15px;"><small>Fonte: Shanghai Metals Market, Asian Metal</small></p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📊 Supply/Demand Dynamics</h3>
+                        <div class="chart-container">
+                            <canvas id="supplyDemandChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔮 Proiezioni Mercato 2025-2033</h3>
+                    <ul>
+                        <li><strong>Crescita CAGR:</strong> 12.83% annuo</li>
+                        <li><strong>Valore mercato 2033:</strong> $37.06 miliardi</li>
+                        <li><strong>Driver principali:</strong> EV, Wind turbines, AI chips</li>
+                        <li><strong>Rischi:</strong> Export controls Cina, geopolitica</li>
+                        <li><strong>Opportunità:</strong> US/EU reshoring, recycling</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Applications Tab -->
+            <div id="applications" class="tab-content">
+                <h3>💻 Applicazioni Avanzate in Semiconduttori</h3>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>🖥️ Advanced Node Manufacturing (3/5nm)</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Processo</th>
+                                    <th>REE Utilizzato</th>
+                                    <th>Funzione Specifica</th>
+                                    <th>Conc. Richiesta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>EUV Lithography</strong></td>
+                                    <td>Neodimio (Nd₂Fe₁₄B)</td>
+                                    <td>Magneti permanenti per stage positioning</td>
+                                    <td>99.95%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CMP Ultra-Precision</strong></td>
+                                    <td>Cerio (CeO₂)</td>
+                                    <td>Nanoparticelle 20-50nm per surface finish</td>
+                                    <td>99.99%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>High-k Gate Stack</strong></td>
+                                    <td>Lantanio (La₂O₃)</td>
+                                    <td>Dielectric layer < 10nm gate length</td>
+                                    <td>99.999%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Metal Gate Electrodes</strong></td>
+                                    <td>Gadolinio (GdOx)</td>
+                                    <td>Work function tuning per PMOS/NMOS</td>
+                                    <td>99.99%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Chamber Coatings</strong></td>
+                                    <td>Ittrio (Y₂O₃)</td>
+                                    <td>Plasma-resistant surfaces per etching</td>
+                                    <td>99.9%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Doping Precursors</strong></td>
+                                    <td>Europio (EuCl₃)</td>
+                                    <td>P-type dopant per compound semiconductors</td>
+                                    <td>99.999%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🤖 AI & ML Accelerator Chips</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin: 20px 0;">
+                            <div class="info-box">
+                                <h4>🏆 NVIDIA H100/H200 Series</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Architecture:</strong> Hopper, 4nm TSMC</li>
+                                    <li><strong>Transistors:</strong> 80B (H100), 110B (H200)</li>
+                                    <li><strong>REE Usage:</strong> CeO₂ CMP, La₂O₃ gates</li>
+                                    <li><strong>HBM Integration:</strong> Y₂O₃ isolation layers</li>
+                                    <li><strong>Yield Impact:</strong> REE purity critical for 90%+ yields</li>
+                                </ul>
+                            </div>
+                            <div class="info-box">
+                                <h4>🧠 Google TPU v5e/v5p</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Architecture:</strong> Custom ASIC, 5nm process</li>
+                                    <li><strong>Specialization:</strong> BFloat16 AI computations</li>
+                                    <li><strong>REE Requirements:</strong> Gd₂O₃ high-k dielectrics</li>
+                                    <li><strong>Cooling:</strong> NdFeB magneti per liquid cooling</li>
+                                    <li><strong>Performance:</strong> 393 TOPS INT8</li>
+                                </ul>
+                            </div>
+                            <div class="info-box">
+                                <h4>⚡ AMD MI300X/MI325X</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Architecture:</strong> CDNA 3, chiplet design</li>
+                                    <li><strong>Process:</strong> 5nm (compute) + 6nm (I/O)</li>
+                                    <li><strong>Memory:</strong> 192GB HBM3 con REE-doped interfaces</li>
+                                    <li><strong>Packaging:</strong> 2.5D interposer con Y₂O₃ layers</li>
+                                    <li><strong>Power Efficiency:</strong> Advanced power gating con REE</li>
+                                </ul>
+                            </div>
+                            <div class="info-box">
+                                <h4>🚀 Intel Gaudi 3/Ponte Vecchio</h4>
+                                <ul style="font-size: 0.9rem;">
+                                    <li><strong>Gaudi 3:</strong> 5nm, dedicate AI training</li>
+                                    <li><strong>Ponte Vecchio:</strong> Xe-HPC, 47 tiles</li>
+                                    <li><strong>Foveros 3D:</strong> REE-enhanced bonding tech</li>
+                                    <li><strong>Optical I/O:</strong> Eu-doped fiber connections</li>
+                                    <li><strong>AI Throughput:</strong> 1.8 PetaOPS mixed precision</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>🔮 Quantum Computing Applications</h3>
+                        <div class="info-box">
+                            <h4>🚨 Quantum Supremacy Requirements</h4>
+                            <p>I quantum processors richiedono isotopi ultra-puri di REE per mantenere coerenza quantistica oltre i 100 µs.</p>
+                        </div>
+                        <table style="font-size: 0.9rem; margin-top: 15px;">
+                            <thead>
+                                <tr><th>Quantum System</th><th>REE Critical</th><th>Purezza Richiesta</th><th>Applicazione</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>IBM Quantum System</strong></td><td>Europio (¹⁵¹Eu, ¹⁵³Eu)</td><td>99.9999%</td><td>Spin-photon interfaces</td></tr>
+                                <tr><td><strong>Google Sycamore</strong></td><td>Ytterbio (¹⁷¹Yb)</td><td>99.999%</td><td>Optical qubits</td></tr>
+                                <tr><td><strong>IonQ Quantum</strong></td><td>Itterbio (¹⁷¹Yb⁺)</td><td>99.9999%</td><td>Trapped ion qubits</td></tr>
+                                <tr><td><strong>Rigetti QPU</strong></td><td>Cerio (CeB₆)</td><td>99.99%</td><td>Superconducting qubits isolation</td></tr>
+                                <tr><td><strong>PsiQuantum</strong></td><td>Erbio (Er³⁺)</td><td>99.999%</td><td>Photonic quantum computing</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📡 5G/6G RF & Millimeter Wave Chips</h3>
+                        <div style="margin: 20px 0;">
+                            <h4>📊 GaN/InGaN RF Applications</h4>
+                            <table style="font-size: 0.9rem;">
+                                <thead>
+                                    <tr><th>Technology</th><th>Frequency</th><th>REE Dopant</th><th>Function</th><th>Performance Gain</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>GaN HEMT</strong></td><td>28-39 GHz</td><td>Europio (Eu³⁺)</td><td>Electron mobility enhancement</td><td>+35% efficiency</td></tr>
+                                    <tr><td><strong>InGaN LEDs</strong></td><td>Optical</td><td>Terbio (Tb³⁺)</td><td>Green emission optimization</td><td>+85% luminous efficacy</td></tr>
+                                    <tr><td><strong>AlGaN UV</strong></td><td>UV-C band</td><td>Gadolinio (Gd³⁺)</td><td>Deep UV emission</td><td>280nm precision</td></tr>
+                                    <tr><td><strong>GaN mmWave</strong></td><td>60-100 GHz</td><td>Neodimio (Nd³⁺)</td><td>Power amplifier linearity</td><td>+28 dBm output</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="info-box">
+                            <h4>🌐 6G Technology Roadmap</h4>
+                            <p>Il 6G richiederà frequenze terahertz (0.1-3 THz), creando nuova domanda per REE-doped semiconductor materials con band gap ultra-wide.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>📊 REE Consumption by Advanced Applications</h3>
+                        <div class="chart-container">
+                            <canvas id="advancedChipUsageChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>💰 Economic Impact by Sector</h3>
+                        <table>
+                            <thead>
+                                <tr><th>Settore</th><th>REE Value $/year</th><th>Market Size 2025</th><th>Growth Rate</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>AI Accelerators</strong></td><td>$4.2B</td><td>$145B</td><td>32% CAGR</td></tr>
+                                <tr><td><strong>5G/6G Infrastructure</strong></td><td>$1.8B</td><td>$89B</td><td>28% CAGR</td></tr>
+                                <tr><td><strong>Quantum Computing</strong></td><td>$890M</td><td>$12B</td><td>67% CAGR</td></tr>
+                                <tr><td><strong>Advanced Logic (3/5nm)</strong></td><td>$3.1B</td><td>$203B</td><td>18% CAGR</td></tr>
+                                <tr><td><strong>Automotive Semiconductors</strong></td><td>$2.6B</td><td>$78B</td><td>24% CAGR</td></tr>
+                                <tr><td><strong>Memory & Storage</strong></td><td>$1.4B</td><td>$156B</td><td>12% CAGR</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔬 Emerging Applications & Future Technologies</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                        <div class="info-box">
+                            <h4>🧬 Neuromorphic Computing</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Memristor arrays:</strong> Gd₂O₃ switching layers</li>
+                                <li><strong>Synaptic devices:</strong> Pr₆O₁₁ resistive switching</li>
+                                <li><strong>Intel Loihi 2:</strong> 14nm with REE-enhanced plasticity</li>
+                                <li><strong>IBM TrueNorth:</strong> Spike-timing dependent plasticity</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>🌌 Space-Grade Electronics</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Radiation hardened:</strong> Y₂O₃ protective coatings</li>
+                                <li><strong>Extreme temperature:</strong> CeO₂ thermal barriers</li>
+                                <li><strong>Single-event upset immunity:</strong> Eu-doped logic</li>
+                                <li><strong>Deep space missions:</strong> 25-year operational life</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>⚕️ Medical Implant Electronics</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Biocompatible coatings:</strong> La₂O₃ surfaces</li>
+                                <li><strong>Neural interfaces:</strong> Gd-doped electrode arrays</li>
+                                <li><strong>Wireless power transfer:</strong> NdFeB micro-magnets</li>
+                                <li><strong>Longevity requirements:</strong> 30+ year operation</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>🔋 Next-Gen Energy Storage</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Solid-state batteries:</strong> Ce-doped electrolytes</li>
+                                <li><strong>Supercapacitors:</strong> La-enhanced electrodes</li>
+                                <li><strong>Grid-scale storage:</strong> REE-iron-air batteries</li>
+                                <li><strong>EV integration:</strong> 1000km range targets</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alternatives Tab -->
+            <div id="alternatives" class="tab-content">
+                <h3>🔄 Materiali Alternativi e Sostituti</h3>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>🧲 Alternative ai Magneti NdFeB</h3>
+                        <div class="info-box">
+                            <h4>🚨 Sfida della Sostituzione</h4>
+                            <p>I magneti NdFeB hanno densità energetica di <strong>50-60 MGOe</strong>. Le alternative attuali raggiungono al massimo il 70-80% di questa performance.</p>
+                        </div>
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr><th>Materiale Alternativo</th><th>Energy Product (MGOe)</th><th>Temp. Max (°C)</th><th>Status</th><th>Cost vs NdFeB</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Ferrite (SrFe₁₂O₁₉)</strong></td><td>4.5</td><td>450°C</td><td>🟢 Commerciale</td><td>-85%</td></tr>
+                                <tr><td><strong>AlNiCo</strong></td><td>8.5</td><td>550°C</td><td>🟢 Commerciale</td><td>-45%</td></tr>
+                                <tr><td><strong>Samarium Cobalt (SmCo)</strong></td><td>32</td><td>350°C</td><td>🟢 Commerciale</td><td>+340%</td></tr>
+                                <tr><td><strong>Mn-Al-C</strong></td><td>12</td><td>200°C</td><td>🟡 R&D</td><td>-70%</td></tr>
+                                <tr><td><strong>MnBi</strong></td><td>17</td><td>180°C</td><td>🟡 R&D</td><td>-60%</td></tr>
+                                <tr><td><strong>Fe-Ni (Tetrataenite)</strong></td><td>40+ (stimato)</td><td>300°C</td><td>🔴 Ricerca</td><td>-90% (teorico)</td></tr>
+                                <tr><td><strong>Exchange-coupled nanocomposites</strong></td><td>45+ (target)</td><td>200°C</td><td>🔴 Ricerca</td><td>-50% (target)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>💻 Alternative per CMP Polishing</h3>
+                        <div style="margin: 20px 0;">
+                            <h4>🔄 Sostituti del Cerio Ossido</h4>
+                            <table style="font-size: 0.9rem;">
+                                <thead>
+                                    <tr><th>Materiale</th><th>Removal Rate</th><th>Surface Finish</th><th>Cost</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>Colloidal Silica</strong></td><td>2,500 Å/min</td><td>0.8 nm Ra</td><td>-30%</td><td>🟢 Limited use</td></tr>
+                                    <tr><td><strong>Aluminum Oxide</strong></td><td>1,800 Å/min</td><td>1.2 nm Ra</td><td>-65%</td><td>🟡 Specialty</td></tr>
+                                    <tr><td><strong>Zirconium Oxide</strong></td><td>2,100 Å/min</td><td>1.0 nm Ra</td><td>-20%</td><td>🟡 Development</td></tr>
+                                    <tr><td><strong>Diamond nanoparticles</strong></td><td>4,000 Å/min</td><td>0.3 nm Ra</td><td>+400%</td><td>🔴 Research</td></tr>
+                                    <tr><td><strong>Synthetic CeO₂</strong></td><td>3,000 Å/min</td><td>0.5 nm Ra</td><td>+15%</td><td>🟢 Alternative supply</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="info-box">
+                            <h4>⚗️ Advanced Polishing Technologies</h4>
+                            <ul>
+                                <li><strong>Plasma-enhanced CMP:</strong> Riduce uso CeO₂ del 60%</li>
+                                <li><strong>Electrochemical polishing:</strong> Zero abrasivi necessari</li>
+                                <li><strong>Ion beam milling:</strong> Atomic-level precision</li>
+                                <li><strong>AI-optimized slurries:</strong> Mixing intelligente per efficienza</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>⚛️ Sostituti per High-k Dielectrics</h3>
+                        <table>
+                            <thead>
+                                <tr><th>REE Material</th><th>Alternative</th><th>Dielectric Constant</th><th>Band Gap (eV)</th><th>Maturity</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>La₂O₃ (k~30)</strong></td><td>HfO₂</td><td>~25</td><td>5.7</td><td>🟢 Production</td></tr>
+                                <tr><td><strong>Gd₂O₃ (k~14)</strong></td><td>ZrO₂</td><td>~25</td><td>5.0</td><td>🟢 Production</td></tr>
+                                <tr><td><strong>Y₂O₃ (k~15)</strong></td><td>Al₂O₃</td><td>~9</td><td>8.7</td><td>🟢 Production</td></tr>
+                                <tr><td><strong>Er₂O₃ (k~12)</strong></td><td>Ta₂O₅</td><td>~22</td><td>4.0</td><td>🟡 Limited</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="info-box" style="margin-top: 15px;">
+                            <h4>🔬 Next-Generation Dielectrics</h4>
+                            <p><strong>Engineered materials:</strong> HfZrOx, doped silicon nitrides, e multilayer stacks possono sostituire REE mantenendo performance comparabili.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🌈 Fosfori e LED Alternatives</h3>
+                        <div style="margin: 15px 0;">
+                            <h4>💡 Sostituti per Europio/Terbio Fosfori</h4>
+                            <table style="font-size: 0.9rem;">
+                                <thead>
+                                    <tr><th>Color</th><th>REE Phosphor</th><th>Alternative</th><th>Efficiency</th><th>Cost Impact</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><strong>Red</strong></td><td>Eu³⁺:Y₂O₃</td><td>Quantum dots (CdSe)</td><td>95%</td><td>-40%</td></tr>
+                                    <tr><td><strong>Green</strong></td><td>Tb³⁺:CeMgAl₁₁O₁₉</td><td>Quantum dots (InP)</td><td>90%</td><td>-25%</td></tr>
+                                    <tr><td><strong>Blue</strong></td><td>Eu²⁺:BaMgAl₁₀O₁₇</td><td>Perovskite nanocrystals</td><td>85%</td><td>-60%</td></tr>
+                                    <tr><td><strong>White</strong></td><td>Mixed REE</td><td>RGB Quantum dots</td><td>92%</td><td>-35%</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="info-box">
+                            <h4>🚀 Emerging Display Technologies</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>MicroLED displays:</strong> Eliminano fosfori completamente</li>
+                                <li><strong>Perovskite LEDs:</strong> Colori puri senza REE</li>
+                                <li><strong>Organic LEDs:</strong> Carbon-based emitters</li>
+                                <li><strong>E-ink evolution:</strong> Electrophoretic displays avanzati</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>📊 Investment in Alternative Technologies</h3>
+                        <div class="chart-container">
+                            <canvas id="alternativesInvestmentChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>⏰ Technology Readiness Timeline</h3>
+                        <div class="process-flow">
+                            <div class="process-step">
+                                <div class="step-icon">2025</div>
+                                <div class="step-title">Lab Scale</div>
+                                <div class="step-description">Fe-Ni magnets, plasma CMP, quantum dot LEDs</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">2027</div>
+                                <div class="step-title">Pilot Production</div>
+                                <div class="step-description">MnBi magnets, synthetic CeO₂, perovskite displays</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">2029</div>
+                                <div class="step-title">Commercial Scale</div>
+                                <div class="step-description">Advanced composites, AI-optimized processes</div>
+                            </div>
+                            <div class="process-step">
+                                <div class="step-icon">2032</div>
+                                <div class="step-title">Market Adoption</div>
+                                <div class="step-description">25-30% REE demand reduction achievable</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🎯 Strategic Recommendations</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                        <div class="info-box">
+                            <h4>🚀 High Priority R&D</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Tetrataenite synthesis:</strong> Potential game-changer per magneti</li>
+                                <li><strong>Quantum dot manufacturing:</strong> Scale-up per display mass market</li>
+                                <li><strong>AI materials discovery:</strong> Accelera sviluppo alternative</li>
+                                <li><strong>Recycling automation:</strong> Urban mining technologies</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>💰 Investment Opportunities</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Startups alternatives:</strong> $4.2B venture funding needed</li>
+                                <li><strong>Processing technology:</strong> IP licensing opportunities</li>
+                                <li><strong>Substitution consulting:</strong> Engineering services market</li>
+                                <li><strong>Testing & certification:</strong> New standards development</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>⚠️ Implementation Challenges</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Performance gaps:</strong> 10-30% typical deficit</li>
+                                <li><strong>Supply chain complexity:</strong> New material sourcing</li>
+                                <li><strong>Qualification time:</strong> 3-5 anni per aerospace/automotive</li>
+                                <li><strong>Economic incentives:</strong> Carbon pricing needed</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>📈 Market Impact Projections</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>2030 demand reduction:</strong> 15-20% feasible</li>
+                                <li><strong>Cost competitiveness:</strong> Alternatives at parity</li>
+                                <li><strong>Geographic distribution:</strong> +50% supply diversification</li>
+                                <li><strong>Innovation acceleration:</strong> Patent filings +280%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Future Tab -->
+            <div id="future" class="tab-content">
+                <h3>🔮 Scenari Futuri 2025-2030</h3>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>📈 Trend Emergenti</h3>
+                        <ul>
+                            <li><strong>Decoupling USA-Cina:</strong> DoD floor price $110/kg NdPr</li>
+                            <li><strong>EU Critical Raw Materials Act:</strong> 10% domestic mining by 2030</li>
+                            <li><strong>Recycling urbano:</strong> 20-30% supply entro 2035</li>
+                            <li><strong>Deep sea mining:</strong> Pacific nodules exploration</li>
+                            <li><strong>Alternative materials:</strong> Ricerca su ferrite magnets</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>⚠️ Rischi Geopolitici</h3>
+                        <ul>
+                            <li><strong>Export ban Cina:</strong> Ga, Ge, Sb già restricted</li>
+                            <li><strong>Myanmar instability:</strong> 70% heavy REE at risk</li>
+                            <li><strong>Environmental regulations:</strong> Malaysia processing limits</li>
+                            <li><strong>Trade wars:</strong> Tariffs e counter-sanctions</li>
+                            <li><strong>Technology transfer bans:</strong> Separation tech restricted</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🚀 Progetti in Sviluppo</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Progetto</th>
+                                <th>Località</th>
+                                <th>Capacità</th>
+                                <th>Timeline</th>
+                                <th>Investment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Nolans Project</strong></td>
+                                <td>🇦🇺 Australia</td>
+                                <td>4,000 t NdPr/anno</td>
+                                <td>2026</td>
+                                <td>$1.2B</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Eneabba Refinery</strong></td>
+                                <td>🇦🇺 Australia</td>
+                                <td>17,500 t REO/anno</td>
+                                <td>2025</td>
+                                <td>$1.8B</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Pensana Saltend</strong></td>
+                                <td>🇬🇧 UK</td>
+                                <td>12,500 t REO/anno</td>
+                                <td>2024</td>
+                                <td>$195M</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fort Worth Magnets</strong></td>
+                                <td>🇺🇸 USA</td>
+                                <td>1,000 t magnets/anno</td>
+                                <td>2025</td>
+                                <td>$700M</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kvanefjeld</strong></td>
+                                <td>🇬🇱 Greenland</td>
+                                <td>32,000 t REO/anno</td>
+                                <td>2028+</td>
+                                <td>$1.5B</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box">
+                    <h4>🎯 Strategia di Investimento Consigliata</h4>
+                    <p><strong>Core Portfolio (60%):</strong> REMX ETF + MP Materials + Lynas</p>
+                    <p><strong>Satellite (30%):</strong> Energy Fuels + Iluka + Critical Materials ETFs</p>
+                    <p><strong>Speculative (10%):</strong> Junior miners + recycling plays</p>
+                    <p><strong>Hedge:</strong> Copper futures per correlazione con REE demand</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Data Links -->
+        <div class="card">
+            <h3>🔗 Collegamenti Dati Real-Time</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <a href="https://www.metal.com/Rare-Earth-Oxides" target="_blank" class="link-button">Shanghai Metals Market</a>
+                <a href="https://www.asianmetal.com/RareEarthsPrice/RareEarths.html" target="_blank" class="link-button">Asian Metal Prices</a>
+                <a href="https://finance.yahoo.com/quote/REMX" target="_blank" class="link-button">REMX ETF</a>
+                <a href="https://finance.yahoo.com/quote/MP" target="_blank" class="link-button">MP Materials</a>
+                <a href="https://finance.yahoo.com/quote/LYC.AX" target="_blank" class="link-button">Lynas</a>
+                <a href="https://pubs.usgs.gov/periodicals/mcs2024/mcs2024-rare-earths.pdf" target="_blank" class="link-button">USGS Report</a>
+                <a href="https://www.iea.org/reports/critical-minerals-market-review-2024" target="_blank" class="link-button">IEA Critical Minerals</a>
+                <a href="https://tradingeconomics.com/commodity/rare-earth" target="_blank" class="link-button">Trading Economics</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Charts with fixed dimensions
+        const ctx1 = document.getElementById('productionChart');
+        const ctx2 = document.getElementById('reservesChart');
+        const ctx3 = document.getElementById('supplyChainChart');
+        const ctx4 = document.getElementById('supplyDemandChart');
+        const ctx5 = document.getElementById('chipUsageChart');
+        const ctx6 = document.getElementById('dependencyMatrix');
+        const ctx7 = document.getElementById('patentsChart');
+        const ctx8 = document.getElementById('patentTrendsChart');
+        const ctx9 = document.getElementById('carbonFootprintChart');
+        const ctx10 = document.getElementById('recyclingChart');
+        const ctx11 = document.getElementById('advancedChipUsageChart');
+        const ctx12 = document.getElementById('alternativesInvestmentChart');
+        
+        // Set fixed dimensions for all canvas elements to prevent resize issues
+        if (ctx1) { ctx1.width = 800; ctx1.height = 300; }
+        if (ctx2) { ctx2.width = 800; ctx2.height = 300; }
+        if (ctx3) { ctx3.width = 800; ctx3.height = 300; }
+        if (ctx4) { ctx4.width = 800; ctx4.height = 300; }
+        if (ctx5) { ctx5.width = 800; ctx5.height = 300; }
+        if (ctx6) { ctx6.width = 800; ctx6.height = 300; }
+        if (ctx7) { ctx7.width = 800; ctx7.height = 300; }
+        if (ctx8) { ctx8.width = 800; ctx8.height = 300; }
+        if (ctx9) { ctx9.width = 800; ctx9.height = 300; }
+        if (ctx10) { ctx10.width = 800; ctx10.height = 300; }
+        if (ctx11) { ctx11.width = 800; ctx11.height = 300; }
+        if (ctx12) { ctx12.width = 800; ctx12.height = 300; }
+
+        // Production Chart
+        if (ctx1) {
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Cina', 'USA', 'Myanmar', 'Australia', 'Thailand', 'India', 'Russia', 'Vietnam', 'Brasil', 'Altri'],
+                    datasets: [{
+                        label: 'Produzione 2024 (MT)',
+                        data: [270000, 45000, 31000, 22000, 7000, 2900, 2500, 300, 500, 1800],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(139, 92, 246, 0.7)',
+                            'rgba(236, 72, 153, 0.7)',
+                            'rgba(99, 102, 241, 0.7)',
+                            'rgba(14, 165, 233, 0.7)',
+                            'rgba(168, 85, 247, 0.7)',
+                            'rgba(107, 114, 128, 0.7)'
+                        ],
+                        borderColor: 'rgba(0, 0, 0, 0.1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 0
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Produzione Globale Terre Rare 2024 (Metric Tons)'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Reserves Chart
+        if (ctx2) {
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cina', 'Vietnam', 'Brasile', 'Russia', 'India', 'Australia', 'USA', 'Groenlandia', 'Altri'],
+                    datasets: [{
+                        data: [44, 22, 21, 14, 6.9, 4.2, 2.3, 1.5, 5.1],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#10b981',
+                            '#3b82f6',
+                            '#8b5cf6',
+                            '#ec4899',
+                            '#14b8a6',
+                            '#f97316',
+                            '#6b7280'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 0
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribuzione Riserve Globali (%)'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Supply Chain Flow
+        if (ctx3) {
+            new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: ['Mining', 'Concentration', 'Separation', 'Refining', 'Metal/Alloy', 'Manufacturing', 'End Use'],
+                    datasets: [{
+                        label: 'Value Addition ($)',
+                        data: [10, 25, 60, 120, 250, 500, 1000],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'China Control (%)',
+                        data: [70, 75, 85, 90, 95, 80, 60],
+                        borderColor: 'rgb(239, 68, 68)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 0
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Value Chain & China Control'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Supply/Demand Chart
+        if (ctx4) {
+            new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025E', '2026E', '2027E', '2028E'],
+                    datasets: [{
+                        label: 'Supply (MT)',
+                        data: [240000, 280000, 300000, 320000, 350000, 380000, 420000, 460000, 500000],
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)'
+                    }, {
+                        label: 'Demand (MT)',
+                        data: [230000, 275000, 310000, 335000, 360000, 400000, 450000, 510000, 580000],
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)'
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 0
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Supply vs Demand Forecast'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value/1000) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chip Usage Chart
+        if (ctx5) {
+            new Chart(ctx5, {
+                type: 'radar',
+                data: {
+                    labels: ['CMP Polishing', 'Lithography', 'Etching', 'Deposition', 'Doping', 'Packaging'],
+                    datasets: [{
+                        label: 'Logic Chips',
+                        data: [30, 20, 15, 10, 15, 10],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)'
+                    }, {
+                        label: 'Memory Chips',
+                        data: [50, 10, 10, 15, 5, 10],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)'
+                    }, {
+                        label: 'Power Chips',
+                        data: [15, 5, 20, 25, 25, 10],
+                        borderColor: 'rgb(245, 158, 11)',
+                        backgroundColor: 'rgba(245, 158, 11, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 0
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'REE Usage by Process Step (%)'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 60
+                        }
+                    }
+                }
+            });
+        }
+
+        // Dependency Matrix Chart
+        if (ctx6) {
+            new Chart(ctx6, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Critical Applications',
+                        data: [
+                            {x: 95, y: 90, element: 'CeO₂ CMP'},
+                            {x: 88, y: 85, element: 'NdFeB Magnets'},
+                            {x: 72, y: 78, element: 'Dy Heavy REE'},
+                            {x: 85, y: 65, element: 'La₂O₃ Gates'},
+                            {x: 63, y: 72, element: 'Gd₂O₃ Dielectrics'},
+                            {x: 45, y: 55, element: 'Y₂O₃ Coatings'}
+                        ],
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                        pointRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'China Control vs Technical Criticality Matrix'
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'China Supply Control (%)' },
+                            min: 0, max: 100
+                        },
+                        y: {
+                            title: { display: true, text: 'Technical Criticality (%)' },
+                            min: 0, max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Patents Chart
+        if (ctx7) {
+            new Chart(ctx7, {
+                type: 'pie',
+                data: {
+                    labels: ['Cina', 'USA', 'Giappone', 'Germania', 'Corea Sud', 'Altri'],
+                    datasets: [{
+                        data: [127340, 15250, 12800, 8650, 6200, 8760],
+                        backgroundColor: ['#ef4444', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6', '#6b7280']
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Distribuzione Brevetti REE Globali (179,000 totali)'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Patent Trends Chart
+        if (ctx8) {
+            new Chart(ctx8, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025E'],
+                    datasets: [{
+                        label: 'Cina',
+                        data: [12400, 15600, 18200, 21800, 26300, 31000],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'USA',
+                        data: [1800, 2100, 2650, 3200, 4100, 5300],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'EU',
+                        data: [950, 1200, 1580, 2100, 2800, 3600],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Trend Patent Filing Annuale REE'
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Carbon Footprint Chart
+        if (ctx9) {
+            new Chart(ctx9, {
+                type: 'bar',
+                data: {
+                    labels: ['Cina', 'Australia', 'USA', 'Myanmar', 'India', 'Altri'],
+                    datasets: [{
+                        label: 'CO₂ Emissions (kt/year)',
+                        data: [2047, 89, 156, 234, 67, 123],
+                        backgroundColor: [
+                            'rgba(220, 38, 38, 0.8)',
+                            'rgba(245, 158, 11, 0.8)', 
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(107, 114, 128, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Emissioni CO₂ per Paese Produttore REE'
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Recycling Chart
+        if (ctx10) {
+            new Chart(ctx10, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Virgin Material', 'Recycling Current', 'Recycling Potential 2030'],
+                    datasets: [{
+                        data: [385000, 23000, 88500],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981']
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Supply REE: Virgin vs Recycling (tonnellate/anno)'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Advanced Chip Usage Chart
+        if (ctx11) {
+            new Chart(ctx11, {
+                type: 'bar',
+                data: {
+                    labels: ['AI Accelerators', '5G/6G RF', 'Quantum Computing', 'Advanced Logic', 'Memory/Storage', 'Automotive'],
+                    datasets: [{
+                        label: 'REE Value (Billions $)',
+                        data: [4.2, 1.8, 0.89, 3.1, 1.4, 2.6],
+                        backgroundColor: [
+                            'rgba(139, 92, 246, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(99, 102, 241, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Valore REE per Settore Semiconductors 2025'
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Alternatives Investment Chart
+        if (ctx12) {
+            new Chart(ctx12, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025E', '2026E'],
+                    datasets: [{
+                        label: 'Magnet Alternatives',
+                        data: [250, 420, 680, 1200, 1850, 2800, 4200],
+                        borderColor: '#8b5cf6',
+                        tension: 0.4
+                    }, {
+                        label: 'CMP Alternatives',
+                        data: [180, 340, 580, 890, 1340, 1950, 2800],
+                        borderColor: '#10b981',
+                        tension: 0.4
+                    }, {
+                        label: 'Phosphor Alternatives',
+                        data: [120, 230, 420, 650, 980, 1450, 2100],
+                        borderColor: '#f59e0b',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Investment in REE Alternative Technologies (Million $)'
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Initialize Map
+        let map;
+        function initMap() {
+            if (document.getElementById('worldMap')) {
+                map = L.map('worldMap').setView([30, 0], 2);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Add markers for major mines - Updated with more locations
+                const mines = [
+                    // Miniere attive principali
+                    {name: 'Bayan Obo', lat: 41.77, lng: 109.97, country: 'China', production: '120,000 t/y', status: 'active'},
+                    {name: 'Mountain Pass', lat: 35.47, lng: -115.53, country: 'USA', production: '45,000 t/y', status: 'active'},
+                    {name: 'Mount Weld', lat: -28.78, lng: 122.41, country: 'Australia', production: '24,000 t/y', status: 'active'},
+                    {name: 'Kachin State', lat: 26.0, lng: 98.0, country: 'Myanmar', production: '31,000 t/y', status: 'active'},
+                    {name: 'Kerala', lat: 10.85, lng: 76.27, country: 'India', production: '2,900 t/y', status: 'active'},
+                    {name: 'Dong Pao', lat: 22.43, lng: 103.83, country: 'Vietnam', production: '300 t/y', status: 'active'},
+                    
+                    // Nuove miniere e progetti in sviluppo
+                    {name: 'Pela Ema (Serra Verde)', lat: -13.08, lng: -46.77, country: 'Brazil', production: '5,000 t/y (2026)', status: 'developing'},
+                    {name: 'Kvanefjeld', lat: 60.96, lng: -45.97, country: 'Greenland', production: '32,000 t/y (futuro)', status: 'developing'},
+                    {name: 'Tanbreez', lat: 60.01, lng: -44.05, country: 'Greenland', production: '28.2 Mt TREO', status: 'developing'},
+                    {name: 'Wheatland', lat: 42.05, lng: -104.95, country: 'USA (Wyoming)', production: '2.34 Bt riserve', status: 'developing'},
+                    {name: 'Yangibana', lat: -24.88, lng: 115.67, country: 'Australia', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Browns Range', lat: -18.45, lng: 128.12, country: 'Australia', production: 'Heavy REE (2025)', status: 'developing'},
+                    {name: 'Ngualla', lat: -9.25, lng: 33.78, country: 'Tanzania', production: '4.6 Mt TREO', status: 'developing'},
+                    {name: 'Longonjo', lat: -15.25, lng: 13.52, country: 'Angola', production: 'In sviluppo', status: 'developing'},
+                    // Europa
+                    {name: 'Telemark', lat: 59.33, lng: 8.58, country: 'Norway', production: '8.8 Mt (2030)', status: 'developing'},
+                    {name: 'Kiruna (Per Geijer)', lat: 67.85, lng: 20.23, country: 'Sweden', production: '1.7 Mt REO', status: 'developing'},
+                    {name: 'Sokli', lat: 67.80, lng: 29.30, country: 'Finland', production: '10% EU demand', status: 'developing'},
+                    {name: 'Fen Complex', lat: 59.28, lng: 9.30, country: 'Norway', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Norra Kärr', lat: 57.95, lng: 14.85, country: 'Sweden', production: 'Heavy REE', status: 'developing'},
+                    {name: 'Monte Galiñeiro', lat: 42.15, lng: -8.73, country: 'Spain (Galicia)', production: 'In esplorazione', status: 'exploring'},
+                    {name: 'Monchique', lat: 37.32, lng: -8.55, country: 'Portugal', production: 'In esplorazione', status: 'exploring'},
+                    {name: 'Cínovec', lat: 50.73, lng: 13.73, country: 'Czech Republic', production: 'Li + REE', status: 'developing'},
+                    {name: 'Kutessay II', lat: 47.25, lng: 18.75, country: 'Hungary', production: 'In esplorazione', status: 'exploring'},
+                    {name: 'Storkwitz', lat: 51.63, lng: 12.95, country: 'Germany (Saxony)', production: 'In esplorazione', status: 'exploring'},
+                    {name: 'Delitzsch', lat: 51.52, lng: 12.33, country: 'Germany', production: 'In esplorazione', status: 'exploring'},
+                    {name: 'Olserum', lat: 57.70, lng: 16.10, country: 'Sweden', production: 'Heavy REE', status: 'exploring'},
+                    {name: 'Sarfartoq', lat: 66.60, lng: -51.50, country: 'Greenland', production: '14 Mt REO', status: 'developing'},
+                    {name: 'Kringlerne', lat: 61.05, lng: -48.10, country: 'Greenland', production: '4.3 Mt TREO', status: 'developing'},
+                    {name: 'Motzfeldt', lat: 60.98, lng: -45.95, country: 'Greenland', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Sichevita', lat: 44.75, lng: 21.95, country: 'Romania', production: 'In esplorazione', status: 'exploring'},
+                    {name: 'Jadar', lat: 44.30, lng: 19.60, country: 'Serbia', production: 'Li + REE', status: 'developing'},
+                    {name: 'Azov Sea region', lat: 47.10, lng: 37.50, country: 'Ukraine', production: 'Riserve significative', status: 'inactive'},
+                    {name: 'Chagyr', lat: 47.95, lng: 36.40, country: 'Ukraine', production: 'In esplorazione', status: 'inactive'},
+                    {name: 'St Honoré', lat: 48.55, lng: -71.13, country: 'Canada (Quebec)', production: '18.4 Mt TREO', status: 'developing'},
+                    {name: 'Ashram', lat: 56.75, lng: -66.45, country: 'Canada (Quebec)', production: '4.68 Mt TREO', status: 'developing'},
+                    {name: 'Strange Lake', lat: 56.35, lng: -64.18, country: 'Canada', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Nechalacho', lat: 62.09, lng: -112.36, country: 'Canada (NWT)', production: 'In sviluppo', status: 'developing'},
+                    
+                    // Altri paesi produttori
+                    {name: 'Nigeria REE zones', lat: 9.08, lng: 8.68, country: 'Nigeria', production: '13,000 t/y', status: 'active'},
+                    {name: 'Thailand deposits', lat: 15.87, lng: 100.99, country: 'Thailand', production: '13,000 t/y', status: 'active'},
+                    {name: 'Lovozero', lat: 67.88, lng: 34.60, country: 'Russia', production: '2,500 t/y', status: 'active'},
+                    {name: 'Tomtor', lat: 71.05, lng: 116.60, country: 'Russia', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Araxá', lat: -19.59, lng: -46.94, country: 'Brazil', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Catalão', lat: -18.16, lng: -47.95, country: 'Brazil', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Steenkampskraal', lat: -29.87, lng: 18.33, country: 'South Africa', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Makuutu', lat: 0.89, lng: 33.86, country: 'Uganda', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Gakara', lat: -3.52, lng: 30.06, country: 'Burundi', production: '500 t/y', status: 'active'},
+                    {name: 'Dubbo', lat: -32.26, lng: 148.60, country: 'Australia', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Nolans Bore', lat: -23.05, lng: 133.32, country: 'Australia', production: 'In sviluppo', status: 'developing'},
+                    {name: 'Weishan', lat: 34.80, lng: 117.12, country: 'China (Shandong)', production: '20,000 t/y', status: 'active'},
+                    {name: 'Longnan', lat: 24.91, lng: 114.78, country: 'China (Jiangxi)', production: '35,000 t/y', status: 'active'},
+                    {name: 'Mianning', lat: 28.55, lng: 102.17, country: 'China (Sichuan)', production: '15,000 t/y', status: 'active'}
+                ];
+
+                mines.forEach(mine => {
+                    // Colori per paese/regione
+                    let color;
+                    if (mine.country.includes('China')) color = 'red';
+                    else if (mine.country.includes('USA')) color = 'blue';
+                    else if (mine.country.includes('Australia')) color = 'orange';
+                    else if (mine.country.includes('Canada')) color = 'purple';
+                    else if (mine.country.includes('Brazil')) color = 'yellow';
+                    else if (mine.country.includes('Greenland')) color = 'cyan';
+                    else if (mine.country.includes('Russia')) color = 'pink';
+                    else color = 'green';
+                    
+                    // Dimensioni e opacità in base allo status
+                    let opacity, radius, weight, statusLabel;
+                    
+                    switch(mine.status) {
+                        case 'active':
+                            opacity = 0.6;
+                            weight = 2;
+                            statusLabel = '🟢 Attivo';
+                            radius = mine.production.includes('t/y') ? 
+                                    Math.min(parseInt(mine.production.replace(/[^0-9]/g, '')) * 2, 200000) : 
+                                    50000;
+                            break;
+                        case 'developing':
+                            opacity = 0.4;
+                            weight = 1.5;
+                            statusLabel = '🟡 In sviluppo';
+                            radius = 40000;
+                            break;
+                        case 'exploring':
+                            opacity = 0.25;
+                            weight = 1;
+                            statusLabel = '🔵 In esplorazione';
+                            radius = 30000;
+                            break;
+                        case 'inactive':
+                            opacity = 0.15;
+                            weight = 1;
+                            statusLabel = '⚫ Inattivo';
+                            radius = 35000;
+                            break;
+                        default:
+                            opacity = 0.3;
+                            weight = 1;
+                            statusLabel = '⚪ Status sconosciuto';
+                            radius = 30000;
+                    }
+                    
+                    const circle = L.circle([mine.lat, mine.lng], {
+                        color: color,
+                        fillColor: color,
+                        fillOpacity: opacity,
+                        radius: radius,
+                        weight: weight
+                    }).addTo(map);
+                    circle.bindPopup(`<strong>${mine.name}</strong><br>
+                        <strong>Paese:</strong> ${mine.country}<br>
+                        <strong>Status:</strong> ${statusLabel}<br>
+                        <strong>Produzione/Riserve:</strong> ${mine.production}`);
+                });
+            }
+        }
+
+        // Tab switching
+        function showTab(tabName, event) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Fallback: find and activate the button by tabName
+                document.querySelector(`.tab[onclick*="${tabName}"]`).classList.add('active');
+            }
+            
+            // Initialize map if geography tab
+            if (tabName === 'geography') {
+                setTimeout(() => {
+                    if (!map) {
+                        initMap();
+                    } else {
+                        map.invalidateSize();
+                    }
+                }, 100);
+            }
+        }
+
+        // Filter functionality
+        function applyFilters() {
+            const material = document.getElementById('materialFilter').value;
+            const country = document.getElementById('countryFilter').value;
+            const company = document.getElementById('companyFilter').value;
+            
+            // Here you would implement actual filtering logic
+            console.log('Filters applied:', { material, country, company });
+            
+            // Show notification
+            showNotification('Filtri applicati con successo!');
+        }
+
+        function resetFilters() {
+            document.getElementById('materialFilter').value = '';
+            document.getElementById('countryFilter').value = '';
+            document.getElementById('companyFilter').value = '';
+            
+            showNotification('Filtri resettati');
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Add filter event listeners
+        document.getElementById('materialFilter').addEventListener('change', applyFilters);
+        document.getElementById('countryFilter').addEventListener('change', applyFilters);
+        document.getElementById('companyFilter').addEventListener('change', applyFilters);
+
+        // Auto-refresh simulation - DISABLED to fix scrolling issue
+        // Commenting out the auto-refresh that was causing DOM modifications
+        /*
+        setInterval(() => {
+            const indicators = document.querySelectorAll('.real-time-indicator');
+            indicators.forEach(indicator => {
+                indicator.style.background = '#10b981';
+                setTimeout(() => {
+                    indicator.style.background = '#f59e0b';
+                }, 500);
+            });
+        }, 5000);
+        */
+
+        // Add CSS animations - Check if already added to prevent duplicates
+        if (!document.getElementById('dynamic-animations')) {
+            const style = document.createElement('style');
+            style.id = 'dynamic-animations';
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                
+                @keyframes fadeOut {
+                    from {
+                        opacity: 1;
+                    }
+                    to {
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Initialize tooltips
+        document.querySelectorAll('[data-tooltip]').forEach(element => {
+            element.addEventListener('mouseenter', (e) => {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = e.target.getAttribute('data-tooltip');
+                tooltip.style.display = 'block';
+                tooltip.style.left = e.pageX + 'px';
+                tooltip.style.top = (e.pageY - 30) + 'px';
+                document.body.appendChild(tooltip);
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                document.querySelectorAll('.tooltip').forEach(t => t.remove());
+            });
+        });
+
+        // Initial notification - DISABLED to prevent scrolling issues
+        // Commenting out initial notification that might cause reflow
+        /*
+        setTimeout(() => {
+            showNotification('Dashboard caricato con successo! Dati aggiornati al 2025');
+        }, 1000);
+        */
+    </script>
+</body>
+</html>
