@@ -25,3 +25,8 @@ GP-5.md
 # Mantieni solo i file per GitHub Pages
 !99_Archivio/Claude Artifacts GIT/
 !99_Archivio/*.html
+
+
+
+# Ignore Smart Environment folder
+.smart-env
