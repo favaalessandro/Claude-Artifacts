@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Entropia del Debito - Termodinamica Economica</title>
+    
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Math.js for calculations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    
+    <!-- Three.js for 3D visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-dark: #0a0e27;
+            --primary-light: #1a1f3a;
+            --accent-blue: #00d4ff;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --glow-blue: 0 0 30px rgba(0, 212, 255, 0.5);
+            --glow-purple: 0 0 30px rgba(139, 92, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        #particles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Navigation tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(26, 31, 58, 0.5);
+            padding: 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--accent-purple);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(0, 212, 255, 0.2));
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            box-shadow: var(--glow-blue);
+        }
+
+        /* Content sections */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin: 20px 0 15px 0;
+            color: var(--accent-purple);
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+        }
+
+        /* Metrics display */
+        .metric {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Charts container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+            background: rgba(10, 14, 39, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .chart-container canvas {
+            max-height: 360px;
+        }
+
+        /* Equation display */
+        .equation {
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid var(--accent-purple);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+            text-align: center;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--glow-blue);
+        }
+
+        input[type="number"], select {
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+        }
+
+        /* Alert boxes */
+        .alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            color: var(--accent-red);
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        /* Progress bars */
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(10, 14, 39, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 15px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .grid { grid-template-columns: 1fr; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .tabs { flex-direction: column; }
+            .tab { width: 100%; }
+        }
+
+        /* Animation classes */
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .glow {
+            box-shadow: var(--glow-purple);
+        }
+
+        /* Entropy visualization */
+        #entropyVisualization {
+            width: 100%;
+            height: 500px;
+            background: rgba(10, 14, 39, 0.8);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-purple);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated particles background -->
+    <canvas id="particles-bg"></canvas>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⚡ ENTROPIA DEL DEBITO</h1>
+            <p class="subtitle">La Termodinamica Applicata ai Sistemi Economici</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="tabs">
+            <div class="tab active" onclick="showSection('overview')">🌌 Overview</div>
+            <div class="tab" onclick="showSection('thermodynamics')">🔥 Termodinamica</div>
+            <div class="tab" onclick="showSection('simulation')">📊 Simulazione</div>
+            <div class="tab" onclick="showSection('metrics')">📈 Metriche Live</div>
+            <div class="tab" onclick="showSection('collapse')">💀 Curve di Collasso</div>
+            <div class="tab" onclick="showSection('strategies')">🎯 Strategie</div>
+            <div class="tab" onclick="showSection('cases')">📚 Casi Storici</div>
+            <div class="tab" onclick="showSection('philosophy')">🧠 Filosofia</div>
+        </div>
+
+        <!-- Overview Section -->
+        <div id="overview" class="content-section active">
+            <div class="card">
+                <h2>🌀 Il Principio Fondamentale</h2>
+                <div class="equation">
+                    ΔS(universo) ≥ 0 ⟺ ΔDebito(sistema) ≥ 0
+                </div>
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 10px;">
+                    "L'entropia dell'universo aumenta sempre" = "Il debito totale del sistema aumenta sempre"
+                </p>
+            </div>
+
+            <div class="grid">
+                <div class="metric glow">
+                    <div class="metric-icon">🌡️</div>
+                    <div class="metric-label">Entropia Sistemica</div>
+                    <div class="metric-value" id="systemEntropy">87.3%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-label">Debito Globale</div>
+                    <div class="metric-value" id="globalDebt">$307T</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-icon">📈</div>
+                    <div class="metric-label">Tasso Entropico</div>
+                    <div class="metric-value" id="entropicRate">3.2%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-icon">⏰</div>
+                    <div class="metric-label">Tempo al Collasso</div>
+                    <div class="metric-value" id="collapseTime">~24y</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚡ La Catena Causale</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3>Sistema Termodinamico</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-blue); margin: 10px 0;">
+                                Serve energia per mantenere ordine
+                            </li>
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-blue); margin: 10px 0;">
+                                Prende in "prestito" energia dall'ambiente
+                            </li>
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-blue); margin: 10px 0;">
+                                Deve "restituire" più entropia
+                            </li>
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-blue); margin: 10px 0;">
+                                Sistema degrada senza input costante
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Sistema Economico</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-purple); margin: 10px 0;">
+                                Serve capitale per mantenere crescita
+                            </li>
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-purple); margin: 10px 0;">
+                                Prende in prestito risorse dal futuro
+                            </li>
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-purple); margin: 10px 0;">
+                                Deve restituire con interesse
+                            </li>
+                            <li style="padding: 10px; border-left: 3px solid var(--accent-purple); margin: 10px 0;">
+                                Sistema va in crisi senza crescita costante
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert">
+                <div class="alert-icon">⚠️</div>
+                <div>
+                    <strong>L'Impossibilità del Moto Perpetuo Economico:</strong><br>
+                    Come non esiste una macchina con efficienza 100%, non può esistere un'economia senza debito.
+                    Ogni trasformazione ha un "costo entropico", ogni transazione ha un "costo di frizione".
+                </div>
+            </div>
+
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-overview.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        📖 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Thermodynamics Section -->
+        <div id="thermodynamics" class="content-section">
+            <div class="card">
+                <h2>🔥 Le Leggi della Termodinamica Economica</h2>
+                
+                <div class="grid">
+                    <div class="info-box">
+                        <h3>1️⃣ Prima Legge</h3>
+                        <p><strong>"Non puoi vincere"</strong></p>
+                        <p>L'energia/ricchezza totale si conserva. Non puoi creare valore dal nulla.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>2️⃣ Seconda Legge</h3>
+                        <p><strong>"Non puoi pareggiare"</strong></p>
+                        <p>L'entropia/debito aumenta sempre. Ogni transazione ha un costo.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>3️⃣ Terza Legge</h3>
+                        <p><strong>"Non puoi uscire dal gioco"</strong></p>
+                        <p>Non puoi raggiungere lo zero assoluto. Il debito zero è impossibile.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📐 L'Equazione del Debito Entropico</h2>
+                <div class="equation">
+                    D(t) = D₀ × e^(rt) × (1 + S(t))
+                </div>
+                <div style="margin: 20px; color: var(--text-secondary);">
+                    <p><strong>Dove:</strong></p>
+                    <ul style="list-style: none; padding: 10px;">
+                        <li>D(t) = Debito al tempo t</li>
+                        <li>D₀ = Debito iniziale</li>
+                        <li>r = Tasso interesse (≈ tasso entropico)</li>
+                        <li>S(t) = Entropia accumulata del sistema</li>
+                        <li>e = Costante di Eulero (crescita esponenziale)</li>
+                    </ul>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="debtGrowthChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔄 Il Paradosso dell'Accelerazione</h2>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 1.2rem; margin: 10px;">PIÙ DEBITO = PIÙ VELOCE IL SISTEMA</div>
+                    <div style="font-size: 2rem; color: var(--accent-purple);">↓</div>
+                    <div style="font-size: 1.2rem; margin: 10px;">PIÙ ENTROPIA PRODOTTA</div>
+                    <div style="font-size: 2rem; color: var(--accent-purple);">↓</div>
+                    <div style="font-size: 1.2rem; margin: 10px;">PIÙ DEBITO NECESSARIO</div>
+                    <div style="font-size: 2rem; color: var(--accent-purple);">↓</div>
+                    <div style="font-size: 1.2rem; margin: 10px; color: var(--accent-red);">SPIRALE ACCELERANTE</div>
+                </div>
+            </div>
+
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-termodinamica.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        🔬 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Simulation Section -->
+        <div id="simulation" class="content-section">
+            <div class="card">
+                <h2>🎮 Simulatore di Entropia del Debito</h2>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="initialDebt">Debito Iniziale (miliardi $)</label>
+                        <input type="range" id="initialDebt" min="100" max="10000" value="1000" oninput="updateSimulation()">
+                        <span id="initialDebtValue">1000</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="interestRate">Tasso d'Interesse (%)</label>
+                        <input type="range" id="interestRate" min="0" max="20" step="0.1" value="3" oninput="updateSimulation()">
+                        <span id="interestRateValue">3.0</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="entropyRate">Tasso Entropico (%)</label>
+                        <input type="range" id="entropyRate" min="0" max="10" step="0.1" value="2" oninput="updateSimulation()">
+                        <span id="entropyRateValue">2.0</span>
+                    </div>
+                    <div class="control-group">
+                        <label for="growthRate">Tasso di Crescita (%)</label>
+                        <input type="range" id="growthRate" min="0" max="10" step="0.1" value="3" oninput="updateSimulation()">
+                        <span id="growthRateValue">3.0</span>
+                    </div>
+                </div>
+
+                <button onclick="runSimulation()" style="margin: 20px 0;">▶️ Esegui Simulazione</button>
+                
+                <div class="chart-container">
+                    <canvas id="simulationChart"></canvas>
+                </div>
+
+                <div class="grid" style="margin-top: 20px;">
+                    <div class="metric">
+                        <div class="metric-label">Punto di Non Ritorno</div>
+                        <div class="metric-value" id="noReturnPoint">Anno 18</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Debito Finale</div>
+                        <div class="metric-value" id="finalDebt">$45.2T</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Entropia Totale</div>
+                        <div class="metric-value" id="totalEntropy">342%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🌊 Visualizzazione 3D dell'Entropia</h2>
+                <div id="entropyVisualization"></div>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-simulazione.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        🔮 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Live Metrics Section -->
+        <div id="metrics" class="content-section">
+            <div class="card">
+                <h2>📊 Metriche Globali in Tempo Reale</h2>
+                
+                <div class="grid">
+                    <div class="metric pulse-animation">
+                        <div class="metric-icon">🌍</div>
+                        <div class="metric-label">Debito/PIL Globale</div>
+                        <div class="metric-value" id="debtToGDP">356%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-icon">🏦</div>
+                        <div class="metric-label">Debito Corporate</div>
+                        <div class="metric-value" id="corporateDebt">$88T</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-icon">🏛️</div>
+                        <div class="metric-label">Debito Sovrano</div>
+                        <div class="metric-value" id="sovereignDebt">$92T</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-icon">👥</div>
+                        <div class="metric-label">Debito Personale</div>
+                        <div class="metric-value" id="personalDebt">$54T</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="debtDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔴 Indicatori di Stress Sistemico</h2>
+                
+                <div style="margin: 20px 0;">
+                    <label>Stress del Sistema Finanziario</label>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 72%; background: linear-gradient(90deg, var(--accent-yellow), var(--accent-red));">
+                            72%
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <label>Sostenibilità del Debito</label>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 35%; background: linear-gradient(90deg, var(--accent-green), var(--accent-yellow));">
+                            35%
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <label>Velocità di Accelerazione</label>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 89%; background: linear-gradient(90deg, var(--accent-red), #8b0000);">
+                            89%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert">
+                    <div class="alert-icon">🚨</div>
+                    <div>
+                        <strong>AVVISO CRITICO:</strong> Il sistema sta entrando nella fase di crescita esponenziale.
+                        La sostenibilità del debito è sotto pressione critica.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-metriche.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        📊 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Collapse Curves Section -->
+        <div id="collapse" class="content-section">
+            <div class="card">
+                <h2>💀 Le Curve di Collasso</h2>
+                
+                <div class="chart-container">
+                    <canvas id="collapseChart"></canvas>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fase</th>
+                            <th>Caratteristiche</th>
+                            <th>Durata Media</th>
+                            <th>Indicatori</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Crescita Lineare</strong></td>
+                            <td>Debito < Produzione</td>
+                            <td>20-30 anni</td>
+                            <td>Inflazione stabile, crescita costante</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Crescita Esponenziale</strong></td>
+                            <td>Debito = Produzione</td>
+                            <td>10-15 anni</td>
+                            <td>Asset bubble, euforia di mercato</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Singolarità</strong></td>
+                            <td>Debito > Capacità totale</td>
+                            <td>2-5 anni</td>
+                            <td>Volatilità estrema, panico</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Collasso</strong></td>
+                            <td>Reset entropico</td>
+                            <td>1-2 anni</td>
+                            <td>Default, guerra, rivoluzione</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>⏱️ Timeline della Morte Termica</h2>
+                
+                <div class="grid">
+                    <div class="info-box">
+                        <h3>🌌 Universo</h3>
+                        <p>Morte termica in 10^100 anni</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0.0001%;">0.0001%</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h3>☀️ Sole</h3>
+                        <p>Burnout in 5 miliardi di anni</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 50%;">50%</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h3>🏛️ Civiltà</h3>
+                        <p>Collasso in secoli/millenni</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;">85%</div>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <h3>👤 Individuo</h3>
+                        <p>Default biologico in ~80 anni</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%;">45%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-collasso.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        💀 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- System Stability Section -->
+        <div id="stability" class="content-section">
+            <div class="card">
+                <h2>⚖️ Stabilità dei Sistemi Complessi</h2>
+                
+                <div class="grid">
+                    <div class="card" style="border-color: var(--accent-green);">
+                        <h3>🌳 Sistemi Naturali</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li><strong>Ecosistemi:</strong> Auto-regolazione tramite feedback loops</li>
+                            <li><strong>Clima:</strong> Punti di non ritorno (tipping points)</li>
+                            <li><strong>Evoluzione:</strong> Adattamento vs estinzione</li>
+                        </ul>
+                        <div class="metric" style="margin-top: 15px;">
+                            <div class="metric-label">Resilienza</div>
+                            <div class="metric-value" style="color: var(--accent-green);">Alta</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="border-color: var(--accent-yellow);">
+                        <h3>💰 Sistemi Economici</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li><strong>Mercati:</strong> Cicli boom-bust inevitabili</li>
+                            <li><strong>Valute:</strong> Inflazione come entropia monetaria</li>
+                            <li><strong>Banche:</strong> Fragilità sistemica crescente</li>
+                        </ul>
+                        <div class="metric" style="margin-top: 15px;">
+                            <div class="metric-label">Resilienza</div>
+                            <div class="metric-value" style="color: var(--accent-yellow);">Media</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="border-color: var(--accent-red);">
+                        <h3>🏛️ Sistemi Sociali</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li><strong>Civiltà:</strong> Complessità crescente = fragilità</li>
+                            <li><strong>Istituzioni:</strong> Decadimento burocratico</li>
+                            <li><strong>Cultura:</strong> Entropia informativa</li>
+                        </ul>
+                        <div class="metric" style="margin-top: 15px;">
+                            <div class="metric-label">Resilienza</div>
+                            <div class="metric-value" style="color: var(--accent-red);">Bassa</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔄 Dinamiche di Feedback</h2>
+                
+                <div class="alert">
+                    <div class="alert-icon">⚠️</div>
+                    <div>
+                        <strong>Feedback Positivi (Destabilizzanti):</strong><br>
+                        • Panico bancario → Più prelievi → Più panico<br>
+                        • Inflazione → Aspettative → Più inflazione<br>
+                        • Debito → Interessi → Più debito
+                    </div>
+                </div>
+                
+                <div class="info-box" style="margin-top: 20px;">
+                    <div class="alert-icon" style="color: var(--accent-green);">✅</div>
+                    <div>
+                        <strong>Feedback Negativi (Stabilizzanti):</strong><br>
+                        • Prezzi alti → Meno domanda → Prezzi più bassi<br>
+                        • Sovrapproduzione → Scorte → Riduzione produzione<br>
+                        • Eccesso speculativo → Correzione → Equilibrio
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-stabilita.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        ⚖️ Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Interconnections Section -->
+        <div id="interconnections" class="content-section">
+            <div class="card">
+                <h2>🌐 Interconnessioni Sistemiche</h2>
+                
+                <div style="padding: 20px; background: rgba(139, 92, 246, 0.1); border-radius: 15px; margin: 20px 0;">
+                    <h3 style="color: var(--accent-purple); margin-bottom: 15px;">La Rete del Debito Globale</h3>
+                    <p style="line-height: 1.8;">
+                        Ogni nodo del sistema è simultaneamente <strong>creditore</strong> e <strong>debitore</strong>, 
+                        creando una rete di interdipendenze che amplifica sia la crescita che il collasso.
+                    </p>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Settore</th>
+                            <th>Debito (% PIL)</th>
+                            <th>Interconnessione</th>
+                            <th>Rischio Contagio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Governi</strong></td>
+                            <td>103%</td>
+                            <td>Banche, Pensioni, Cittadini</td>
+                            <td style="color: var(--accent-red);">Estremo</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Corporazioni</strong></td>
+                            <td>98%</td>
+                            <td>Banche, Mercati, Supply Chain</td>
+                            <td style="color: var(--accent-yellow);">Alto</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Banche</strong></td>
+                            <td>85%</td>
+                            <td>Tutti i settori</td>
+                            <td style="color: var(--accent-red);">Critico</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Famiglie</strong></td>
+                            <td>75%</td>
+                            <td>Banche, Economia reale</td>
+                            <td style="color: var(--accent-yellow);">Medio-Alto</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>🔗 Effetti Domino</h2>
+                
+                <div class="grid">
+                    <div class="info-box">
+                        <h3>1️⃣ Trigger Iniziale</h3>
+                        <p>Un singolo default significativo</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 20%; background: var(--accent-green);">Locale</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>2️⃣ Propagazione</h3>
+                        <p>Contagio attraverso la rete</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 50%; background: var(--accent-yellow);">Regionale</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>3️⃣ Amplificazione</h3>
+                        <p>Feedback loops si attivano</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%; background: var(--accent-red);">Sistemico</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>4️⃣ Collasso</h3>
+                        <p>Cascata inarrestabile</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%; background: #8b0000;">Globale</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🛡️ Punti di Vulnerabilità</h2>
+                
+                <div class="alert" style="background: rgba(239, 68, 68, 0.1);">
+                    <div class="alert-icon">🔴</div>
+                    <div>
+                        <strong>Nodi Critici del Sistema:</strong>
+                        <ul style="margin-top: 10px; color: var(--text-secondary);">
+                            <li>🏦 <strong>Banche "Too Big to Fail"</strong> - Concentrazione del rischio</li>
+                            <li>💱 <strong>Sistema dei pagamenti internazionali</strong> - SWIFT, clearing houses</li>
+                            <li>🌐 <strong>Internet e infrastrutture digitali</strong> - Cyber-vulnerabilità</li>
+                            <li>⚡ <strong>Rete energetica</strong> - Dipendenza totale</li>
+                            <li>🚢 <strong>Supply chain globali</strong> - Just-in-time fragility</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-interconnessioni.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        🌐 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Strategies Section -->
+        <div id="strategies" class="content-section">
+            <div class="card">
+                <h2>🎯 Tre Strategie Esistenziali</h2>
+                
+                <div class="grid">
+                    <div class="card" style="border-color: var(--accent-green);">
+                        <h3>😊 NEGAZIONE</h3>
+                        <p><em>"Il debito si può eliminare!"</em></p>
+                        <ul style="color: var(--text-secondary); margin-top: 15px;">
+                            <li>Illusione di controllo</li>
+                            <li>Porta a collasso improvviso</li>
+                            <li>Rifiuto della realtà entropica</li>
+                        </ul>
+                        <div class="alert" style="margin-top: 15px;">
+                            <div>❌ Non sostenibile a lungo termine</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="border-color: var(--accent-yellow);">
+                        <h3>🚀 ACCELERAZIONE</h3>
+                        <p><em>"Più debito = più crescita!"</em></p>
+                        <ul style="color: var(--text-secondary); margin-top: 15px;">
+                            <li>Bruciamo brillante ma breve</li>
+                            <li>Massimizza il presente</li>
+                            <li>Ignora le conseguenze future</li>
+                        </ul>
+                        <div class="alert" style="margin-top: 15px;">
+                            <div>⚠️ Alto rischio, alto rendimento</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="border-color: var(--accent-blue);">
+                        <h3>☯️ EQUILIBRIO DINAMICO</h3>
+                        <p><em>"Surfare l'onda entropica"</em></p>
+                        <ul style="color: var(--text-secondary); margin-top: 15px;">
+                            <li>Accettare il debito come partner</li>
+                            <li>Gestione attiva del rischio</li>
+                            <li>Sostenibilità relativa</li>
+                        </ul>
+                        <div class="info-box" style="margin-top: 15px;">
+                            <div>✅ Strategia più saggia</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🛠️ Strumenti di Gestione Entropica</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Strumento</th>
+                            <th>Effetto</th>
+                            <th>Costo Entropico</th>
+                            <th>Sostenibilità</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Stampare Moneta</strong></td>
+                            <td>Debito → Inflazione</td>
+                            <td>Alto (entropia monetaria)</td>
+                            <td>⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Austerity</strong></td>
+                            <td>Debito → Recessione</td>
+                            <td>Medio (entropia sociale)</td>
+                            <td>⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Guerra</strong></td>
+                            <td>Debito → Distruzione</td>
+                            <td>Massimo (entropia fisica)</td>
+                            <td>⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Innovazione</strong></td>
+                            <td>Compra tempo</td>
+                            <td>Basso (aumenta complessità)</td>
+                            <td>⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cooperazione</strong></td>
+                            <td>Distribuzione del carico</td>
+                            <td>Minimo</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-strategie.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        🎯 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Historical Cases Section -->
+        <div id="cases" class="content-section">
+            <div class="card">
+                <h2>📚 Casi Storici di Collasso Entropico</h2>
+                
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>🏛️ Impero Romano (476 d.C.)</h3>
+                        <ul>
+                            <li><strong>Debito:</strong> Svalutazione monetaria progressiva</li>
+                            <li><strong>Entropia:</strong> Complessità amministrativa insostenibile</li>
+                            <li><strong>Collasso:</strong> Frammentazione in stati minori</li>
+                            <li><strong>Lezione:</strong> La complessità ha un costo entropico</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>🇩🇪 Repubblica di Weimar (1923)</h3>
+                        <ul>
+                            <li><strong>Debito:</strong> Riparazioni di guerra impossibili</li>
+                            <li><strong>Entropia:</strong> Iperinflazione (prezzi x2 ogni 3 giorni)</li>
+                            <li><strong>Collasso:</strong> Reset monetario totale</li>
+                            <li><strong>Lezione:</strong> L'accelerazione porta al collasso rapido</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>🏦 Lehman Brothers (2008)</h3>
+                        <ul>
+                            <li><strong>Debito:</strong> Leva 30:1</li>
+                            <li><strong>Entropia:</strong> Rischio sistemico diffuso</li>
+                            <li><strong>Collasso:</strong> Bancarotta e contagio globale</li>
+                            <li><strong>Lezione:</strong> L'interconnessione amplifica l'entropia</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>🇬🇷 Crisi Greca (2010-2018)</h3>
+                        <ul>
+                            <li><strong>Debito:</strong> 180% del PIL</li>
+                            <li><strong>Entropia:</strong> Austerity → contrazione economica</li>
+                            <li><strong>Collasso:</strong> Default parziale, bailout multipli</li>
+                            <li><strong>Lezione:</strong> Il debito sovrano ha limiti fisici</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Pattern Ricorrenti nei Collassi</h2>
+                
+                <div class="chart-container">
+                    <canvas id="historicalPatternsChart"></canvas>
+                </div>
+                
+                <ol style="margin: 20px; color: var(--text-secondary);">
+                    <li style="margin: 10px 0;"><strong>Fase di Euforia:</strong> "Questa volta è diverso"</li>
+                    <li style="margin: 10px 0;"><strong>Accelerazione del Debito:</strong> Crescita esponenziale mascherata</li>
+                    <li style="margin: 10px 0;"><strong>Primi Segnali:</strong> Volatilità crescente, spreads in aumento</li>
+                    <li style="margin: 10px 0;"><strong>Momento Minsky:</strong> Improvvisa perdita di fiducia</li>
+                    <li style="margin: 10px 0;"><strong>Collasso:</strong> Liquidazione forzata, default a catena</li>
+                    <li style="margin: 10px 0;"><strong>Reset:</strong> Nuovo ciclo con memoria corta</li>
+                </ol>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-storia.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        📚 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Philosophy Section -->
+        <div id="philosophy" class="content-section">
+            <div class="card">
+                <h2>🧠 Il Paradosso Esistenziale</h2>
+                
+                <div style="text-align: center; padding: 30px;">
+                    <h3 style="color: var(--accent-purple); margin-bottom: 20px;">
+                        "Se il debito-entropia è inevitabile, perché non disperare?"
+                    </h3>
+                    
+                    <p style="font-size: 1.2rem; line-height: 1.8; max-width: 800px; margin: 0 auto;">
+                        Perché <strong>la vita stessa</strong> è la prova che si può:
+                    </p>
+                    
+                    <div class="grid" style="margin-top: 30px;">
+                        <div class="metric">
+                            <div class="metric-icon">🏗️</div>
+                            <div style="color: var(--text-primary);">Creare ordine locale<br>(anche se temporaneo)</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-icon">🎨</div>
+                            <div style="color: var(--text-primary);">Generare bellezza<br>nel decay</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-icon">💫</div>
+                            <div style="color: var(--text-primary);">Trovare significato<br>nell'impermanenza</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="margin-top: 30px;">
+                    <p style="text-align: center; font-size: 1.1rem; font-style: italic;">
+                        "Il debito non è il nemico - è il prezzo del biglietto per esistere in un universo entropico."
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>💭 La Saggezza Termodinamica</h2>
+                
+                <blockquote style="border-left: 4px solid var(--accent-blue); padding: 20px; margin: 20px; font-style: italic;">
+                    <p>"Non puoi vincere" (1° legge)</p>
+                    <p>"Non puoi pareggiare" (2° legge)</p>
+                    <p>"Non puoi uscire dal gioco" (3° legge)</p>
+                    <p style="margin-top: 20px; color: var(--accent-purple);"><strong>Ma puoi giocare magnificamente.</strong></p>
+                </blockquote>
+                
+                <div class="grid" style="margin-top: 30px;">
+                    <div class="card">
+                        <h3>🌊 Lezioni dal Surfing Entropico</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li>Non combattere l'onda, cavalcala</li>
+                            <li>L'equilibrio è dinamico, non statico</li>
+                            <li>La caduta è parte del processo</li>
+                            <li>La maestria viene dalla pratica</li>
+                            <li>Rispetta la potenza dell'oceano</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🎭 L'Arte del Debito Consapevole</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li>Riconosci la sua inevitabilità</li>
+                            <li>Usalo come strumento, non come stampella</li>
+                            <li>Mantieni sempre margini di sicurezza</li>
+                            <li>Investi in capacità produttive</li>
+                            <li>Costruisci resilienza, non solo efficienza</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔮 Visione per il Futuro</h2>
+                
+                <div class="alert" style="background: rgba(16, 185, 129, 0.1); border-color: var(--accent-green);">
+                    <div class="alert-icon" style="color: var(--accent-green);">💚</div>
+                    <div>
+                        <strong>Una Nuova Economia Entropica:</strong><br>
+                        Invece di negare l'entropia, possiamo progettare sistemi che la incorporano consapevolmente:
+                        economia circolare, energia rinnovabile, cooperazione globale, tecnologie rigenerative.
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h3>Principi per un'Economia Post-Entropica</h3>
+                    <ol style="color: var(--text-secondary); line-height: 1.8;">
+                        <li><strong>Accettazione:</strong> L'entropia è una feature, non un bug</li>
+                        <li><strong>Resilienza:</strong> Sistemi che si piegano ma non si spezzano</li>
+                        <li><strong>Circolarità:</strong> Minimizzare sprechi, massimizzare riuso</li>
+                        <li><strong>Cooperazione:</strong> L'entropia condivisa pesa meno</li>
+                        <li><strong>Innovazione:</strong> Nuovi modi di creare valore con meno risorse</li>
+                        <li><strong>Saggezza:</strong> Sapere quando accelerare e quando rallentare</li>
+                        <li><strong>Bellezza:</strong> Trovare grazia anche nel decadimento</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-filosofia.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        🧠 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <!-- Practical Applications Section -->
+        <div id="applications" class="content-section">
+            <div class="card">
+                <h2>🚀 Applicazioni Pratiche</h2>
+                
+                <div class="grid">
+                    <div class="card" style="border-color: var(--accent-blue);">
+                        <h3>📊 Finanza Personale</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li><strong>Diversificazione:</strong> Non tutti i debiti sono uguali</li>
+                            <li><strong>Cash flow:</strong> Gestire il flusso entropico</li>
+                            <li><strong>Investimenti:</strong> Bilanciare rischio e rendimento</li>
+                            <li><strong>Emergency fund:</strong> Buffer contro l'entropia</li>
+                        </ul>
+                        <div class="info-box" style="margin-top: 15px;">
+                            <div>💡 Usa il debito per asset produttivi, non per consumo</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="border-color: var(--accent-green);">
+                        <h3>🏢 Business Strategy</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li><strong>Leverage ottimale:</strong> Quanto debito è sostenibile?</li>
+                            <li><strong>Risk management:</strong> Hedging entropico</li>
+                            <li><strong>Innovation debt:</strong> Il costo del non innovare</li>
+                            <li><strong>Operational efficiency:</strong> Ridurre entropia interna</li>
+                        </ul>
+                        <div class="info-box" style="margin-top: 15px;">
+                            <div>📈 ROI deve superare costo del debito + entropia</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="border-color: var(--accent-purple);">
+                        <h3>🌍 Policy Making</h3>
+                        <ul style="color: var(--text-secondary);">
+                            <li><strong>Fiscal policy:</strong> Bilanciare stimolo e sostenibilità</li>
+                            <li><strong>Monetary policy:</strong> Gestire inflazione entropica</li>
+                            <li><strong>Regulation:</strong> Prevenire accumulo sistemico</li>
+                            <li><strong>Social safety nets:</strong> Ammortizzatori entropici</li>
+                        </ul>
+                        <div class="info-box" style="margin-top: 15px;">
+                            <div>⚖️ Equilibrio tra crescita e stabilità</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🛠️ Toolkit Pratico</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Strumento</th>
+                            <th>Applicazione</th>
+                            <th>Beneficio</th>
+                            <th>Limitazione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Stress Testing</strong></td>
+                            <td>Simulare scenari estremi</td>
+                            <td>Identificare vulnerabilità</td>
+                            <td>Non prevede cigni neri</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Value at Risk</strong></td>
+                            <td>Quantificare perdite potenziali</td>
+                            <td>Metriche chiare</td>
+                            <td>Sottostima tail risk</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scenario Planning</strong></td>
+                            <td>Preparare multiple futures</td>
+                            <td>Flessibilità strategica</td>
+                            <td>Costoso da implementare</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Real Options</strong></td>
+                            <td>Valutare flessibilità</td>
+                            <td>Cattura valore opzionalità</td>
+                            <td>Matematicamente complesso</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>🎓 Lezioni Chiave</h2>
+                
+                <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 212, 255, 0.1)); padding: 30px; border-radius: 15px;">
+                    <h3 style="color: var(--accent-purple); margin-bottom: 20px;">I 7 Principi dell'Entropia Applicata</h3>
+                    
+                    <ol style="line-height: 2; color: var(--text-primary);">
+                        <li><strong>Accettazione:</strong> L'entropia non si elimina, si gestisce</li>
+                        <li><strong>Monitoraggio:</strong> Misura costantemente i tuoi livelli entropici</li>
+                        <li><strong>Diversificazione:</strong> Distribuisci il rischio entropico</li>
+                        <li><strong>Temporizzazione:</strong> Scegli quando assumere/ridurre debito</li>
+                        <li><strong>Produttività:</strong> Usa il debito per creare valore superiore</li>
+                        <li><strong>Resilienza:</strong> Mantieni sempre margini di sicurezza</li>
+                        <li><strong>Adattamento:</strong> Evolvi con il cambiamento entropico</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📱 Tools & Risorse</h2>
+                
+                <div class="grid">
+                    <div class="info-box">
+                        <h3>📊 Calcolatori</h3>
+                        <ul style="color: var(--text-secondary); list-style: none; padding: 10px 0;">
+                            <li>• Debt-to-Entropy Ratio</li>
+                            <li>• Sustainability Index</li>
+                            <li>• Collapse Probability</li>
+                            <li>• Recovery Time Estimator</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>📚 Letture Essenziali</h3>
+                        <ul style="color: var(--text-secondary); list-style: none; padding: 10px 0;">
+                            <li>• "The Black Swan" - Taleb</li>
+                            <li>• "Thinking in Systems" - Meadows</li>
+                            <li>• "Debt: The First 5000 Years" - Graeber</li>
+                            <li>• "The Entropy Law" - Georgescu-Roegen</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>🔗 Framework</h3>
+                        <ul style="color: var(--text-secondary); list-style: none; padding: 10px 0;">
+                            <li>• OODA Loop per decisioni rapide</li>
+                            <li>• Antifragile Design Principles</li>
+                            <li>• Complexity Science Toolkit</li>
+                            <li>• Systems Thinking Canvas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pulsante Approfondimento -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="entropia-approfondimento-applicazioni.html" style="text-decoration: none;">
+                    <button style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); border: none; border-radius: 15px; padding: 15px 40px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;">
+                        🚀 Approfondisci questa sezione →
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize particles background
+        function initParticles() {
+            const canvas = document.getElementById('particles-bg');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const particleCount = 100;
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.radius = Math.random() * 2;
+                    this.opacity = Math.random() * 0.5 + 0.2;
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(139, 92, 246, ${this.opacity})`;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Debt Growth Chart
+            const debtGrowthCtx = document.getElementById('debtGrowthChart');
+            if (debtGrowthCtx) {
+                new Chart(debtGrowthCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 50}, (_, i) => `Anno ${i}`),
+                        datasets: [{
+                            label: 'Debito Semplice',
+                            data: Array.from({length: 50}, (_, i) => 1000 * (1 + 0.03 * i)),
+                            borderColor: '#00d4ff',
+                            fill: false
+                        }, {
+                            label: 'Debito Entropico',
+                            data: Array.from({length: 50}, (_, i) => 1000 * Math.exp(0.03 * i) * (1 + 0.02 * i)),
+                            borderColor: '#ef4444',
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#e2e8f0' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                        }
+                    }
+                });
+            }
+
+            // Debt Distribution Chart
+            const debtDistCtx = document.getElementById('debtDistributionChart');
+            if (debtDistCtx) {
+                new Chart(debtDistCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Corporate', 'Sovrano', 'Personale', 'Finanziario'],
+                        datasets: [{
+                            data: [88, 92, 54, 73],
+                            backgroundColor: ['#8b5cf6', '#00d4ff', '#10b981', '#f59e0b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#e2e8f0' } }
+                        }
+                    }
+                });
+            }
+
+            // Collapse Chart
+            const collapseCtx = document.getElementById('collapseChart');
+            if (collapseCtx) {
+                new Chart(collapseCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 40}, (_, i) => `${i}`),
+                        datasets: [{
+                            label: 'Curva di Collasso',
+                            data: Array.from({length: 40}, (_, i) => {
+                                if (i < 20) return Math.pow(1.03, i) * 100;
+                                if (i < 30) return Math.pow(1.08, i) * 100;
+                                if (i < 35) return Math.pow(1.15, i) * 100;
+                                return Math.pow(1.15, 35) * 100 * Math.exp(-(i-35));
+                            }),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#e2e8f0' } }
+                        },
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Anni', color: '#94a3b8' },
+                                ticks: { color: '#94a3b8' }, 
+                                grid: { color: '#334155' } 
+                            },
+                            y: { 
+                                title: { display: true, text: 'Livello di Debito', color: '#94a3b8' },
+                                ticks: { color: '#94a3b8' }, 
+                                grid: { color: '#334155' } 
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Historical Patterns Chart
+            const historicalCtx = document.getElementById('historicalPatternsChart');
+            if (historicalCtx) {
+                new Chart(historicalCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Euforia', 'Accelerazione', 'Segnali', 'Minsky', 'Collasso', 'Reset'],
+                        datasets: [{
+                            label: 'Durata Media (anni)',
+                            data: [5, 3, 2, 0.5, 1, 2],
+                            backgroundColor: [
+                                '#10b981',
+                                '#f59e0b',
+                                '#f59e0b',
+                                '#ef4444',
+                                '#8b0000',
+                                '#8b5cf6'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#e2e8f0' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Simulation functions
+        let simulationChart = null;
+
+        function updateSimulation() {
+            document.getElementById('initialDebtValue').textContent = document.getElementById('initialDebt').value;
+            document.getElementById('interestRateValue').textContent = parseFloat(document.getElementById('interestRate').value).toFixed(1);
+            document.getElementById('entropyRateValue').textContent = parseFloat(document.getElementById('entropyRate').value).toFixed(1);
+            document.getElementById('growthRateValue').textContent = parseFloat(document.getElementById('growthRate').value).toFixed(1);
+        }
+
+        function runSimulation() {
+            const initialDebt = parseFloat(document.getElementById('initialDebt').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
+            const entropyRate = parseFloat(document.getElementById('entropyRate').value) / 100;
+            const growthRate = parseFloat(document.getElementById('growthRate').value) / 100;
+            
+            const years = 30;
+            const debtData = [];
+            const gdpData = [];
+            const entropyData = [];
+            
+            for (let i = 0; i <= years; i++) {
+                const debt = initialDebt * Math.exp((interestRate + entropyRate) * i);
+                const gdp = initialDebt * Math.exp(growthRate * i);
+                const entropy = (debt / gdp) * 100;
+                
+                debtData.push(debt);
+                gdpData.push(gdp);
+                entropyData.push(entropy);
+            }
+            
+            // Find point of no return
+            let noReturnYear = years;
+            for (let i = 0; i < entropyData.length; i++) {
+                if (entropyData[i] > 200) {
+                    noReturnYear = i;
+                    break;
+                }
+            }
+            
+            // Update metrics
+            document.getElementById('noReturnPoint').textContent = `Anno ${noReturnYear}`;
+            document.getElementById('finalDebt').textContent = `$${(debtData[debtData.length - 1] / 1000).toFixed(1)}T`;
+            document.getElementById('totalEntropy').textContent = `${entropyData[entropyData.length - 1].toFixed(0)}%`;
+            
+            // Update chart
+            const ctx = document.getElementById('simulationChart');
+            if (ctx) {
+                if (simulationChart) {
+                    simulationChart.destroy();
+                }
+                
+                simulationChart = new Chart(ctx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: years + 1}, (_, i) => `${i}`),
+                        datasets: [{
+                            label: 'Debito',
+                            data: debtData,
+                            borderColor: '#ef4444',
+                            yAxisID: 'y'
+                        }, {
+                            label: 'PIL',
+                            data: gdpData,
+                            borderColor: '#10b981',
+                            yAxisID: 'y'
+                        }, {
+                            label: 'Entropia (%)',
+                            data: entropyData,
+                            borderColor: '#8b5cf6',
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#e2e8f0' } }
+                        },
+                        scales: {
+                            x: { 
+                                title: { display: true, text: 'Anni', color: '#94a3b8' },
+                                ticks: { color: '#94a3b8' }, 
+                                grid: { color: '#334155' } 
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: { display: true, text: 'Valore ($B)', color: '#94a3b8' },
+                                ticks: { color: '#94a3b8' }, 
+                                grid: { color: '#334155' }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: { display: true, text: 'Entropia (%)', color: '#94a3b8' },
+                                ticks: { color: '#94a3b8' },
+                                grid: {
+                                    drawOnChartArea: false,
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 3D Entropy Visualization
+        function init3DVisualization() {
+            const container = document.getElementById('entropyVisualization');
+            if (!container) return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // Create particle system
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 5000;
+            const posArray = new Float32Array(particlesCount * 3);
+
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 50;
+            }
+
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                color: 0x8b5cf6,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            // Add torus knot as entropy representation
+            const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x00d4ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            const torusKnot = new THREE.Mesh(geometry, material);
+            scene.add(torusKnot);
+
+            camera.position.z = 30;
+
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.y += 0.001;
+                particlesMesh.rotation.x += 0.0005;
+                
+                torusKnot.rotation.x += 0.01;
+                torusKnot.rotation.y += 0.01;
+
+                // Entropy effect - particles spread out
+                const positions = particlesGeometry.attributes.position.array;
+                for(let i = 0; i < positions.length; i += 3) {
+                    positions[i] *= 1.0001;
+                    positions[i + 1] *= 1.0001;
+                    positions[i + 2] *= 1.0001;
+                    
+                    // Reset if too far
+                    if(Math.abs(positions[i]) > 25) {
+                        positions[i] = (Math.random() - 0.5) * 5;
+                        positions[i + 1] = (Math.random() - 0.5) * 5;
+                        positions[i + 2] = (Math.random() - 0.5) * 5;
+                    }
+                }
+                particlesGeometry.attributes.position.needsUpdate = true;
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
+
+        // Tab navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+            }
+            
+            // Activate selected tab
+            event.target.classList.add('active');
+            
+            // Initialize 3D visualization if needed
+            if (sectionId === 'simulation' && !document.querySelector('#entropyVisualization canvas')) {
+                setTimeout(init3DVisualization, 100);
+            }
+        }
+
+        // Update live metrics periodically
+        function updateLiveMetrics() {
+            // Simulate live data updates
+            const metrics = {
+                systemEntropy: (85 + Math.random() * 10).toFixed(1),
+                globalDebt: (300 + Math.random() * 20).toFixed(0),
+                entropicRate: (3 + Math.random() * 0.5).toFixed(1),
+                collapseTime: Math.floor(20 + Math.random() * 10),
+                debtToGDP: (350 + Math.random() * 20).toFixed(0),
+                corporateDebt: (85 + Math.random() * 10).toFixed(0),
+                sovereignDebt: (90 + Math.random() * 10).toFixed(0),
+                personalDebt: (50 + Math.random() * 10).toFixed(0)
+            };
+            
+            // Update DOM elements
+            const elements = {
+                systemEntropy: `${metrics.systemEntropy}%`,
+                globalDebt: `$${metrics.globalDebt}T`,
+                entropicRate: `${metrics.entropicRate}%`,
+                collapseTime: `~${metrics.collapseTime}y`,
+                debtToGDP: `${metrics.debtToGDP}%`,
+                corporateDebt: `$${metrics.corporateDebt}T`,
+                sovereignDebt: `$${metrics.sovereignDebt}T`,
+                personalDebt: `$${metrics.personalDebt}T`
+            };
+            
+            for (const [id, value] of Object.entries(elements)) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                }
+            }
+        }
+
+        // Initialize everything on load
+        window.addEventListener('load', () => {
+            initParticles();
+            initCharts();
+            updateSimulation();
+            runSimulation();
+            
+            // Start live updates
+            setInterval(updateLiveMetrics, 5000);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('particles-bg');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+    </script>
+</body>
+</html>
