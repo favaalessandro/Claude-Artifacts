@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confronto Architetture LLM 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .model-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            animation: slideUp 0.6s;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .model-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 60px rgba(0,0,0,0.2);
+        }
+        
+        .model-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .model-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .claude-icon { background: linear-gradient(135deg, #FF6B6B, #C44569); }
+        .gpt-icon { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+        .deepseek-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .qwen-icon { background: linear-gradient(135deg, #F7971E, #FFD200); }
+        
+        .model-title h2 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        .model-subtitle {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .spec-section {
+            margin-bottom: 20px;
+        }
+        
+        .spec-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .spec-title::before {
+            content: '▸';
+            margin-right: 8px;
+            color: #667eea;
+        }
+        
+        .spec-content {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 2px;
+        }
+        
+        .badge-primary { background: #e3f2fd; color: #1976d2; }
+        .badge-success { background: #e8f5e9; color: #388e3c; }
+        .badge-warning { background: #fff3e0; color: #f57c00; }
+        .badge-danger { background: #ffebee; color: #c62828; }
+        .badge-info { background: #f3e5f5; color: #7b1fa2; }
+        
+        .comparison-table {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            animation: fadeIn 1s;
+        }
+        
+        .comparison-table h2 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 1.8em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .metric-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .metric-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .pros, .cons {
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .pros {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .cons {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+        
+        .pros h4, .cons h4 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .pros h4::before {
+            content: '✓';
+            margin-right: 8px;
+            color: #4caf50;
+        }
+        
+        .cons h4::before {
+            content: '✗';
+            margin-right: 8px;
+            color: #f44336;
+        }
+        
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        li {
+            padding: 4px 0;
+            font-size: 0.9em;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Confronto Architetture LLM 2025</h1>
+            <p>Analisi tecnica comparativa dei principali modelli linguistici</p>
+        </div>
+        
+        <div class="comparison-grid">
+            <!-- Claude Card -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div class="model-icon claude-icon">C</div>
+                    <div class="model-title">
+                        <h2>Claude Opus 4.1</h2>
+                        <div class="model-subtitle">Anthropic</div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Architettura</div>
+                    <div class="spec-content">
+                        <span class="badge badge-primary">Transformer Decoder</span>
+                        <span class="badge badge-info">Constitutional AI</span>
+                        <p style="margin-top: 8px;">Architettura proprietaria basata su Transformer con training costituzionale per sicurezza e allineamento</p>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Parametri</div>
+                    <div class="spec-content">
+                        Non divulgato (stimato >175B)
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="width: 75%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Context Window</div>
+                    <div class="spec-content">
+                        <strong>200.000 token</strong> (espandibile)
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Caratteristiche Chiave</div>
+                    <div class="spec-content">
+                        • Constitutional AI per sicurezza<br>
+                        • Artifacts per contenuti strutturati<br>
+                        • Analisi documenti complessi<br>
+                        • Forte focus su etica e sicurezza
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Punti di Forza</h4>
+                        <ul>
+                            <li>• Ragionamento accurato</li>
+                            <li>• Minori allucinazioni</li>
+                            <li>• Ottimo per coding</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Limitazioni</h4>
+                        <ul>
+                            <li>• API chiusa</li>
+                            <li>• Costo elevato</li>
+                            <li>• No fine-tuning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- GPT Card -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div class="model-icon gpt-icon">G</div>
+                    <div class="model-title">
+                        <h2>GPT-4 / o1</h2>
+                        <div class="model-subtitle">OpenAI</div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Architettura</div>
+                    <div class="spec-content">
+                        <span class="badge badge-primary">Transformer Decoder</span>
+                        <span class="badge badge-success">MoE (rumored)</span>
+                        <p style="margin-top: 8px;">GPT-4: Dense Transformer con RLHF<br>
+                        o1: Chain-of-Thought reasoning integrato</p>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Parametri</div>
+                    <div class="spec-content">
+                        GPT-4: ~1.76T (MoE, 220B attivi)<br>
+                        o1: Non divulgato
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Context Window</div>
+                    <div class="spec-content">
+                        <strong>128.000 token</strong> (GPT-4 Turbo)
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Caratteristiche Chiave</div>
+                    <div class="spec-content">
+                        • Multimodale (testo, immagini, voce)<br>
+                        • Function calling avanzato<br>
+                        • o1: reasoning step-by-step<br>
+                        • Ampio ecosistema plugin
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Punti di Forza</h4>
+                        <ul>
+                            <li>• Performance SOTA</li>
+                            <li>• Multimodalità</li>
+                            <li>• Vasto ecosistema</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Limitazioni</h4>
+                        <ul>
+                            <li>• Molto costoso</li>
+                            <li>• Completamente chiuso</li>
+                            <li>• Rate limits</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- DeepSeek Card -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div class="model-icon deepseek-icon">D</div>
+                    <div class="model-title">
+                        <h2>DeepSeek-R1</h2>
+                        <div class="model-subtitle">DeepSeek AI</div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Architettura</div>
+                    <div class="spec-content">
+                        <span class="badge badge-success">MoE Transformer</span>
+                        <span class="badge badge-warning">Pure RL</span>
+                        <p style="margin-top: 8px;">Basato su DeepSeek-V3, addestrato con RL puro senza SFT preliminare</p>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Parametri</div>
+                    <div class="spec-content">
+                        <strong>671B totali</strong> (37B attivi)
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Context Window</div>
+                    <div class="spec-content">
+                        <strong>128.000 token</strong>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Caratteristiche Chiave</div>
+                    <div class="spec-content">
+                        • Reasoning emergente da RL puro<br>
+                        • Multi-Head Latent Attention<br>
+                        • Costo training 95% inferiore<br>
+                        • Completamente open source
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Punti di Forza</h4>
+                        <ul>
+                            <li>• Costo bassissimo</li>
+                            <li>• Open source</li>
+                            <li>• Reasoning avanzato</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Limitazioni</h4>
+                        <ul>
+                            <li>• Language mixing</li>
+                            <li>• Meno robusto</li>
+                            <li>• Nuovo, meno testato</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Qwen Card -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div class="model-icon qwen-icon">Q</div>
+                    <div class="model-title">
+                        <h2>Qwen2.5-Max</h2>
+                        <div class="model-subtitle">Alibaba Cloud</div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Architettura</div>
+                    <div class="spec-content">
+                        <span class="badge badge-primary">Transformer + GQA</span>
+                        <span class="badge badge-success">MoE Available</span>
+                        <p style="margin-top: 8px;">Grouped Query Attention + Dual Chunk Attention per efficienza</p>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Parametri</div>
+                    <div class="spec-content">
+                        Dense: 0.5B-72B<br>
+                        MoE: 57B (14B attivi)
+                        <div class="metric-bar">
+                            <div class="metric-fill" style="width: 60%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Context Window</div>
+                    <div class="spec-content">
+                        <strong>128.000-131.000 token</strong>
+                    </div>
+                </div>
+                
+                <div class="spec-section">
+                    <div class="spec-title">Caratteristiche Chiave</div>
+                    <div class="spec-content">
+                        • Supporto 29+ lingue<br>
+                        • YARN per context extension<br>
+                        • Versioni ottimizzate per edge<br>
+                        • Forte su task multilingue
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>Punti di Forza</h4>
+                        <ul>
+                            <li>• Multilingue eccellente</li>
+                            <li>• Molto efficiente</li>
+                            <li>• Range di dimensioni</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>Limitazioni</h4>
+                        <ul>
+                            <li>• Meno diffuso in occidente</li>
+                            <li>• Reasoning limitato</li>
+                            <li>• Documentazione cinese</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Table -->
+        <div class="comparison-table">
+            <h2>📊 Confronto Dettagliato Metriche</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Caratteristica</th>
+                        <th>Claude Opus 4.1</th>
+                        <th>GPT-4 / o1</th>
+                        <th>DeepSeek-R1</th>
+                        <th>Qwen2.5-Max</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Architettura Core</strong></td>
+                        <td>Transformer Dense</td>
+                        <td>Transformer (MoE suspected)</td>
+                        <td>MoE Transformer</td>
+                        <td>Transformer + GQA/DCA</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Training Approach</strong></td>
+                        <td>Constitutional AI + RLHF</td>
+                        <td>SFT + RLHF</td>
+                        <td>Pure RL (no SFT)</td>
+                        <td>SFT + RLHF</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Context Window</strong></td>
+                        <td>200K tokens</td>
+                        <td>128K tokens</td>
+                        <td>128K tokens</td>
+                        <td>128-131K tokens</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Costo Inferenza</strong></td>
+                        <td>Alto ($15/M tokens)</td>
+                        <td>Molto Alto ($30-60/M)</td>
+                        <td>Bassissimo ($0.14/M)</td>
+                        <td>Medio ($1-3/M)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Open Source</strong></td>
+                        <td>❌ Chiuso</td>
+                        <td>❌ Chiuso</td>
+                        <td>✅ MIT License</td>
+                        <td>✅ Apache 2.0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multimodalità</strong></td>
+                        <td>✅ (Vision in beta)</td>
+                        <td>✅ Completa</td>
+                        <td>❌ Solo testo</td>
+                        <td>✅ VL models disponibili</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reasoning Score</strong></td>
+                        <td>9.5/10</td>
+                        <td>10/10 (o1)</td>
+                        <td>9/10</td>
+                        <td>7.5/10</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Velocità Inferenza</strong></td>
+                        <td>Media</td>
+                        <td>Lenta (o1 molto lenta)</td>
+                        <td>Veloce (MoE)</td>
+                        <td>Molto Veloce (GQA)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MMLU Score</strong></td>
+                        <td>~88%</td>
+                        <td>~90% (GPT-4)</td>
+                        <td>~87%</td>
+                        <td>~85%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HumanEval (Coding)</strong></td>
+                        <td>~85%</td>
+                        <td>~90%</td>
+                        <td>~88%</td>
+                        <td>~80%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Summary Section -->
+        <div class="comparison-table" style="margin-top: 30px;">
+            <h2>🎯 Quale Scegliere?</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div style="padding: 20px; background: #e8f5e9; border-radius: 10px;">
+                    <h3 style="color: #2e7d32; margin-bottom: 10px;">🏆 Miglior Performance</h3>
+                    <p><strong>GPT-4 / o1</strong> - Per task complessi dove la qualità è critica</p>
+                </div>
+                <div style="padding: 20px; background: #e3f2fd; border-radius: 10px;">
+                    <h3 style="color: #1565c0; margin-bottom: 10px;">💰 Miglior Rapporto Qualità/Prezzo</h3>
+                    <p><strong>DeepSeek-R1</strong> - Performance quasi SOTA a costo minimo</p>
+                </div>
+                <div style="padding: 20px; background: #f3e5f5; border-radius: 10px;">
+                    <h3 style="color: #6a1b9a; margin-bottom: 10px;">🔒 Più Sicuro e Allineato</h3>
+                    <p><strong>Claude Opus 4.1</strong> - Constitutional AI per massima sicurezza</p>
+                </div>
+                <div style="padding: 20px; background: #fff3e0; border-radius: 10px;">
+                    <h3 style="color: #e65100; margin-bottom: 10px;">🌍 Migliore per Multilingue</h3>
+                    <p><strong>Qwen2.5</strong> - Eccellente supporto per 29+ lingue</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px;">
+                <h3 style="margin-bottom: 15px;">📈 Trend e Considerazioni Future</h3>
+                <ul style="line-height: 1.8;">
+                    <li><strong>Convergenza MoE:</strong> Tutti i modelli stanno migrando verso architetture Mixture-of-Experts per efficienza</li>
+                    <li><strong>Context Extension:</strong> La corsa verso context window sempre più grandi (1M+ tokens all'orizzonte)</li>
+                    <li><strong>RL vs SFT:</strong> DeepSeek dimostra che il pure RL può competere con approcci tradizionali</li>
+                    <li><strong>Open vs Closed:</strong> Pressione crescente per modelli open source competitivi</li>
+                    <li><strong>Efficienza Computazionale:</strong> Focus su riduzione costi attraverso architetture innovative (GQA, DCA, MoE)</li>
+                    <li><strong>Specializzazione:</strong> Modelli sempre più ottimizzati per task specifici (reasoning, coding, multimodale)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
