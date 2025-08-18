@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Value Investing - AMZN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tier-section {
+            margin-bottom: 40px;
+        }
+
+        .tier-title {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tier-1 .flip-card-front {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .tier-2 .flip-card-front {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .tier-3 .flip-card-front {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .tier-4 .flip-card-front {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .tier-5 .flip-card-front {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .flip-card-back {
+            background-color: white;
+            color: #333;
+            transform: rotateY(180deg);
+            text-align: left;
+            font-size: 0.85em;
+        }
+
+        .metric-number {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+
+        .back-section {
+            margin-bottom: 12px;
+        }
+
+        .back-section h4 {
+            color: #2a5298;
+            font-size: 1em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .back-section p {
+            line-height: 1.4;
+            color: #555;
+        }
+
+        .formula {
+            background: #f0f4f8;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .buffett-quote {
+            border-left: 3px solid #f5576c;
+            padding-left: 10px;
+            font-style: italic;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .flip-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Dashboard Value Investing - AMZN</h1>
+        <p>Analisi secondo i principi di Warren Buffett e Charlie Munger</p>
+        <p style="font-size: 0.9em; margin-top: 10px;">💡 Clicca su ogni card per vedere i dettagli</p>
+        <div style="margin-top: 20px;">
+            <a href="buffett-wisdom.html" style="
+                display: inline-block;
+                padding: 12px 30px;
+                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+                color: #1e3c72;
+                text-decoration: none;
+                border-radius: 25px;
+                font-weight: bold;
+                font-size: 1.1em;
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+                transition: all 0.3s ease;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(255, 215, 0, 0.6)';" 
+               onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(255, 215, 0, 0.4)';">
+                📚 Buffett & Charlie's Wisdom
+            </a>
+        </div>
+    </div>
+
+    <!-- TIER 1: QUALITÀ DEL BUSINESS E MOAT -->
+    <div class="tier-section">
+        <h2 class="tier-title">TIER 1 - Qualità del Business e Moat Economico (1-12)</h2>
+        <div class="metrics-grid tier-1">
+            <!-- 1. ROE -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#1</div>
+                        <div class="metric-name">Return on Equity</div>
+                        <div class="metric-value">24.8%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Misura il rendimento generato sul capitale proprio degli azionisti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">ROE = Net Income / Shareholders' Equity</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Indica l'efficienza nel generare profitti dal capitale investito.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Il ROE è il singolo miglior indicatore della qualità di un business. Cerchiamo aziende con ROE >15% sostenibile."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Free Cash Flow -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#2</div>
+                        <div class="metric-name">Free Cash Flow</div>
+                        <div class="metric-value">$13.48B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Cassa disponibile dopo spese operative e investimenti necessari.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">FCF = Operating Cash - CapEx</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Cassa reale disponibile per azionisti, dividendi o reinvestimenti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Owner earnings: la cassa che posso estrarre senza danneggiare il business."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Gross Profit Margin -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#3</div>
+                        <div class="metric-name">Gross Profit Margin</div>
+                        <div class="metric-value">49.6%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Percentuale di ricavi che rimane dopo i costi diretti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">GPM = (Revenue - COGS) / Revenue</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Indica pricing power e vantaggio competitivo.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Margini lordi >40% suggeriscono un moat durevole. L'azienda può alzare i prezzi."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Return on Assets -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#4</div>
+                        <div class="metric-name">Return on Assets</div>
+                        <div class="metric-value">11.4%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Efficienza nel generare profitti dagli asset totali.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">ROA = Net Income / Total Assets</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Misura l'efficienza senza l'effetto della leva finanziaria.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"ROA elevato indica un business che non richiede asset eccessivi per crescere."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Cash from Operations -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#5</div>
+                        <div class="metric-name">Cash from Operations</div>
+                        <div class="metric-value">$121.1B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Cassa generata dalle attività operative core.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">CFO = Net Income + Non-cash items + ΔWC</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Qualità degli utili: profitti supportati da cassa reale.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"La cassa non mente. Preferisco business che generano cassa, non solo profitti contabili."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Operating Margin -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#6</div>
+                        <div class="metric-name">Operating Margin</div>
+                        <div class="metric-value">11.3%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Profittabilità delle operazioni core dopo tutti i costi operativi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">OM = Operating Income / Revenue</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Efficienza operativa e controllo dei costi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Margini operativi stabili nel tempo indicano un vantaggio competitivo durevole."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Revenue -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#7</div>
+                        <div class="metric-name">Revenue</div>
+                        <div class="metric-value">$670B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Ricavi totali generati dal business.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">Revenue = Price × Quantity</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Dimensione e scala del business.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Grandi ricavi stabili indicano un business maturo con domanda consistente."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Revenue Growth -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#8</div>
+                        <div class="metric-name">Revenue Growth</div>
+                        <div class="metric-value">10.9%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Tasso di crescita annuale dei ricavi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">Growth = (Rev₁ - Rev₀) / Rev₀</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Momentum e capacità di espansione.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Crescita sostenibile >GDP indica un business che guadagna quote di mercato."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. Net Income -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#9</div>
+                        <div class="metric-name">Net Income</div>
+                        <div class="metric-value">$70.62B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Profitto netto dopo tutte le spese e tasse.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">NI = Revenue - All Expenses - Taxes</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Bottom line: quello che resta agli azionisti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"I profitti sono opinioni, la cassa è un fatto. Ma profitti consistenti indicano qualità."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. EBITDA Margin -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#10</div>
+                        <div class="metric-name">EBITDA Margin</div>
+                        <div class="metric-value">19.9%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Profittabilità prima di interessi, tasse e ammortamenti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">EBITDA Margin = EBITDA / Revenue</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Profittabilità operativa normalizzata.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"EBITDA è utile per confronti, ma ricorda: non è cassa reale."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11. Gross Profit -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#11</div>
+                        <div class="metric-name">Gross Profit</div>
+                        <div class="metric-value">$332.4B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Profitto lordo dopo i costi diretti di produzione.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">GP = Revenue - COGS</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Valore assoluto del margine lordo.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Un gross profit elevato e crescente indica pricing power."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12. Operating Income -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#12</div>
+                        <div class="metric-name">Operating Income</div>
+                        <div class="metric-value">$76.19B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Profitto dalle operazioni core del business.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">OI = Gross Profit - Operating Expenses</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Efficienza operativa escludendo elementi finanziari.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Focus sul business core: quanto guadagna dalle sue operazioni principali?"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIER 2: SOLIDITÀ PATRIMONIALE -->
+    <div class="tier-section">
+        <h2 class="tier-title">TIER 2 - Solidità Patrimoniale e Finanziaria (13-24)</h2>
+        <div class="metrics-grid tier-2">
+            <!-- 13. Total Equity -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#13</div>
+                        <div class="metric-name">Total Equity</div>
+                        <div class="metric-value">$333.8B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Valore contabile del patrimonio netto.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">Equity = Assets - Liabilities</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Valore di liquidazione teorico per gli azionisti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Book value è il punto di partenza, ma il valore intrinseco è ciò che conta."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 14. Debt/Equity -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#14</div>
+                        <div class="metric-name">Debt/Equity</div>
+                        <div class="metric-value">47.8%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Rapporto tra debito totale e patrimonio netto.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">D/E = Total Debt / Total Equity</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Leva finanziaria e rischio finanziario.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Preferisco aziende che possono crescere senza debito. D/E <0.5 è ideale."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 15. Net Debt -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#15</div>
+                        <div class="metric-name">Net Debt</div>
+                        <div class="metric-value">$66.39B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Debito totale meno cassa disponibile.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">Net Debt = Total Debt - Cash</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Indebitamento reale considerando la liquidità.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Il debito netto mostra la vera posizione finanziaria. Preferisco vedere numeri negativi."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 16. Total Debt -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#16</div>
+                        <div class="metric-name">Total Debt</div>
+                        <div class="metric-value">$159.6B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Somma di tutti i debiti a breve e lungo termine.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">TD = Short-term + Long-term Debt</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Obbligazioni finanziarie totali.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"Il debito è come il fuoco: utile se controllato, distruttivo se eccessivo."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 17. Current Ratio -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#17</div>
+                        <div class="metric-name">Current Ratio</div>
+                        <div class="metric-value">1.0x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Capacità di coprire passività a breve con asset liquidi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">CR = Current Assets / Current Liabilities</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Liquidità e solvibilità a breve termine.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Un current ratio >1.5 indica prudenza finanziaria. <1 può essere rischioso."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 18. Quick Ratio -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#18</div>
+                        <div class="metric-name">Quick Ratio</div>
+                        <div class="metric-value">0.8x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Test acido della liquidità escludendo inventario.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">QR = (CA - Inventory) / CL</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Liquidità immediata senza vendere inventario.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Il quick ratio mostra la vera liquidità. Importante per business con inventario alto."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 19. Cash and Short Term Investments -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#19</div>
+                        <div class="metric-name">Cash & Investments</div>
+                        <div class="metric-value">$93.18B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Liquidità e investimenti facilmente convertibili.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">C&I = Cash + Marketable Securities</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Fortezza finanziaria e flessibilità strategica.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"La cassa è ossigeno. Permette di sopravvivere alle crisi e cogliere opportunità."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 20. Working Capital -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#20</div>
+                        <div class="metric-name">Working Capital</div>
+                        <div class="metric-value">$4.5B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Capitale disponibile per operazioni quotidiane.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">WC = Current Assets - Current Liabilities</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Cushion finanziario per le operazioni.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Working capital positivo è essenziale. Negativo può indicare efficienza o rischio."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 21. Total Assets -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#21</div>
+                        <div class="metric-name">Total Assets</div>
+                        <div class="metric-value">$682.2B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Valore totale di tutto ciò che l'azienda possiede.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">TA = Current + Non-current Assets</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Dimensione patrimoniale del business.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"Grandi asset non significano grandi ritorni. Conta l'efficienza nell'usarli."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 22. Total Current Assets -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#22</div>
+                        <div class="metric-name">Current Assets</div>
+                        <div class="metric-value">$191.4B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Asset convertibili in cassa entro un anno.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">CA = Cash + Receivables + Inventory</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Liquidità a breve termine del business.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Current assets di qualità sono quelli rapidamente convertibili senza perdite."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 23. Interest Coverage -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#23</div>
+                        <div class="metric-name">Interest Coverage</div>
+                        <div class="metric-value">~15x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Capacità di pagare gli interessi sul debito.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">IC = EBIT / Interest Expense</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Margine di sicurezza nel servizio del debito.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Interest coverage >5x indica che l'azienda può facilmente gestire il suo debito."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 24. Debt Service Coverage -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#24</div>
+                        <div class="metric-name">Debt Service Coverage</div>
+                        <div class="metric-value">Derivato</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Capacità di ripagare tutto il servizio del debito.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">DSCR = EBITDA / Total Debt Service</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Sostenibilità complessiva del debito.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"Un DSCR >2x fornisce margine per le avversità."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIER 3: METRICHE DI EFFICIENZA -->
+    <div class="tier-section">
+        <h2 class="tier-title">TIER 3 - Metriche di Efficienza Operativa (25-32)</h2>
+        <div class="metrics-grid tier-3">
+            <!-- 25. Asset Turnover -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#25</div>
+                        <div class="metric-name">Asset Turnover</div>
+                        <div class="metric-value">0.98x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Ricavi generati per ogni dollaro di asset.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">AT = Revenue / Total Assets</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Efficienza nell'utilizzo degli asset.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Asset turnover alto indica un business efficiente che non richiede asset eccessivi."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 26. Capital Intensity -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#26</div>
+                        <div class="metric-name">Capital Intensity</div>
+                        <div class="metric-value">1.02x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Asset necessari per generare un dollaro di ricavi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">CI = Total Assets / Revenue</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Quanto capitale richiede il business.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Preferisco business capital-light che generano alti ritorni con pochi asset."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 27. ROIC -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#27</div>
+                        <div class="metric-name">ROIC</div>
+                        <div class="metric-value">~18%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Ritorno sul capitale totale investito.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">ROIC = NOPAT / Invested Capital</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Efficienza nel generare ritorni sul capitale.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"ROIC >15% sostenibile indica un vantaggio competitivo durevole."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 28. Cash Conversion Cycle -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#28</div>
+                        <div class="metric-name">Cash Conversion Cycle</div>
+                        <div class="metric-value">Negativo</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Giorni per convertire investimenti in cassa.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">CCC = DIO + DSO - DPO</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Efficienza nella gestione del capitale circolante.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Un CCC negativo significa che i fornitori finanziano la crescita. Geniale!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 29. Inventory Turnover -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#29</div>
+                        <div class="metric-name">Inventory Turnover</div>
+                        <div class="metric-value">Derivato</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Volte che l'inventario ruota nell'anno.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">IT = COGS / Average Inventory</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Efficienza nella gestione delle scorte.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"Alto turnover riduce il capitale immobilizzato e il rischio di obsolescenza."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 30. Fixed Asset Efficiency -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#30</div>
+                        <div class="metric-name">Fixed Asset Efficiency</div>
+                        <div class="metric-value">Derivato</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Ricavi generati dagli asset fissi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">FAE = Revenue / Fixed Assets</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Produttività degli investimenti in asset fissi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Business con alta efficienza degli asset fissi richiedono meno capex per crescere."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 31. Total Liabilities -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#31</div>
+                        <div class="metric-name">Total Liabilities</div>
+                        <div class="metric-value">$348.4B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Tutte le obbligazioni finanziarie dell'azienda.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">TL = Current + Non-current Liabilities</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Totale delle obbligazioni verso terzi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"Le passività sono promesse. Meno promesse, più flessibilità."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 32. Current Liabilities -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#32</div>
+                        <div class="metric-name">Current Liabilities</div>
+                        <div class="metric-value">$186.9B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Obbligazioni da pagare entro un anno.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">CL = Payables + Short-term Debt</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Pressione finanziaria a breve termine.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Current liabilities gestibili indicano buona pianificazione finanziaria."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIER 4: VALUTAZIONE E MARGINE DI SICUREZZA -->
+    <div class="tier-section">
+        <h2 class="tier-title">TIER 4 - Valutazione e Margine di Sicurezza (33-40)</h2>
+        <div class="metrics-grid tier-4">
+            <!-- 33. EPS -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#33</div>
+                        <div class="metric-name">EPS</div>
+                        <div class="metric-value">$6.68</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Utile netto per ogni azione in circolazione.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">EPS = Net Income / Shares Outstanding</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Profittabilità per singola azione.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"EPS crescente nel tempo indica creazione di valore per azionista."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 34. Price to Book -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#34</div>
+                        <div class="metric-name">Price to Book</div>
+                        <div class="metric-value">~7.4x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Prezzo di mercato vs valore contabile.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">P/B = Market Cap / Book Value</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Premio pagato sopra il valore patrimoniale.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"P/B <1.5 può indicare opportunità, ma dipende dalla qualità degli asset."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 35. Earnings Yield -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#35</div>
+                        <div class="metric-name">Earnings Yield</div>
+                        <div class="metric-value">2.9%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Rendimento degli utili sul prezzo pagato.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">EY = EPS / Price = 1 / P/E</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Rendimento se tutti gli utili fossero distribuiti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Confronto l'earnings yield con i bond yield. Deve essere superiore per giustificare il rischio."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 36. EV/EBITDA -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#36</div>
+                        <div class="metric-name">EV/EBITDA</div>
+                        <div class="metric-value">18.9x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Valore enterprise su profitti operativi.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">EV/EBITDA = Enterprise Value / EBITDA</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Valutazione normalizzata per struttura capitale.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"EV/EBITDA <10 può essere interessante, ma verifica sempre la qualità dell'EBITDA."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 37. P/E Ratio -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#37</div>
+                        <div class="metric-name">P/E Ratio</div>
+                        <div class="metric-value">34.6x</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Prezzo pagato per ogni dollaro di utili.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">P/E = Price / EPS</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Aspettative di crescita incorporate nel prezzo.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"P/E è solo un riferimento. Pagherei 40x per un business eccezionale piuttosto che 10x per uno mediocre."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 38. FCF Yield -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#38</div>
+                        <div class="metric-name">FCF Yield</div>
+                        <div class="metric-value">0.55%</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Free cash flow come percentuale del market cap.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">FCF Yield = FCF / Market Cap</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Rendimento reale in cassa sul prezzo.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"FCF yield >5% inizia ad essere interessante. La cassa è re."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 39. Shares Outstanding -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#39</div>
+                        <div class="metric-name">Shares Outstanding</div>
+                        <div class="metric-value">10.665B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Numero totale di azioni in circolazione.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">SO = Basic + Diluted shares</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Base azionaria e potenziale diluizione.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Preferisco aziende che riducono le azioni con buyback. È tax-efficient."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 40. Dividend Policy -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#40</div>
+                        <div class="metric-name">Dividend Policy</div>
+                        <div class="metric-value">No dividends</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Politica di distribuzione degli utili.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">Payout Ratio = Dividends / Net Income</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Come l'azienda alloca il capitale.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Preferisco che reinvestano se possono generare ROE >15%. Altrimenti, restituiscano il capitale."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TIER 5: CONTESTO E RIFERIMENTI -->
+    <div class="tier-section">
+        <h2 class="tier-title">TIER 5 - Contesto e Riferimenti (41-45)</h2>
+        <div class="metrics-grid tier-5">
+            <!-- 41. Market Cap -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#41</div>
+                        <div class="metric-name">Market Cap</div>
+                        <div class="metric-value">$2.47T</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Valore di mercato totale dell'azienda.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">MC = Price × Shares Outstanding</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Quanto il mercato valuta l'azienda.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Market cap è il prezzo, non il valore. Mr. Market è spesso irrazionale."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 42. COGS -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#42</div>
+                        <div class="metric-name">Cost of Goods Sold</div>
+                        <div class="metric-value">$337.7B</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Costi diretti di produzione/acquisto merci.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">COGS = Beginning Inv + Purchases - Ending Inv</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Efficienza nella gestione dei costi diretti.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Munger</h4>
+                            <p class="buffett-quote">"COGS bassi e stabili indicano potere contrattuale con i fornitori."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 43. 10-Year Average ROE -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#43</div>
+                        <div class="metric-name">10-Year Avg ROE</div>
+                        <div class="metric-value">N/A</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Media del ROE negli ultimi 10 anni.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">Avg ROE = Σ(ROE₁...ROE₁₀) / 10</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Consistenza dei ritorni nel lungo termine.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Guardo sempre almeno 10 anni di storia. La consistenza batte la brillantezza occasionale."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 44. Normalized P/E -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#44</div>
+                        <div class="metric-name">Normalized P/E</div>
+                        <div class="metric-value">Adjusted</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>P/E usando utili normalizzati per il ciclo.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">Norm P/E = Price / Avg Earnings</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Valutazione aggiustata per ciclo economico.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Normalizzo sempre gli earnings. Un anno non fa una tendenza."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 45. Economic Goodwill -->
+            <div class="flip-card" onclick="flipCard(this)">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="metric-number">#45</div>
+                        <div class="metric-name">Economic Goodwill</div>
+                        <div class="metric-value">Derivato</div>
+                        <div class="flip-hint">📋 Clicca per dettagli</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-section">
+                            <h4>📖 Definizione</h4>
+                            <p>Valore del moat e asset intangibili.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🧮 Formula</h4>
+                            <div class="formula">EG = Market Value - Tangible Assets</div>
+                        </div>
+                        <div class="back-section">
+                            <h4>💡 Significato</h4>
+                            <p>Premium per brand, relazioni, moat.</p>
+                        </div>
+                        <div class="back-section">
+                            <h4>🎯 Principio Buffett</h4>
+                            <p class="buffett-quote">"Economic goodwill è il vero valore: la capacità di generare ritorni superiori."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
