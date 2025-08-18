@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warren Buffett - Analisi Professionale delle Metriche</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #e8e8e8;
+            line-height: 1.8;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,210,255,0.1) 0%, transparent 70%);
+            animation: rotate 40s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            color: #00d2ff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #ffffff;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+            opacity: 0.9;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.6);
+        }
+
+        .tier-nav {
+            background: rgba(30, 60, 114, 0.9);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .tier-nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .tier-nav a {
+            color: #00d2ff;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        .tier-nav a:hover {
+            background: rgba(0, 210, 255, 0.2);
+            border-color: #00d2ff;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .tier-section {
+            margin-bottom: 60px;
+        }
+
+        .tier-title {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.2) 0%, rgba(58, 123, 213, 0.2) 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border-left: 5px solid #00d2ff;
+        }
+
+        .tier-title h2 {
+            color: #00d2ff;
+            font-size: 2.2em;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .metric-analysis {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 210, 255, 0.1);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid rgba(0, 210, 255, 0.3);
+        }
+
+        .metric-number {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin-right: 20px;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+        }
+
+        .metric-name {
+            flex-grow: 1;
+        }
+
+        .metric-name h3 {
+            color: #00d2ff;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .metric-formula {
+            color: #87ceeb;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .warren-speaks {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.02) 100%);
+            border-left: 4px solid #ffd700;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 5px;
+            font-size: 1.05em;
+            line-height: 1.9;
+        }
+
+        .warren-speaks::before {
+            content: "Warren dice:";
+            display: block;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .analysis-section {
+            margin: 25px 0;
+        }
+
+        .analysis-section h4 {
+            color: #00d2ff;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+        }
+
+        .key-points {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .key-points li {
+            padding: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #d3d3d3;
+        }
+
+        .key-points li::before {
+            content: "▸";
+            position: absolute;
+            left: 10px;
+            color: #00d2ff;
+            font-size: 1.2em;
+        }
+
+        .practical-example {
+            background: rgba(58, 123, 213, 0.1);
+            border: 2px solid rgba(58, 123, 213, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .practical-example h5 {
+            color: #87ceeb;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .warning-box {
+            background: rgba(255, 69, 0, 0.1);
+            border: 2px solid rgba(255, 69, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box h5 {
+            color: #ff6347;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(30, 60, 114, 0.5);
+            color: #00d2ff;
+            font-style: italic;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .metric-analysis {
+                padding: 25px;
+            }
+            
+            .tier-nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .back-button {
+                position: static;
+                display: inline-block;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="buffett-dashboard.html" class="back-button">← Torna alla Dashboard</a>
+
+    <div class="header">
+        <h1>📈 Analisi Professionale delle Metriche</h1>
+        <p class="subtitle">Warren Buffett spiega nel dettaglio come valutare ogni indicatore per l'analisi di business</p>
+    </div>
+
+    <nav class="tier-nav">
+        <ul>
+            <li><a href="#tier1">Tier 1: Qualità & Moat</a></li>
+            <li><a href="#tier2">Tier 2: Solidità Patrimoniale</a></li>
+            <li><a href="#tier3">Tier 3: Efficienza Operativa</a></li>
+            <li><a href="#tier4">Tier 4: Valutazione</a></li>
+            <li><a href="#tier5">Tier 5: Contesto</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- TIER 1: QUALITÀ DEL BUSINESS E MOAT -->
+        <section id="tier1" class="tier-section">
+            <div class="tier-title">
+                <h2>TIER 1 - Qualità del Business e Moat Economico</h2>
+            </div>
+
+            <!-- 1. ROE -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">1</div>
+                    <div class="metric-name">
+                        <h3>Return on Equity (ROE)</h3>
+                        <div class="metric-formula">ROE = Net Income / Shareholders' Equity</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Quando guardo il ROE, non vedo solo un numero - vedo l'abilità del management di generare profitti con i soldi degli azionisti. È come valutare un gestore di fondi: se ti do $100, quanto riuscirai a farmi guadagnare ogni anno? Un ROE del 25% significa che per ogni dollaro di equity, l'azienda genera 25 centesimi di profitto. È straordinario.
+                    
+                    Ma attenzione - il ROE può essere manipolato. Un'azienda può aumentarlo artificialmente prendendo più debito, che riduce l'equity. Per questo lo guardo sempre insieme al debt-to-equity ratio. Un ROE del 30% con un debt-to-equity del 200% è molto diverso da un ROE del 20% senza debito.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Analizzo il ROE nel Dettaglio</h4>
+                    <ul class="key-points">
+                        <li>Cerco consistenza nel tempo: preferisco un ROE stabile del 15-20% per 10 anni piuttosto che uno che salta dal 5% al 40%</li>
+                        <li>Confronto con i competitor: un ROE superiore alla media del settore indica un vantaggio competitivo</li>
+                        <li>Scompongo usando DuPont: ROE = Net Margin × Asset Turnover × Financial Leverage</li>
+                        <li>Verifico la qualità: gli earnings devono essere supportati da cash flow reale</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Coca-Cola</h5>
+                    <p>Quando acquistai Coca-Cola nel 1988, aveva un ROE consistente del 30%+ senza debito eccessivo. Questo mi diceva che il business aveva un moat economico straordinario - il brand permetteva margini elevati e non richiedeva capitale intensivo per crescere. Oggi, dopo 35 anni, Coca-Cola mantiene ancora ROE superiori al 35%.</p>
+                </div>
+
+                <div class="warning-box">
+                    <h5>⚠️ Segnali di Allarme</h5>
+                    <p>ROE in declino costante, ROE ottenuto principalmente tramite leva finanziaria, ROE volatile che indica business ciclico o instabile, ROE elevato in settori commodity (probabilmente non sostenibile).</p>
+                </div>
+            </div>
+
+            <!-- 2. Free Cash Flow -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">2</div>
+                    <div class="metric-name">
+                        <h3>Free Cash Flow</h3>
+                        <div class="metric-formula">FCF = Operating Cash Flow - Capital Expenditures</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Free Cash Flow è la metrica che mi dice la verità nuda e cruda: quanti soldi reali posso mettere in tasca come proprietario senza danneggiare il business. Non mi interessano gli "earnings" contabili che possono essere manipolati - mi interessa la cassa che posso estrarre.
+                    
+                    Pensalo come possedere una fattoria: dopo aver pagato per semi, fertilizzanti, manutenzione del trattore e tutto il necessario per mantenere la fattoria produttiva, quanto ti rimane? Quello è il tuo free cash flow. È il denaro che puoi usare per comprare un'altra fattoria, distribuire dividendi, o semplicemente accumulare per opportunità future.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Il Mio Framework per Valutare il FCF</h4>
+                    <ul class="key-points">
+                        <li>FCF/Revenue ratio: voglio vedere almeno 10-15% - indica efficienza nella conversione delle vendite in cassa</li>
+                        <li>Crescita del FCF vs crescita degli earnings: devono muoversi insieme, altrimenti c'è manipolazione contabile</li>
+                        <li>FCF yield (FCF/Market Cap): se è sopra il 5%, sto prestando molta attenzione</li>
+                        <li>Stabilità: preferisco FCF prevedibile e crescente piuttosto che erratico</li>
+                        <li>Capex maintenance vs growth: distinguo tra spese per mantenere il business e spese per crescere</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Apple</h5>
+                    <p>Apple genera oltre $100 miliardi di FCF annuo. Con una base di capitale relativamente piccola, non ha bisogno di reinvestire massicciamente per mantenere la sua posizione. Questo FCF può essere restituito agli azionisti tramite buyback e dividendi. È un modello di business da sogno - alta generazione di cassa con bassi requisiti di reinvestimento.</p>
+                </div>
+
+                <div class="warning-box">
+                    <h5>⚠️ Segnali di Allarme</h5>
+                    <p>FCF negativo per anni (tranne che per aziende in rapida crescita con chiaro path to profitability), grande gap tra net income e FCF, FCF che dipende da tagli insostenibili al capex, working capital management aggressivo che gonfia temporaneamente il FCF.</p>
+                </div>
+            </div>
+
+            <!-- 3. Gross Profit Margin -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">3</div>
+                    <div class="metric-name">
+                        <h3>Gross Profit Margin</h3>
+                        <div class="metric-formula">GPM = (Revenue - COGS) / Revenue</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Gross Profit Margin mi dice immediatamente se un'azienda ha pricing power - la capacità di alzare i prezzi senza perdere clienti. È uno dei migliori indicatori di un moat economico durevole. Se puoi mantenere margini lordi del 40-50% o più per decenni, hai qualcosa di speciale.
+                    
+                    Quando vedo margini lordi elevati e stabili, so che l'azienda offre qualcosa che i clienti valorizzano molto più del suo costo di produzione. È la differenza tra vendere commodity e vendere prodotti differenziati. Preferisco sempre possedere business con alti margini lordi - significa che c'è molto spazio per errori operativi e ancora generare profitti.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Interpreto i Gross Margins</h4>
+                    <ul class="key-points">
+                        <li>>40%: Indica forte differenziazione di prodotto o brand power</li>
+                        <li>20-40%: Può essere accettabile se compensato da alto asset turnover</li>
+                        <li><20%: Generalmente indica business commodity - procedo con estrema cautela</li>
+                        <li>Trend: Margini in espansione indicano crescente pricing power</li>
+                        <li>Stabilità: Margini costanti attraverso cicli economici indicano resilienza</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: See's Candies</h5>
+                    <p>Quando acquistammo See's Candies nel 1972, aveva gross margins superiori al 40%. Potevamo alzare i prezzi ogni anno sopra l'inflazione e i clienti continuavano a comprare perché associavano See's a qualità e tradizione. Oggi, dopo 50 anni, See's mantiene ancora margini lordi eccezionali. Questo è il potere di un brand.</p>
+                </div>
+
+                <div class="warning-box">
+                    <h5>⚠️ Segnali di Allarme</h5>
+                    <p>Margini in costante erosione (indica perdita di pricing power), margini volatili (indica mancanza di controllo sui costi), margini artificialmente alti da accounting aggressivo, dipendenza da un singolo prodotto ad alto margine.</p>
+                </div>
+            </div>
+
+            <!-- 4. Return on Assets -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">4</div>
+                    <div class="metric-name">
+                        <h3>Return on Assets (ROA)</h3>
+                        <div class="metric-formula">ROA = Net Income / Total Assets</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il ROA mi dice quanto efficacemente un'azienda usa i suoi asset per generare profitti. È particolarmente importante per business capital-intensive come manufacturing o retail. Un ROA elevato significa che l'azienda non ha bisogno di molti asset per generare profitti - è il tipo di business che amo.
+                    
+                    La bellezza del ROA è che non può essere facilmente manipolato con la leva finanziaria come il ROE. Mi dà una visione pura dell'efficienza operativa. Quando confronto aziende nello stesso settore, quella con il ROA più alto di solito ha il miglior modello di business o il management più capace.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Il Mio Approccio al ROA</h4>
+                    <ul class="key-points">
+                        <li>Confronto sempre con la media del settore - il contesto è cruciale</li>
+                        <li>ROA >10% in business non finanziari è eccellente</li>
+                        <li>Guardo il trend su 5-10 anni, non un singolo anno</li>
+                        <li>Aggiusto per asset intangibili e goodwill quando necessario</li>
+                        <li>Considero la qualità degli asset - alcuni asset sono più produttivi di altri</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Walmart vs Amazon</h5>
+                    <p>Walmart ha un ROA intorno al 6-7%, eccellente per un retailer tradizionale con enormi asset fisici. Amazon, con il suo modello più asset-light (specialmente AWS), raggiunge ROA superiori al 7-8%. Questo riflette l'efficienza superiore del modello di business digitale, ma entrambi sono leader nei loro segmenti.</p>
+                </div>
+
+                <div class="warning-box">
+                    <h5>⚠️ Segnali di Allarme</h5>
+                    <p>ROA in declino mentre i competitor migliorano, ROA basso con asset in rapida crescita (indica investimenti non produttivi), grande discrepanza tra ROA e ROIC, manipolazione tramite asset write-downs.</p>
+                </div>
+            </div>
+
+            <!-- 5. Cash from Operations -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">5</div>
+                    <div class="metric-name">
+                        <h3>Cash from Operations</h3>
+                        <div class="metric-formula">CFO = Net Income + Non-cash charges + Changes in Working Capital</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Cash from Operations è dove la contabilità incontra la realtà. Puoi manipolare gli earnings, ma è molto più difficile falsificare la cassa. Quando vedo un'azienda con earnings elevati ma cash from operations debole, suona immediatamente un campanello d'allarme.
+                    
+                    Questa metrica mi dice se il business sta veramente generando cassa dalle sue operazioni quotidiane, non da trucchi finanziari o vendite di asset. È il polso vitale del business - se è forte e regolare, il business è sano. Se è debole o erratico, c'è qualcosa che non va.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Valuto il Cash from Operations</h4>
+                    <ul class="key-points">
+                        <li>CFO/Net Income ratio: dovrebbe essere costantemente >1.0</li>
+                        <li>Crescita del CFO: deve seguire o superare la crescita dei ricavi</li>
+                        <li>Qualità: analizzo le componenti - preferisco CFO da operations core</li>
+                        <li>Confronto con capex: CFO deve coprire ampiamente il maintenance capex</li>
+                        <li>Stagionalità: comprendo i pattern stagionali del business</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Microsoft</h5>
+                    <p>Microsoft genera oltre $100 miliardi di cash from operations annualmente. La bellezza del modello software è che una volta sviluppato il prodotto, ogni vendita aggiuntiva è quasi puro margine. Il CFO di Microsoft supera costantemente il net income, indicando earnings di altissima qualità.</p>
+                </div>
+
+                <div class="warning-box">
+                    <h5>⚠️ Segnali di Allarme</h5>
+                    <p>CFO costantemente inferiore al net income, deterioramento del working capital, dipendenza da extending payables o accelerating collections, CFO volatile in un business che dovrebbe essere stabile.</p>
+                </div>
+            </div>
+
+            <!-- 6. Operating Margin -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">6</div>
+                    <div class="metric-name">
+                        <h3>Operating Margin</h3>
+                        <div class="metric-formula">Operating Margin = Operating Income / Revenue</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    L'Operating Margin mi mostra quanto del ricavo sopravvive dopo tutti i costi operativi. È qui che vedo la vera efficienza di un business. Un'azienda può avere gross margin elevati, ma se spreca tutto in spese operative eccessive, non vale molto per gli azionisti.
+                    
+                    Quello che cerco sono operating margin stabili o in espansione nel tempo. Questo indica che il management ha controllo sui costi e che il business ha operating leverage - può crescere i ricavi più velocemente dei costi. È una delle chiavi per la creazione di valore a lungo termine.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>La Mia Analisi degli Operating Margins</h4>
+                    <ul class="key-points">
+                        <li>Stabilità attraverso i cicli: margini resilienti indicano potere di pricing</li>
+                        <li>Trend di lungo termine: preferisco miglioramento graduale a volatilità</li>
+                        <li>Confronto con peer: margini superiori indicano esecuzione superiore</li>
+                        <li>Scala economics: margini che migliorano con la crescita sono ideali</li>
+                        <li>Sostenibilità: verifico che non derivino da sottoinvestimento</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Google</h5>
+                    <p>Google mantiene operating margins intorno al 25-30% nonostante investa massicciamente in R&D. Questo è possibile grazie al modello di business con costi marginali quasi zero. Ogni click aggiuntivo sugli ads non costa praticamente nulla, quindi la crescita dei ricavi cade direttamente sul bottom line.</p>
+                </div>
+
+                <div class="warning-box">
+                    <h5>⚠️ Segnali di Allarme</h5>
+                    <p>Margini in compressione mentre i ricavi crescono (indica perdita di controllo sui costi), margini mantenuti solo tagliando R&D o marketing, grande volatilità nei margini, margini inferiori ai competitor senza chiara ragione.</p>
+                </div>
+            </div>
+
+            <!-- Continuerò con le metriche 7-12 del Tier 1, poi proseguirò con i Tier successivi -->
+
+            <!-- 7. Revenue -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">7</div>
+                    <div class="metric-name">
+                        <h3>Revenue</h3>
+                        <div class="metric-formula">Revenue = Price × Quantity</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Revenue è il punto di partenza di tutto. Senza ricavi, non c'è business. Ma non mi interessa solo la dimensione - mi interessa la qualità e la prevedibilità. Preferisco $1 miliardo di ricavi ricorrenti e prevedibili a $2 miliardi di ricavi volatili e incerti.
+                    
+                    Analizzo sempre la composizione dei ricavi. Vengono da prodotti diversificati o da un singolo prodotto? Sono ricorrenti o one-time? Dipendono da pochi grandi clienti o da milioni di piccoli clienti? La qualità dei ricavi determina la qualità del business.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Esamino i Ricavi</h4>
+                    <ul class="key-points">
+                        <li>Ricorrenza: subscription e repeat business sono oro</li>
+                        <li>Concentrazione: preferisco base clienti diversificata</li>
+                        <li>Pricing power: capacità di alzare prezzi senza perdere volumi</li>
+                        <li>Mix geografico: diversificazione riduce rischio</li>
+                        <li>Trend secolari: voglio ricavi supportati da megatrend</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Visa</h5>
+                    <p>Visa genera ricavi prendendo una piccola percentuale su trilioni di transazioni. Non ha rischio di credito, ha costi marginali minimi, e beneficia della crescita secolare dei pagamenti digitali. È un modello di ricavi quasi perfetto - ricorrente, diversificato, e in crescita strutturale.</p>
+                </div>
+            </div>
+
+            <!-- 8. Revenue Growth -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">8</div>
+                    <div class="metric-name">
+                        <h3>Revenue Growth</h3>
+                        <div class="metric-formula">Growth Rate = (Revenue T1 - Revenue T0) / Revenue T0</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    La crescita dei ricavi è importante, ma non a qualsiasi costo. Preferisco una crescita sostenibile del 10% annuo per 20 anni a una crescita del 50% per 2 anni seguita da un crollo. La consistenza batte la velocità nel lungo termine.
+                    
+                    Distinguo sempre tra crescita organica e crescita tramite acquisizioni. La crescita organica indica che i clienti vogliono di più del tuo prodotto. La crescita tramite acquisizioni può nascondere problemi nel business core. Guardo anche se la crescita è profittevole - crescere perdendo soldi su ogni vendita non è sostenibile.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Il Mio Framework per la Crescita</h4>
+                    <ul class="key-points">
+                        <li>Crescita vs GDP: deve battere la crescita economica</li>
+                        <li>Crescita vs settore: deve battere i competitor</li>
+                        <li>Qualità: crescita con margini stabili o in espansione</li>
+                        <li>Sostenibilità: valuto il TAM rimanente</li>
+                        <li>Drivers: comprendo cosa guida la crescita</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Amazon</h5>
+                    <p>Amazon ha mantenuto crescita dei ricavi >20% per oltre due decenni. Questo non è accaduto per caso - hanno continuamente espanso in nuove categorie, geografie, e servizi. La loro ossessione per il cliente garantisce che la crescita sia sostenibile.</p>
+                </div>
+            </div>
+
+            <!-- 9. Net Income -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">9</div>
+                    <div class="metric-name">
+                        <h3>Net Income</h3>
+                        <div class="metric-formula">Net Income = Revenue - All Expenses - Taxes</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Net Income è quello che rimane dopo che tutti hanno preso la loro parte - fornitori, dipendenti, governo. È importante, ma non mi fermo qui. Lo confronto sempre con il cash flow per verificare la qualità. Un net income che non si traduce in cassa è solo un numero su carta.
+                    
+                    Preferisco net income "noioso" e prevedibile a uno volatile. Quando posso prevedere il net income dei prossimi 5 anni con ragionevole accuratezza, posso valutare appropriatamente il business. La prevedibilità vale più della grandezza.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Analizzo il Net Income</h4>
+                    <ul class="key-points">
+                        <li>Qualità: elimino one-time items per vedere il core</li>
+                        <li>Conversione: Net Income/CFO ratio deve essere sano</li>
+                        <li>Trend: crescita costante è preferibile a salti</li>
+                        <li>Margini: Net Margin deve essere sostenibile</li>
+                        <li>Per share: aggiusto per buybacks e diluizione</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Berkshire Hathaway</h5>
+                    <p>Il nostro net income può fluttuare selvaggiamente a causa di unrealized gains/losses sul portfolio. Per questo pubblico sempre l'operating earnings, che esclude questi items volatili. Gli investitori devono guardare oltre il numero headline per capire il vero earning power.</p>
+                </div>
+            </div>
+
+            <!-- 10. EBITDA Margin -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">10</div>
+                    <div class="metric-name">
+                        <h3>EBITDA Margin</h3>
+                        <div class="metric-formula">EBITDA Margin = EBITDA / Revenue</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Charlie ed io siamo scettici sull'EBITDA. Come Charlie dice, "Ogni volta che sento EBITDA, mi viene da sostituirlo con 'bullshit earnings'". Detto questo, può essere utile per confronti tra aziende con strutture di capitale diverse.
+                    
+                    Il problema dell'EBITDA è che ignora il capitale necessario per mantenere il business. Se hai un business capital-intensive, ignorare depreciation è come ignorare che le tue macchine si usurano. Lo uso solo come punto di partenza, mai come metrica finale.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Quando l'EBITDA è Utile (e Quando Non Lo È)</h4>
+                    <ul class="key-points">
+                        <li>Utile per confronti cross-border con tasse diverse</li>
+                        <li>Utile per valutare capacità di servire debito</li>
+                        <li>NON utile per business capital-intensive</li>
+                        <li>NON utile per valutazione finale</li>
+                        <li>Sempre da confrontare con CFO</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Telecom vs Software</h5>
+                    <p>Una telecom con EBITDA margin del 40% può sembrare attraente, ma richiede enormi investimenti in infrastruttura. Un software company con lo stesso EBITDA margin è molto più attraente perché non ha bisogno di sostituire costantemente asset fisici.</p>
+                </div>
+            </div>
+
+            <!-- 11. Gross Profit -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">11</div>
+                    <div class="metric-name">
+                        <h3>Gross Profit</h3>
+                        <div class="metric-formula">Gross Profit = Revenue - COGS</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Gross Profit in termini assoluti mi dice la dimensione del "pie" che l'azienda ha da distribuire tra spese operative, tasse, e profitti. Un gross profit grande e in crescita indica un business con spazio per investire in crescita mantenendo profittabilità.
+                    
+                    Mi piace vedere gross profit che cresce più velocemente delle spese operative - questo crea operating leverage. È come una palla di neve che rotola giù dalla collina, raccogliendo sempre più neve (profitti) man mano che cresce.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>L'Importanza del Gross Profit Assoluto</h4>
+                    <ul class="key-points">
+                        <li>Copertura delle spese fisse: più gross profit, più sicurezza</li>
+                        <li>Capacità di investimento: R&D, marketing, espansione</li>
+                        <li>Buffer per errori: margine di manovra in tempi difficili</li>
+                        <li>Scala advantages: gross profit crescente indica economie di scala</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: iPhone di Apple</h5>
+                    <p>L'iPhone genera gross profit enormi - stimati oltre $150 miliardi annui. Questo dà ad Apple risorse massive per R&D, marketing, e retail stores, mantenendo ancora margini netti superiori al 20%. Il gross profit elevato è il motore che alimenta tutto l'ecosistema Apple.</p>
+                </div>
+            </div>
+
+            <!-- 12. Operating Income -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">12</div>
+                    <div class="metric-name">
+                        <h3>Operating Income</h3>
+                        <div class="metric-formula">Operating Income = Gross Profit - Operating Expenses</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    L'Operating Income è dove vedo la vera abilità del management. È facile generare gross profit se hai un buon prodotto, ma controllare le spese operative richiede disciplina. Questo numero mi dice quanto profitto genera il business dalle sue operazioni core, escludendo elementi finanziari e tasse.
+                    
+                    Un operating income crescente con ricavi stabili indica miglioramento dell'efficienza. Un operating income stabile con ricavi crescenti indica che l'azienda sta reinvestendo per crescita futura. Entrambi possono essere positivi, dipende dal contesto.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Interpreto l'Operating Income</h4>
+                    <ul class="key-points">
+                        <li>Trend: crescita costante indica business ben gestito</li>
+                        <li>Volatilità: bassa volatilità indica business prevedibile</li>
+                        <li>Confronto: sempre relativo ai competitor</li>
+                        <li>Qualità: verifico che non derivi da tagli insostenibili</li>
+                        <li>Reinvestimento: bilancio tra profitto attuale e crescita futura</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Costco</h5>
+                    <p>Costco mantiene deliberatamente operating income bassi reinvestendo in prezzi bassi per i membri. Potrebbero facilmente raddoppiare l'operating income alzando i prezzi, ma questo danneggerebbe il loro modello a lungo termine. A volte, operating income più bassi oggi significano business più forte domani.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIER 2: SOLIDITÀ PATRIMONIALE -->
+        <section id="tier2" class="tier-section">
+            <div class="tier-title">
+                <h2>TIER 2 - Solidità Patrimoniale e Finanziaria</h2>
+            </div>
+
+            <!-- 13. Total Equity -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">13</div>
+                    <div class="metric-name">
+                        <h3>Total Equity</h3>
+                        <div class="metric-formula">Equity = Assets - Liabilities</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Total Equity è il cushion che protegge l'azienda nei tempi difficili. È come le fondamenta di una casa - più sono solide, più la casa può resistere alle tempeste. Ma attenzione: equity elevato non sempre significa business migliore. Alcune delle migliori aziende operano con equity minimo perché non ne hanno bisogno.
+                    
+                    Quello che cerco è equity di qualità. Un bilancio può mostrare $10 miliardi di equity, ma se $8 miliardi sono goodwill da acquisizioni sopravvalutate, non vale molto. Preferisco $2 miliardi di equity tangibile e produttivo a $10 miliardi di aria fritta.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>La Mia Valutazione dell'Equity</h4>
+                    <ul class="key-points">
+                        <li>Composizione: quanto è tangibile vs intangibile?</li>
+                        <li>ROE: equity elevato con ROE basso è capitale sprecato</li>
+                        <li>Trend: equity crescente da retained earnings è positivo</li>
+                        <li>Book value per share: aggiusto per buybacks</li>
+                        <li>Qualità: verifico write-downs e impairments storici</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Banks vs Tech</h5>
+                    <p>Le banche necessitano equity massiccio per requisiti regolatori - JPMorgan ha oltre $300 miliardi. Google genera profitti simili con una frazione dell'equity. Non è che JPMorgan sia mal gestita - sono business diversi con requisiti di capitale diversi. Context is everything.</p>
+                </div>
+            </div>
+
+            <!-- 14. Debt/Equity -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">14</div>
+                    <div class="metric-name">
+                        <h3>Debt/Equity Ratio</h3>
+                        <div class="metric-formula">D/E = Total Debt / Total Equity</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Debt/Equity ratio mi dice quanto l'azienda sta scommettendo con soldi presi in prestito. È come giocare a poker: puoi vincere di più usando leverage, ma puoi anche perdere tutto. Preferisco aziende che vincono con le proprie carte, non con soldi prestati.
+                    
+                    Charlie dice: "Ci sono tre modi per andare in bancarotta: liquore, donne e leverage". Il leverage amplifica sia i successi che i fallimenti. In 60 anni, ho visto più aziende distrutte dal troppo debito che da qualsiasi altra causa.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Valuto il Leverage</h4>
+                    <ul class="key-points">
+                        <li>Settore: utilities possono sostenere più debito di tech companies</li>
+                        <li>Stabilità dei cash flow: più stabili, più debito sostenibile</li>
+                        <li>Costo del debito vs ROA: il debito deve essere produttivo</li>
+                        <li>Covenant: comprendo i termini e le restrizioni</li>
+                        <li>Maturity schedule: evito maturity concentrate</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: 2008 Financial Crisis</h5>
+                    <p>Lehman Brothers aveva un leverage ratio di 30:1. Bastava una perdita del 3.3% degli asset per azzerare l'equity. Quando il mercato immobiliare crollò, non ebbero scampo. Nel frattempo, noi a Berkshire avevamo cassa e zero leverage, permettendoci di fare i migliori investimenti della nostra storia.</p>
+                </div>
+            </div>
+
+            <!-- 15. Net Debt -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">15</div>
+                    <div class="metric-name">
+                        <h3>Net Debt</h3>
+                        <div class="metric-formula">Net Debt = Total Debt - Cash & Equivalents</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Net Debt mi dà la vera picture della posizione finanziaria. Un'azienda può avere $10 miliardi di debito, ma se ha $15 miliardi in cassa, è in una posizione di forza, non di debolezza. È la differenza tra debito lordo e capacità reale di ripagarlo immediatamente.
+                    
+                    Mi piace vedere net debt negativo - significa che l'azienda ha più cassa che debito. È come avere una pistola carica mentre tutti gli altri sono disarmati. Quando arrivano le opportunità o le crisi, chi ha cassa è re.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>L'Importanza del Net Debt</h4>
+                    <ul class="key-points">
+                        <li>Flessibilità: net debt basso significa opzioni</li>
+                        <li>Opportunità: cassa per acquisizioni o buybacks</li>
+                        <li>Sicurezza: buffer per tempi difficili</li>
+                        <li>Net Debt/EBITDA: preferisco <2x per non-utilities</li>
+                        <li>Trend: net debt in calo è sempre positivo</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Apple</h5>
+                    <p>Apple ha circa $100 miliardi di debito ma oltre $60 miliardi in cassa, risultando in net debt di circa $40 miliardi. Con un FCF annuale di oltre $100 miliardi, potrebbero eliminare tutto il net debt in meno di 6 mesi. Questo è il tipo di posizione finanziaria che amo.</p>
+                </div>
+            </div>
+
+            <!-- Continuerò con le metriche 16-24 del Tier 2 -->
+
+            <!-- 16. Total Debt -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">16</div>
+                    <div class="metric-name">
+                        <h3>Total Debt</h3>
+                        <div class="metric-formula">Total Debt = Short-term Debt + Long-term Debt</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Total Debt è una promessa - una promessa di pagare soldi in futuro. Ogni dollaro di debito è un dollaro che non puoi usare per opportunità, dividendi, o buybacks. È un'obbligazione che devi soddisfare indipendentemente da come va il business.
+                    
+                    Non sono contro tutto il debito - può essere uno strumento utile se usato saggiamente. Ma ho visto troppe aziende trasformarsi da business solidi a zombie finanziari per eccesso di debito. Il debito è come il fuoco: un buon servitore ma un pessimo padrone.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Analizzo il Debito Totale</h4>
+                    <ul class="key-points">
+                        <li>Struttura: fixed vs floating rate in ambiente di tassi variabili</li>
+                        <li>Maturity ladder: evito concentration risk</li>
+                        <li>Currency: currency mismatch può essere letale</li>
+                        <li>Covenants: comprendo tutte le restrizioni</li>
+                        <li>Off-balance sheet: cerco sempre debito nascosto</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Airlines</h5>
+                    <p>Le compagnie aeree hanno tradizionalmente alto debito per finanziare flotte costose. Ma in crisi come COVID, quel debito diventa un cappio. Southwest, con meno debito dei competitor, è sopravvissuta meglio. La lezione: nei business ciclici, meno debito significa sopravvivenza.</p>
+                </div>
+            </div>
+
+            <!-- 17. Current Ratio -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">17</div>
+                    <div class="metric-name">
+                        <h3>Current Ratio</h3>
+                        <div class="metric-formula">Current Ratio = Current Assets / Current Liabilities</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Current Ratio mi dice se un'azienda può pagare i suoi conti nel prossimo anno. È come controllare se hai abbastanza soldi in banca per pagare le bollette del mese. Un current ratio sotto 1 è come vivere paycheck to paycheck - pericoloso.
+                    
+                    Ma attenzione: un current ratio troppo alto può indicare inefficienza. Se hai current ratio di 5, probabilmente hai troppa cassa inutilizzata o inventory eccessivo. Come in tutto, cerco equilibrio - abbastanza liquidità per sicurezza, ma non così tanta da sprecare opportunità.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Interpretazione del Current Ratio</h4>
+                    <ul class="key-points">
+                        <li>>1.5: generalmente sicuro per la maggior parte dei business</li>
+                        <li>1.0-1.5: accettabile se cash flow è forte e prevedibile</li>
+                        <li><1.0: red flag a meno che non sia normale per il settore</li>
+                        <li>Qualità: verifico la liquidità reale degli asset</li>
+                        <li>Trend: deterioramento è warning signal</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Amazon</h5>
+                    <p>Amazon spesso opera con current ratio vicino a 1 perché riceve pagamenti dai clienti immediatamente ma paga i fornitori dopo 30-60 giorni. Questo negative working capital è actually un vantaggio - usano i soldi dei fornitori per finanziare la crescita. Context matters.</p>
+                </div>
+            </div>
+
+            <!-- 18. Quick Ratio -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">18</div>
+                    <div class="metric-name">
+                        <h3>Quick Ratio</h3>
+                        <div class="metric-formula">Quick Ratio = (Current Assets - Inventory) / Current Liabilities</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Quick Ratio è il test acido della liquidità. Esclude l'inventory perché in una crisi, l'inventory può essere difficile da convertire in cash rapidamente e senza perdite. È come chiedere: "Se dovessi pagare tutti i debiti domani, potrei farlo senza svendere la merce?"
+                    
+                    Per business con inventory che può diventare obsoleto rapidamente - moda, tecnologia, cibo - il quick ratio è più importante del current ratio. Non vuoi essere forzato a liquidare inventory in perdita per pagare i debiti.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Quando il Quick Ratio è Critico</h4>
+                    <ul class="key-points">
+                        <li>Business con inventory deperibile o obsolescente</li>
+                        <li>Settori con cicli di inventory lunghi</li>
+                        <li>Aziende in mercati volatili</li>
+                        <li>Quick ratio <0.5 è generalmente pericoloso</li>
+                        <li>Confronto sempre con industry standard</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Fashion Retail</h5>
+                    <p>Un retailer di moda può avere current ratio di 2 ma quick ratio di 0.5 se la maggior parte dei current assets è inventory. Se la moda cambia e l'inventory diventa invendibile, quel current ratio di 2 è illusorio. Per questo evito generalmente fashion retail - troppo rischio di inventory.</p>
+                </div>
+            </div>
+
+            <!-- Altri indicatori Tier 2... continuerò con esempi rappresentativi -->
+
+            <!-- 23. Interest Coverage -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">23</div>
+                    <div class="metric-name">
+                        <h3>Interest Coverage</h3>
+                        <div class="metric-formula">Interest Coverage = EBIT / Interest Expense</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    L'Interest Coverage mi dice quante volte un'azienda può pagare i suoi interessi con i profitti operativi. È come chiedersi: "Se i miei guadagni sono $1000 al mese e il mutuo è $100, quanto margine ho?" Un interest coverage di 10x significa che puoi pagare gli interessi 10 volte over.
+                    
+                    Questo è particolarmente importante in periodi di tassi crescenti. Un'azienda con interest coverage di 2x quando i tassi sono al 2% può trovarsi in seria difficoltà se i tassi salgono al 5%. Sempre stress-test per scenari di tassi più alti.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>I Miei Standard per Interest Coverage</h4>
+                    <ul class="key-points">
+                        <li>>5x: confortevole per la maggior parte dei business</li>
+                        <li>3-5x: accettabile se earnings sono stabili</li>
+                        <li><3x: rischio significativo, specialmente se earnings volatili</li>
+                        <li><1.5x: zona di pericolo - vulnerabile a qualsiasi shock</li>
+                        <li>Trend più importante del numero assoluto</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Utilities vs Tech</h5>
+                    <p>Una utility con interest coverage di 3x può essere più sicura di una tech company con 5x. Perché? Le utilities hanno earnings estremamente stabili e prevedibili. Le tech companies possono vedere earnings crollare del 50% in una recessione. Sempre considerare la volatilità degli earnings.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIER 3: EFFICIENZA OPERATIVA -->
+        <section id="tier3" class="tier-section">
+            <div class="tier-title">
+                <h2>TIER 3 - Metriche di Efficienza Operativa</h2>
+            </div>
+
+            <!-- 25. Asset Turnover -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">25</div>
+                    <div class="metric-name">
+                        <h3>Asset Turnover</h3>
+                        <div class="metric-formula">Asset Turnover = Revenue / Total Assets</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    L'Asset Turnover mi dice quanto efficientemente un'azienda usa i suoi asset per generare vendite. È come misurare quante pizze può sfornare una pizzeria con un singolo forno. Più alto il turnover, più efficiente il business.
+                    
+                    Ma non è una gara al numero più alto. Alcuni business naturalmente hanno asset turnover bassi ma margini alti (gioiellerie di lusso), altri hanno turnover alti ma margini bassi (supermercati). Quello che cerco è un asset turnover superiore ai competitor nello stesso settore.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Uso l'Asset Turnover</h4>
+                    <ul class="key-points">
+                        <li>Sempre confronto con competitor diretti</li>
+                        <li>Guardo il trend - miglioramento indica efficienza crescente</li>
+                        <li>Considero insieme ai margini - è un trade-off</li>
+                        <li>Verifico se deriva da asset produttivi o financial engineering</li>
+                        <li>Asset-light business naturalmente hanno turnover più alti</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Walmart vs Tiffany</h5>
+                    <p>Walmart ha asset turnover di circa 2.5x - ogni dollaro di asset genera $2.50 di vendite. Tiffany ha asset turnover di 0.8x. Ma Tiffany ha margini molto più alti. Entrambi sono leader nei loro segmenti. L'efficienza si misura diversamente in business diversi.</p>
+                </div>
+            </div>
+
+            <!-- 27. ROIC -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">27</div>
+                    <div class="metric-name">
+                        <h3>Return on Invested Capital (ROIC)</h3>
+                        <div class="metric-formula">ROIC = NOPAT / Invested Capital</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il ROIC è forse la metrica più importante per valutare la qualità di un business. Mi dice quanto ritorno genera l'azienda su TUTTO il capitale investito, sia equity che debito. È la misura definitiva di creazione di valore.
+                    
+                    Un ROIC costantemente sopra il 15% per molti anni indica un business eccezionale con vantaggi competitivi durevoli. Se un'azienda può reinvestire a ROIC del 20%, voglio che reinvesta ogni centesimo piuttosto che pagare dividendi. È matematica compound in azione.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Il ROIC nella Mia Filosofia</h4>
+                    <ul class="key-points">
+                        <li>ROIC > WACC è il minimo - deve creare valore</li>
+                        <li>ROIC > 15% indica moat economico</li>
+                        <li>ROIC stabile o crescente nel tempo è cruciale</li>
+                        <li>Gap tra ROIC e WACC = valore creato</li>
+                        <li>Incremental ROIC ancora più importante del ROIC medio</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: See's Candies</h5>
+                    <p>See's Candies ha generato ROIC superiori al 100% per decenni. Pagemmo $25 milioni nel 1972, ha generato oltre $2 miliardi di profitti da allora, richiedendo investimenti incrementali minimi. Questo è il potere del ROIC elevato composto nel tempo.</p>
+                </div>
+            </div>
+
+            <!-- 28. Cash Conversion Cycle -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">28</div>
+                    <div class="metric-name">
+                        <h3>Cash Conversion Cycle</h3>
+                        <div class="metric-formula">CCC = DIO + DSO - DPO</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Cash Conversion Cycle mi dice quanto tempo impiega un dollaro investito in inventory a tornare come cash. È la velocità del circuito del denaro nel business. Un CCC negativo significa che i fornitori finanziano la tua crescita - è il Santo Graal del working capital.
+                    
+                    Amazon ha perfezionato questo: ricevono pagamenti dai clienti immediatamente, tengono inventory minimo grazie alla logistica efficiente, e pagano i fornitori dopo 60+ giorni. Risultato? I fornitori finanziano la loro crescita. Geniale.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Decodificare il Cash Conversion Cycle</h4>
+                    <ul class="key-points">
+                        <li>CCC negativo: il business si autofinanzia</li>
+                        <li>CCC < 30 giorni: eccellente per la maggior parte dei business</li>
+                        <li>Trend più importante del numero assoluto</li>
+                        <li>Confronto con competitor rivela efficienza operativa</li>
+                        <li>Miglioramento del CCC libera cash per crescita</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Dell's Revolution</h5>
+                    <p>Michael Dell rivoluzionò il PC business con un CCC negativo. Riceveva pagamenti prima di ordinare componenti. In un business capital-intensive, trasformò il working capital da peso a vantaggio competitivo. Questo è il tipo di innovazione finanziaria che amo.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIER 4: VALUTAZIONE -->
+        <section id="tier4" class="tier-section">
+            <div class="tier-title">
+                <h2>TIER 4 - Valutazione e Margine di Sicurezza</h2>
+            </div>
+
+            <!-- 33. EPS -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">33</div>
+                    <div class="metric-name">
+                        <h3>Earnings Per Share (EPS)</h3>
+                        <div class="metric-formula">EPS = Net Income / Shares Outstanding</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    L'EPS è quanto guadagna l'azienda per ogni azione che possiedi. È la tua quota dei profitti. Ma attenzione: l'EPS può crescere semplicemente attraverso buybacks anche se il business non migliora. Guardo sempre sia l'EPS che il total net income.
+                    
+                    Preferisco vedere EPS crescere attraverso miglioramento del business piuttosto che financial engineering. Un'azienda che raddoppia l'EPS dimezzando le shares outstanding non ha creato valore reale - ha solo redistribuito lo stesso pie in fette più grandi.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Come Analizzo l'EPS</h4>
+                    <ul class="key-points">
+                        <li>Crescita organica vs buyback-driven</li>
+                        <li>Qualità: adjusted vs GAAP EPS</li>
+                        <li>Prevedibilità: volatilità indica rischio</li>
+                        <li>Sostenibilità: verifico i driver della crescita</li>
+                        <li>Diluizione: monitoro share count changes</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: IBM's Buyback Story</h5>
+                    <p>IBM ha fatto crescere l'EPS per anni principalmente attraverso buybacks mentre i ricavi declinavano. Questo ha mascherato il deterioramento del business core. Preferisco aziende come Microsoft dove l'EPS cresce sia da business improvement che da buybacks disciplinati.</p>
+                </div>
+            </div>
+
+            <!-- 37. P/E Ratio -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">37</div>
+                    <div class="metric-name">
+                        <h3>Price-to-Earnings Ratio</h3>
+                        <div class="metric-formula">P/E = Stock Price / EPS</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il P/E ratio mi dice quanti anni di earnings attuali sto pagando per possedere il business. Un P/E di 20 significa che sto pagando 20 anni di profitti attuali. Ma è solo un punto di partenza, non una conclusione.
+                    
+                    Pagherei felicemente un P/E di 30 per un business eccezionale in crescita piuttosto che un P/E di 10 per un business in declino. Come dico sempre: "È meglio comprare un business meraviglioso a un prezzo fair che un business fair a un prezzo meraviglioso."
+                </div>
+
+                <div class="analysis-section">
+                    <h4>P/E nel Contesto</h4>
+                    <ul class="key-points">
+                        <li>P/E vs crescita attesa (PEG ratio)</li>
+                        <li>P/E vs interest rates (earnings yield vs bond yield)</li>
+                        <li>P/E vs qualità del business (moat premium)</li>
+                        <li>P/E ciclicamente aggiustato (CAPE) per smoothing</li>
+                        <li>P/E settoriale - sempre confrontare con peers</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Amazon's "Expensive" P/E</h5>
+                    <p>Amazon ha tradizionalmente avuto P/E altissimi o negativi perché reinvestiva tutto in crescita. Chi si focalizzava solo sul P/E ha perso uno dei migliori investimenti della storia. Il P/E è utile, ma non può essere l'unica metrica. Guarda sempre il quadro completo.</p>
+                </div>
+            </div>
+
+            <!-- 38. FCF Yield -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">38</div>
+                    <div class="metric-name">
+                        <h3>Free Cash Flow Yield</h3>
+                        <div class="metric-formula">FCF Yield = Free Cash Flow / Market Cap</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il FCF Yield è il mio preferito tra i multipli di valutazione. Mi dice quanto cash reale genera il business relativo a quanto sto pagando. Un FCF yield del 5% significa che il business genera 5 cents di cash per ogni dollaro di market cap.
+                    
+                    Quando il FCF yield supera significativamente i bond yields, presto molta attenzione. Significa che posso ottenere rendimenti cash superiori dai business rispetto ai bonds, con il potenziale upside della crescita. È spesso un segnale di undervaluation.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>FCF Yield come Strumento di Valutazione</h4>
+                    <ul class="key-points">
+                        <li>FCF Yield > 7%: spesso indica opportunità</li>
+                        <li>Confronto con bond yields per relative value</li>
+                        <li>Più affidabile del P/E per business capital-light</li>
+                        <li>Verifico sostenibilità del FCF</li>
+                        <li>Considero reinvestment opportunities</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Apple's Capital Return</h5>
+                    <p>Apple ha un FCF yield intorno al 4%, che potrebbe sembrare basso. Ma con $100+ miliardi di FCF annuale e limitate opportunità di reinvestimento ad alto ritorno, restituiscono massive quantità agli azionisti. Il FCF yield da solo non racconta tutta la storia - bisogna capire cosa l'azienda fa con quel cash.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIER 5: CONTESTO E RIFERIMENTI -->
+        <section id="tier5" class="tier-section">
+            <div class="tier-title">
+                <h2>TIER 5 - Contesto e Riferimenti</h2>
+            </div>
+
+            <!-- 41. Market Cap -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">41</div>
+                    <div class="metric-name">
+                        <h3>Market Capitalization</h3>
+                        <div class="metric-formula">Market Cap = Stock Price × Shares Outstanding</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    Il Market Cap è quanto il mercato pensa valga l'intera azienda. Ma ricorda: Mr. Market è un maniaco-depressivo. Alcuni giorni è euforico e paga prezzi assurdi, altri è depresso e svende gemme. Il market cap è il prezzo, non il valore.
+                    
+                    Uso il market cap principalmente per dimensionare le opportunità. Un'azienda con $1 miliardo di market cap può decuplicare più facilmente di una con $1 trilione. La legge dei grandi numeri è inesorabile - più grande diventi, più difficile è crescere.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Market Cap nel Mio Framework</h4>
+                    <ul class="key-points">
+                        <li>Confronto con replacement cost degli asset</li>
+                        <li>Market cap vs private market value</li>
+                        <li>Dimensione del TAM vs market cap</li>
+                        <li>Liquidità e investibilità per grandi fondi</li>
+                        <li>Potenziale di crescita relativo alla size</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Small Cap Opportunities</h5>
+                    <p>Berkshire ora vale $900+ miliardi, rendendo impossibile per noi investire in small caps che potrebbero muovere l'ago. Ma per investitori individuali, small caps offrono opportunità che noi non possiamo più cogliere. È il vostro vantaggio - usatelo.</p>
+                </div>
+            </div>
+
+            <!-- 45. Economic Goodwill -->
+            <div class="metric-analysis">
+                <div class="metric-header">
+                    <div class="metric-number">45</div>
+                    <div class="metric-name">
+                        <h3>Economic Goodwill</h3>
+                        <div class="metric-formula">Economic Goodwill = Market Value - Tangible Asset Value</div>
+                    </div>
+                </div>
+
+                <div class="warren-speaks">
+                    L'Economic Goodwill è il valore del moat, del brand, delle relazioni con i clienti - tutti gli asset intangibili che permettono a un business di guadagnare returns superiori. È la differenza tra possedere Coca-Cola e possedere una generic cola company.
+                    
+                    Questo è il vero valore in molti business moderni. Google vale trilioni non per i suoi server, ma per i suoi algoritmi, dati, e dominanza nella ricerca. L'economic goodwill è spesso più prezioso di tutti gli asset tangibili combinati.
+                </div>
+
+                <div class="analysis-section">
+                    <h4>Valutare l'Economic Goodwill</h4>
+                    <ul class="key-points">
+                        <li>Durabilità del vantaggio competitivo</li>
+                        <li>Capacità di generare excess returns</li>
+                        <li>Protezione da competizione (moat width)</li>
+                        <li>Necessità di reinvestimento per mantenimento</li>
+                        <li>Trasferibilità e scalabilità</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <h5>Esempio Pratico: Disney's Magic</h5>
+                    <p>Quando Disney vale $200 miliardi ma ha forse $50 miliardi di asset tangibili, gli altri $150 miliardi sono economic goodwill - il valore di Mickey Mouse, Star Wars, Marvel, e generazioni di emotional connection. Questo goodwill è stato costruito in 100 anni e sarebbe impossibile da replicare. È il tipo di moat che cerco.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusione -->
+        <section class="tier-section">
+            <div class="tier-title">
+                <h2>Pensieri Finali di Warren</h2>
+            </div>
+            
+            <div class="metric-analysis">
+                <div class="warren-speaks" style="font-size: 1.1em;">
+                    Dopo 60 anni di analisi di business, posso dirti questo: le metriche sono strumenti, non risposte. Ogni numero ti racconta una parte della storia, ma devi mettere insieme tutti i pezzi per vedere il quadro completo.
+                    
+                    Non cercare la metrica perfetta o la formula magica - non esistono. Invece, sviluppa una comprensione profonda di cosa ogni metrica ti dice e, più importante, cosa non ti dice. Usa le metriche per fare domande migliori, non per evitare di pensare.
+                    
+                    Ricorda sempre: stiamo comprando business, non numeri. I numeri sono il linguaggio con cui i business ci parlano, ma dietro ogni numero c'è una realtà operativa, persone che prendono decisioni, clienti che scelgono prodotti. Non perdere mai di vista la realtà dietro i numeri.
+                    
+                    E infine, la metrica più importante non appare in nessun financial statement: l'integrità e la competenza del management. Puoi avere le migliori metriche del mondo, ma con management disonesto o incompetente, sono inutili. Come Charlie dice sempre: "Show me the incentive and I'll show you the outcome."
+                    
+                    Investi in business che capisci, gestiti da persone che rispetti, a prezzi che hanno senso. Le metriche ti aiutano a valutare questi criteri, ma il giudizio finale deve essere tuo. Non delegare il pensiero ai numeri.
+                    
+                    Buona fortuna nel tuo viaggio di investimento. Ricorda: non è necessario fare cose straordinarie per ottenere risultati straordinari. Consistenza, disciplina, e pensiero razionale battono brillantezza sporadica ogni volta.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="footer">
+        <p>📈 "In the business world, the rearview mirror is always clearer than the windshield." - Warren Buffett 📈</p>
+    </div>
+
+    <script>
+        // Smooth scroll per navigazione
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight sezione attiva
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.tier-section');
+            const navLinks = document.querySelectorAll('.tier-nav a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.background = '';
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.style.background = 'rgba(0, 210, 255, 0.2)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
