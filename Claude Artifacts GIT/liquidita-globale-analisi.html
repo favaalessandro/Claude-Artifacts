@@ -369,9 +369,164 @@
             min-width: 120px;
         }
         
+        .theory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .theory-card {
+            background: linear-gradient(135deg, #1a1a2e, #0f1419);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .theory-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+        
+        .author-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #333;
+        }
+        
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .dalio-avatar { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .elerian-avatar { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .nyfed-avatar { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        
+        .author-info h3 {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+            color: #00ff88;
+        }
+        
+        .author-title {
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        .concept-box {
+            background: rgba(0, 255, 136, 0.05);
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .concept-title {
+            font-weight: 600;
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+        
+        .comparison-table {
+            background: #1a1a2e;
+            border-radius: 15px;
+            padding: 25px;
+            overflow-x: auto;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            color: #000;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            color: #e0e0e0;
+        }
+        
+        .comparison-table tr:hover {
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-item {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 204, 255, 0.1));
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .warning-box {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .success-box {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
+        .danger-box {
+            background: rgba(255, 107, 107, 0.15);
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 1.8em; }
             .grid { grid-template-columns: 1fr; }
+            .theory-grid { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: 1fr; }
             .tabs { flex-direction: column; }
             .tab { width: 100%; text-align: center; }
             .modal-content { width: 95%; margin: 5% auto; }
@@ -395,6 +550,7 @@
             <div class="tab" onclick="switchTab('shadow')">Sistema Ombra</div>
             <div class="tab" onclick="switchTab('paradoxes')">Paradossi</div>
             <div class="tab" onclick="switchTab('critical')">Inversione Critica</div>
+            <div class="tab" onclick="switchTab('theories')">📊 Teorie Esperti</div>
             <div class="tab" onclick="openM2Modal()" style="background: linear-gradient(135deg, #ff9500, #ff6200); color: #fff;">💰 Che cos'è la massa monetaria?</div>
         </div>
         
@@ -600,6 +756,249 @@
                 <li>La blockchain elimina davvero gli intermediari o crea nuove gerarchie (miners, exchanges, whales)?</li>
                 <li>Cosa succederebbe se misurassimo successo economico in benessere anziché in PIL?</li>
             </ul>
+        </div>
+        
+        <!-- TEORIE ESPERTI -->
+        <div id="theories" class="content-panel">
+            <h2 style="margin-bottom: 30px; color: #00ff88;">📊 Tre Visioni Critiche sulla Liquidità Post-2020</h2>
+            <p style="color: #888; margin-bottom: 30px;">Analisi comparativa delle teorie di Dalio, El-Erian e NY Fed sulla liquidità globale</p>
+            
+            <div class="theory-grid">
+                <div class="theory-card">
+                    <div class="author-header">
+                        <div class="author-avatar dalio-avatar">RD</div>
+                        <div class="author-info">
+                            <h3>Ray Dalio</h3>
+                            <div class="author-title">Fondatore Bridgewater Associates</div>
+                        </div>
+                    </div>
+                    <div class="concept-box">
+                        <div class="concept-title">Tesi Centrale</div>
+                        <p><strong>"Liquidity Bubble, non Credit Bubble"</strong></p>
+                        <p style="margin-top: 10px;">Siamo in una bolla di liquidità senza precedenti dove il denaro stampato dalle banche centrali ha gonfiato i prezzi degli asset senza creare un'espansione proporzionale del credito produttivo.</p>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">Rischio Sistemico</div>
+                            <div class="metric-value">Medio</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Orizzonte</div>
+                            <div class="metric-value">2-5 anni</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="theory-card">
+                    <div class="author-header">
+                        <div class="author-avatar elerian-avatar">ME</div>
+                        <div class="author-info">
+                            <h3>Mohamed El-Erian</h3>
+                            <div class="author-title">Chief Economic Advisor, Allianz</div>
+                        </div>
+                    </div>
+                    <div class="concept-box">
+                        <div class="concept-title">Tesi Centrale</div>
+                        <p><strong>"Conseguenze Non Intenzionali del QE Infinito"</strong></p>
+                        <p style="margin-top: 10px;">Il regime di tassi zero e QE illimitato ha creato distorsioni strutturali nell'economia: zombie companies, asset inflation, moral hazard e misallocation del capitale.</p>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-label">Rischio Sistemico</div>
+                            <div class="metric-value">Alto</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Orizzonte</div>
+                            <div class="metric-value">5-10 anni</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="theory-card">
+                <div class="author-header">
+                    <div class="author-avatar nyfed-avatar">NY</div>
+                    <div class="author-info">
+                        <h3>New York Fed</h3>
+                        <div class="author-title">Federal Reserve Bank of New York</div>
+                    </div>
+                </div>
+                <div class="concept-box">
+                    <div class="concept-title">Tesi Centrale</div>
+                    <p><strong>"Risk Migration, non Credit Creation"</strong></p>
+                    <p style="margin-top: 10px;">La liquidità iniettata non ha creato credito bancario tradizionale ma ha migrato il rischio verso il sistema bancario ombra non regolamentato, creando vulnerabilità nascoste.</p>
+                </div>
+                <div class="warning-box">
+                    <strong>⚠️ Allarme:</strong> Il sistema finanziario ombra gestisce ora oltre 60 trilioni di dollari in asset, con leverage e interconnessioni opache che potrebbero causare contagio sistemico.
+                </div>
+            </div>
+            
+            <h2 style="margin: 40px 0 20px; color: #00ff88;">📚 Anatomia delle Teorie</h2>
+            
+            <div class="theory-card">
+                <h3 style="color: #667eea; margin-bottom: 20px;">Ray Dalio: Credit vs Liquidity Bubble</h3>
+                
+                <div class="concept-box">
+                    <div class="concept-title">Credit Bubble (Bolla del Credito)</div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Espansione massiva del debito privato (>100% GDP)</li>
+                        <li>Leverage estremo nel sistema bancario (>20:1)</li>
+                        <li>Speculazione finanziata a debito</li>
+                        <li>Esempi storici: 1929, 1989 (Giappone), 2008</li>
+                    </ul>
+                </div>
+                
+                <div class="success-box">
+                    <div class="concept-title">Liquidity Bubble (Situazione Attuale)</div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Eccesso di cash nel sistema senza destinazione produttiva</li>
+                        <li>Asset price inflation senza leverage eccessivo</li>
+                        <li>Velocity of money in calo drastico</li>
+                        <li>Flight to quality (tutti vogliono asset "sicuri")</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="theory-card">
+                <h3 style="color: #f5576c; margin-bottom: 20px;">El-Erian: Le 4 Distorsioni Strutturali</h3>
+                
+                <div class="danger-box">
+                    <div class="concept-title">1. Zombie Companies</div>
+                    <p><strong>20% delle aziende S&P 500</strong> non possono coprire gli interessi con l'EBIT</p>
+                    <p>Sopravvivono solo grazie a refinancing continuo a tassi bassi</p>
+                </div>
+                
+                <div class="warning-box">
+                    <div class="concept-title">2. Asset Price Inflation</div>
+                    <p>• P/E ratio medi: 25x (storico: 16x)</p>
+                    <p>• Case price/income: 8x (storico: 4x)</p>
+                    <p>• Crypto market cap: 3 trilioni (da zero in 10 anni)</p>
+                </div>
+                
+                <div class="concept-box">
+                    <div class="concept-title">3. Moral Hazard Istituzionalizzato</div>
+                    <p>Il "Greenspan/Bernanke/Powell Put": ogni correzione >10% = intervento Fed garantito</p>
+                </div>
+                
+                <div class="concept-box">
+                    <div class="concept-title">4. Capital Misallocation</div>
+                    <p>• Buybacks: 1 trilione/anno</p>
+                    <p>• R&D: -20% in termini reali</p>
+                    <p>• Productivity growth: 0.5% (minimo storico)</p>
+                </div>
+            </div>
+            
+            <div class="comparison-table">
+                <h3 style="margin-bottom: 20px; color: #00ff88;">⚖️ Confronto delle Tre Visioni</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspetto</th>
+                            <th>Ray Dalio</th>
+                            <th>Mohamed El-Erian</th>
+                            <th>New York Fed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Diagnosi</strong></td>
+                            <td>Eccesso di liquidità senza credito produttivo</td>
+                            <td>Distorsioni strutturali da politica monetaria</td>
+                            <td>Migrazione del rischio fuori dal sistema regolato</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rischio Maggiore</strong></td>
+                            <td>Correzione asset prices 30-50%</td>
+                            <td>Stagnazione secolare stile Giappone</td>
+                            <td>Crisi sistemica da contagio shadow banks</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Orizzonte</strong></td>
+                            <td>2-5 anni</td>
+                            <td>5-10 anni</td>
+                            <td>Prossima recessione</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Soluzione</strong></td>
+                            <td>Beautiful deleveraging graduale</td>
+                            <td>Normalizzazione tassi + riforme strutturali</td>
+                            <td>Regolamentazione shadow banking</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Probabilità Crisi</strong></td>
+                            <td>30%</td>
+                            <td>60%</td>
+                            <td>40%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="theory-card" style="margin-top: 30px;">
+                <h3 style="color: #00ff88; margin-bottom: 20px;">🔄 Punti di Convergenza</h3>
+                <div class="success-box">
+                    <p><strong>Tutti e tre concordano su:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 2;">
+                        <li>✓ La politica monetaria ultra-espansiva ha creato distorsioni senza precedenti</li>
+                        <li>✓ Il tradizionale meccanismo di trasmissione monetaria è rotto</li>
+                        <li>✓ I rischi si sono spostati in aree meno visibili e regolamentate</li>
+                        <li>✓ Le metriche tradizionali (M2, credito bancario) sono inadeguate</li>
+                        <li>✓ La prossima crisi verrà da dove non ce l'aspettiamo</li>
+                    </ul>
+                </div>
+                
+                <h3 style="color: #ff6b6b; margin: 20px 0;">⚔️ Punti di Divergenza</h3>
+                <div class="danger-box">
+                    <p><strong>Dove divergono:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 2;">
+                        <li>✗ <strong>Gravità:</strong> Dalio è più ottimista, El-Erian più pessimista</li>
+                        <li>✗ <strong>Timing:</strong> NY Fed vede rischi immediati, El-Erian problemi decennali</li>
+                        <li>✗ <strong>Soluzioni:</strong> Dalio vuole deleveraging, El-Erian riforme, Fed regolamentazione</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="theory-card">
+                <h3 style="color: #00ff88; margin-bottom: 20px;">⚡ Implicazioni per Investitori</h3>
+                
+                <div class="concept-box">
+                    <div class="concept-title">Se Dalio ha ragione:</div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Aspettarsi correzione 30-50% negli asset risk</li>
+                        <li>Gold e Treasury come hedge</li>
+                        <li>Evitare leverage a tutti i costi</li>
+                    </ul>
+                </div>
+                
+                <div class="warning-box">
+                    <div class="concept-title">Se El-Erian ha ragione:</div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Prepararsi a decennio di bassa crescita</li>
+                        <li>Focus su quality companies con pricing power</li>
+                        <li>Diversificazione geografica essenziale</li>
+                    </ul>
+                </div>
+                
+                <div class="danger-box">
+                    <div class="concept-title">Se NY Fed ha ragione:</div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Ridurre esposizione a leveraged loans</li>
+                        <li>Evitare CLOs e structured products</li>
+                        <li>Cash e T-bills come protezione</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="critical-note">
+                <h3 style="color: #ff6b6b; margin-bottom: 15px;">🎯 Indicatori da Monitorare</h3>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li>📊 <strong>SOFR-Treasury Spread</strong> > 50bps = stress nel funding</li>
+                    <li>📈 <strong>VIX</strong> > 30 per più di 5 giorni = panic mode</li>
+                    <li>💰 <strong>Reverse Repo</strong> > $2T = eccesso liquidità parcheggiata</li>
+                    <li>🏦 <strong>Bank CDS Spreads</strong> > 150bps = rischio sistemico</li>
+                    <li>📉 <strong>High Yield Spreads</strong> > 600bps = credit crunch imminente</li>
+                </ul>
+            </div>
         </div>
     </div>
     
