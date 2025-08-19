@@ -266,11 +266,115 @@
             font-weight: 600;
         }
         
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            position: relative;
+            background: linear-gradient(135deg, #1a1a2e, #0f1419);
+            margin: 2% auto;
+            padding: 30px;
+            border: 2px solid #ff9500;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff9500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: #ff6200;
+            transform: rotate(90deg);
+        }
+        
+        .m2-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255, 149, 0, 0.05);
+            border-left: 3px solid #ff9500;
+            border-radius: 8px;
+        }
+        
+        .m2-title {
+            color: #ff9500;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .pyramid-level {
+            background: linear-gradient(90deg, var(--level-color), transparent);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .pyramid-level:hover {
+            transform: translateX(10px);
+        }
+        
+        .example-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .highlight-number {
+            color: #ff9500;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+        }
+        
+        .timeline-date {
+            font-weight: bold;
+            color: #3b82f6;
+            margin-right: 20px;
+            min-width: 120px;
+        }
+        
         @media (max-width: 768px) {
             h1 { font-size: 1.8em; }
             .grid { grid-template-columns: 1fr; }
             .tabs { flex-direction: column; }
             .tab { width: 100%; text-align: center; }
+            .modal-content { width: 95%; margin: 5% auto; }
         }
     </style>
 </head>
@@ -291,6 +395,7 @@
             <div class="tab" onclick="switchTab('shadow')">Sistema Ombra</div>
             <div class="tab" onclick="switchTab('paradoxes')">Paradossi</div>
             <div class="tab" onclick="switchTab('critical')">Inversione Critica</div>
+            <div class="tab" onclick="openM2Modal()" style="background: linear-gradient(135deg, #ff9500, #ff6200); color: #fff;">💰 Che cos'è la massa monetaria?</div>
         </div>
         
         <!-- STRATIFICAZIONE -->
@@ -298,29 +403,29 @@
             <h2 style="margin-bottom: 20px; color: #00ff88;">La Piramide della Liquidità</h2>
             
             <div class="strata-visual">
-                <div class="stratum" style="--color: #00ff88;" onclick="expandStratum(this)">
+                <div class="stratum" style="--color: #ff6b6b;" onclick="expandStratum(this)">
                     <div class="stratum-title">M0 - Base Monetaria</div>
                     <div class="stratum-value">~$40 Trilioni</div>
-                    <div class="stratum-desc">Cash fisico + Riserve delle banche centrali. Il "denaro vero" del sistema.</div>
+                    <div class="stratum-desc" style="color: #00ff88;">Cash fisico + Riserve delle banche centrali. Il "denaro vero" del sistema.</div>
                 </div>
                 
                 <div class="stratum" style="--color: #00ccff;" onclick="expandStratum(this)">
                     <div class="stratum-title">M1 - Liquidità Immediata</div>
                     <div class="stratum-value">~$55 Trilioni</div>
-                    <div class="stratum-desc">M0 + Depositi a vista. Spendibile istantaneamente.</div>
+                    <div class="stratum-desc" style="color: #00ff88;">M0 + Depositi a vista. Spendibile istantaneamente.</div>
                 </div>
                 
-                <div class="stratum" style="--color: #3b82f6;" onclick="expandStratum(this)">
+                <div class="stratum" style="--color: #ff9500;" onclick="expandStratum(this)">
                     <div class="stratum-title">M2 - Broad Money</div>
                     <div class="stratum-value">~$130-150 Trilioni</div>
-                    <div class="stratum-desc">M1 + Depositi a termine + Money market funds. La metrica "standard".</div>
+                    <div class="stratum-desc" style="color: #00ff88;">M1 + Depositi a termine + Money market funds. La metrica "standard".</div>
                     <span class="uncertainty">±20T incertezza</span>
                 </div>
                 
                 <div class="stratum" style="--color: #8b5cf6;" onclick="expandStratum(this)">
                     <div class="stratum-title">Shadow Banking</div>
                     <div class="stratum-value">~$200-250+ Trilioni</div>
-                    <div class="stratum-desc">Repo, Eurodollars, Collateral chains. La liquidità fantasma.</div>
+                    <div class="stratum-desc" style="color: #00ff88;">Repo, Eurodollars, Collateral chains. La liquidità fantasma.</div>
                     <span class="uncertainty">Largely unmeasured</span>
                 </div>
             </div>
@@ -498,6 +603,219 @@
         </div>
     </div>
     
+    <!-- MODAL M2 EXPLANATION -->
+    <div id="m2Modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeM2Modal()">&times;</span>
+            
+            <h1 style="color: #ff9500; margin-bottom: 30px;">💰 Cos'è la Massa Monetaria M2?</h1>
+            
+            <div class="m2-section">
+                <p style="font-size: 1.2em; line-height: 1.8;">
+                    La massa monetaria M2 è una delle misure più importanti di <strong style="color: #ff9500;">quanto denaro circola nell'economia</strong>. 
+                    È come misurare quanta "liquidità" totale hanno famiglie e imprese per spendere e investire.
+                </p>
+            </div>
+            
+            <div class="m2-section">
+                <h2 class="m2-title">📊 La Piramide della Moneta: M0 → M1 → M2</h2>
+                
+                <div class="pyramid-level" style="--level-color: #ff6b6b;">
+                    <h3 style="color: #ffffff;">M0 (Base Monetaria):</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Banconote e monete fisiche in circolazione</li>
+                        <li>Riserve delle banche presso la Fed</li>
+                        <li>La moneta "creata" direttamente dalla banca centrale</li>
+                    </ul>
+                </div>
+                
+                <div class="pyramid-level" style="--level-color: #00ccff;">
+                    <h3 style="color: #ffffff;">M1 (Moneta stretta):</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Tutto il contante in circolazione</li>
+                        <li>Depositi in conto corrente (checking accounts)</li>
+                        <li>Depositi a vista che puoi usare immediatamente</li>
+                        <li><strong>Basically: soldi che puoi spendere SUBITO</strong></li>
+                    </ul>
+                </div>
+                
+                <div class="pyramid-level" style="--level-color: #ff9500;">
+                    <h3 style="color: #ffffff;">M2 (Moneta allargata):</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Tutto M1</li>
+                        <li>PLUS conti di risparmio (savings accounts)</li>
+                        <li>PLUS depositi a tempo < $100,000 (CD - certificates of deposit)</li>
+                        <li>PLUS fondi del mercato monetario retail</li>
+                        <li><strong>Basically: M1 + soldi che puoi convertire in cash rapidamente</strong></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="example-box">
+                <h3 style="color: #00ff88; margin-bottom: 15px;">💡 Esempio Pratico della Differenza</h3>
+                <p style="font-size: 1.1em;">Immagina di avere:</p>
+                <ul style="margin-left: 20px; margin-top: 10px; line-height: 2;">
+                    <li>500€ nel portafoglio → <strong style="color: #00ccff;">M1</strong></li>
+                    <li>5.000€ nel conto corrente → <strong style="color: #00ccff;">M1</strong></li>
+                    <li>20.000€ nel conto risparmio → <strong style="color: #ff9500;">M2</strong> (ma non M1)</li>
+                    <li>10.000€ in un deposito vincolato a 6 mesi → <strong style="color: #ff9500;">M2</strong> (ma non M1)</li>
+                </ul>
+            </div>
+            
+            <div class="m2-section">
+                <h2 class="m2-title">🎯 Perché M2 è così importante?</h2>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="color: #3b82f6; margin-bottom: 10px;">1. Misura il potere d'acquisto totale disponibile</h3>
+                    <ul style="margin-left: 20px;">
+                        <li>Non solo quello che puoi spendere oggi (M1)</li>
+                        <li>Ma anche quello che puoi mobilitare velocemente</li>
+                    </ul>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="color: #3b82f6; margin-bottom: 10px;">2. Predice l'inflazione meglio di M1</h3>
+                    <ul style="margin-left: 20px;">
+                        <li>Quando M2 cresce troppo velocemente → rischio inflazione</li>
+                        <li>USA 2020-2021: M2 +27% → inflazione 2022-2023</li>
+                    </ul>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="color: #3b82f6; margin-bottom: 10px;">3. Indica la "liquidità del sistema"</h3>
+                    <ul style="margin-left: 20px;">
+                        <li>Alta M2 = sistema flush di liquidità</li>
+                        <li>Bassa crescita M2 = possibile stretta creditizia</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="m2-section">
+                <h2 class="m2-title">📈 L'Espansione M2 Durante la Pandemia negli USA</h2>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Gennaio 2020</div>
+                    <div>M2 = <span class="highlight-number">15,4 trilioni di dollari</span> (pre-pandemia)</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Febbraio 2021</div>
+                    <div>Crescita anno su anno: <span class="highlight-number">+26,9%</span> (record storico assoluto!)</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Aprile 2022</div>
+                    <div>M2 = <span class="highlight-number">21,7 trilioni di dollari</span> (picco assoluto)<br>
+                    Espansione totale: <span class="highlight-number">6,3 trilioni</span> in poco più di 2 anni</div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Oggi (2025)</div>
+                    <div>M2 = <span class="highlight-number">21,5 trilioni</span> (leggermente diminuito)<br>
+                    La Fed sta facendo "Quantitative Tightening" per ridurre la liquidità</div>
+                </div>
+            </div>
+            
+            <div class="m2-section">
+                <h2 class="m2-title">💥 Cosa ha causato questa esplosione di M2?</h2>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="color: #ff6b6b;">1. Stimoli fiscali diretti (non dalla Fed ma dal governo):</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Stimulus checks: 1.200$ + 600$ + 1.400$ a persona</li>
+                        <li>Expanded unemployment benefits</li>
+                        <li>PPP loans alle imprese</li>
+                        <li><strong>Totale: circa 5 trilioni di spesa fiscale</strong></li>
+                    </ul>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="color: #ff6b6b;">2. Effetti del QE della Fed:</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>La Fed compra bond → le banche ricevono cash</li>
+                        <li>Parte di questo cash finisce in depositi (M2)</li>
+                        <li>Ma NON nella proporzione prevista dal moltiplicatore</li>
+                    </ul>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <h3 style="color: #ff6b6b;">3. Cambio comportamentale delle persone:</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Lockdown = impossibilità di spendere</li>
+                        <li>Aumento drammatico del risparmio</li>
+                        <li>Spostamento da investimenti a conti liquidi</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="m2-section">
+                <h2 class="m2-title">📚 Perché M2 è importante per l'inflazione</h2>
+                
+                <p style="margin-bottom: 20px;">La relazione storica è chiara:</p>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Anni '70:</strong> M2 cresce rapidamente → inflazione a doppia cifra</li>
+                    <li><strong>Anni '80 (Volcker):</strong> Stretta su M2 → inflazione domata</li>
+                    <li><strong>2010-2019:</strong> M2 cresce moderatamente (5-7% anno) → inflazione bassa</li>
+                    <li><strong>2020-2021:</strong> M2 esplode (+27%) → inflazione 2022-2023</li>
+                </ul>
+            </div>
+            
+            <div class="paradox-box">
+                <div class="paradox-title">💭 Il Dibattito Attuale</div>
+                
+                <p style="margin-bottom: 15px;"><strong>Milton Friedman diceva:</strong> "L'inflazione è sempre e ovunque un fenomeno monetario"</p>
+                <ul style="margin-left: 20px;">
+                    <li>Troppa moneta che insegue pochi beni = prezzi salgono</li>
+                </ul>
+                
+                <p style="margin-top: 15px; margin-bottom: 10px;"><strong>Ma nel 2020-2021 c'era un elemento nuovo:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Supply chain disruptions</li>
+                    <li>La moneta c'era ma i beni non arrivavano</li>
+                    <li>Doppio shock: domanda su + offerta giù</li>
+                </ul>
+            </div>
+            
+            <div class="m2-section">
+                <h2 class="m2-title">🌍 M2 vs M3 (che non esiste più negli USA)</h2>
+                
+                <p style="margin-bottom: 15px;">Gli USA hanno <strong>smesso di pubblicare M3 nel 2006</strong> perché:</p>
+                <ul style="margin-left: 20px;">
+                    <li>Costoso da calcolare</li>
+                    <li>Non aggiungeva informazioni utili rispetto a M2</li>
+                    <li>M3 includeva depositi istituzionali molto grandi e eurodollars</li>
+                </ul>
+                
+                <p style="margin-top: 20px;">L'Europa invece pubblica ancora M3, che include:</p>
+                <ul style="margin-left: 20px;">
+                    <li>Tutto M2</li>
+                    <li>PLUS depositi a termine grandi</li>
+                    <li>PLUS repo</li>
+                    <li>PLUS quote di fondi monetari istituzionali</li>
+                </ul>
+            </div>
+            
+            <div class="critical-note">
+                <h2 style="color: #ff6b6b; margin-bottom: 15px;">⚡ Perché la cifra di 6,4 trilioni è cruciale</h2>
+                
+                <p style="margin-bottom: 15px;">Questa espansione di M2 di 6,4 trilioni è <strong>molto inferiore</strong> a quanto ci si aspetterebbe se il moltiplicatore funzionasse:</p>
+                
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li>Base monetaria aumentata: <span class="highlight-number">~4,7 trilioni</span></li>
+                    <li>Moltiplicatore storico (pre-2008): <span class="highlight-number">8-10x</span></li>
+                    <li>Espansione M2 attesa: <span class="highlight-number">37-47 trilioni</span></li>
+                    <li>Espansione M2 effettiva: <span class="highlight-number">6,4 trilioni</span></li>
+                    <li><strong>Il moltiplicatore implicito: solo <span class="highlight-number">1,4x!</span></strong></li>
+                </ul>
+                
+                <p style="margin-top: 20px; font-size: 1.1em;">
+                    Questo dimostra che la maggior parte della liquidità creata dalla Fed è rimasta "intrappolata" nel sistema finanziario 
+                    invece di moltiplicarsi nell'economia reale attraverso prestiti.
+                </p>
+            </div>
+        </div>
+    </div>
+    
     <script>
         function switchTab(tabName) {
             // Rimuovi active da tutti i tabs e panels
@@ -540,6 +858,32 @@
             card.style.transform = 'translateY(20px)';
             card.style.transition = 'all 0.6s ease';
             observer.observe(card);
+        });
+        
+        // Funzioni per la modale M2
+        function openM2Modal() {
+            document.getElementById('m2Modal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent body scroll when modal is open
+        }
+        
+        function closeM2Modal() {
+            document.getElementById('m2Modal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore body scroll
+        }
+        
+        // Chiudi modale cliccando fuori
+        window.onclick = function(event) {
+            const modal = document.getElementById('m2Modal');
+            if (event.target == modal) {
+                closeM2Modal();
+            }
+        }
+        
+        // Chiudi modale con ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeM2Modal();
+            }
         });
     </script>
 </body>
