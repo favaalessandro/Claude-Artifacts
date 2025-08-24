@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio AI Command Center - Complete Reference Guide</title>
+    <meta name="description" content="Complete reference guide for Portfolio AI investment management commands">
+    <meta property="og:title" content="Portfolio AI Command Center">
+    <meta property="og:description" content="Interactive dashboard for Portfolio AI investment commands">
+    <meta property="og:type" content="website">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151932;
+            --bg-tertiary: #1e2341;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: var(--bg-secondary);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .header-left h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        
+        .header-left p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 10px 40px 10px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            width: 300px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .search-box::after {
+            content: "🔍";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            font-size: 20px;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        .main-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .sidebar h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--accent);
+            transform: translateX(5px);
+        }
+        
+        .content {
+            min-height: 100vh;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .quick-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            border-color: var(--accent);
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .command-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+        
+        .command-text {
+            color: var(--text-primary);
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .copy-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .copy-btn:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+        
+        .copy-btn.copied {
+            background: var(--success);
+        }
+        
+        .command-table {
+            width: 100%;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .command-table thead {
+            background: var(--bg-tertiary);
+        }
+        
+        .command-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .command-table td {
+            padding: 15px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        
+        .command-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-right: 5px;
+        }
+        
+        .tag.etf {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent);
+        }
+        
+        .tag.stock {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+        
+        .tag.value {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+        
+        .tag.quick {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+        
+        .value-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(129, 140, 248, 0.05));
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .value-section::before {
+            content: "💎";
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 40px;
+            opacity: 0.3;
+        }
+        
+        .filter-chips {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .chip:hover, .chip.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        
+        .favorites-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .favorite-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .favorite-btn.active {
+            color: gold;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 30px 0;
+            margin-top: 60px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tooltip.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: auto;
+                border-radius: 20px 20px 0 0;
+                padding: 15px;
+                z-index: 99;
+            }
+            
+            .sidebar h3 {
+                display: none;
+            }
+            
+            .nav-item {
+                display: inline-block;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .search-box input {
+                width: 200px;
+            }
+            
+            .content {
+                padding-bottom: 100px;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .highlight {
+            background: rgba(99, 102, 241, 0.3);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>Portfolio AI Command Center</h1>
+                    <p>Complete Reference Guide for Investment Portfolio Management</p>
+                </div>
+                <div class="header-controls">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Cerca comando... (premi /)">
+                    </div>
+                    <button class="theme-toggle" id="themeToggle">🌙</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" data-counter="45">0</div>
+                <div class="stat-label">Comandi Totali</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-counter="8">0</div>
+                <div class="stat-label">Categorie</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-counter="4">0</div>
+                <div class="stat-label">Opzioni Portfolio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-counter="12">0</div>
+                <div class="stat-label">Value Commands</div>
+            </div>
+        </div>
+
+        <div class="filter-chips">
+            <div class="chip active" data-filter="all">Tutti</div>
+            <div class="chip" data-filter="base">Base Commands</div>
+            <div class="chip" data-filter="value">Value Investing</div>
+            <div class="chip" data-filter="quick">Quick Actions</div>
+            <div class="chip" data-filter="analysis">Analysis</div>
+            <div class="chip" data-filter="portfolio">Portfolio Management</div>
+        </div>
+
+        <div class="favorites-section hidden" id="favoritesSection">
+            <h3>⭐ I Miei Preferiti</h3>
+            <div id="favoritesList"></div>
+        </div>
+
+        <div class="main-layout">
+            <nav class="sidebar">
+                <h3>Navigazione</h3>
+                <a class="nav-item active" data-section="quickstart">Quick Start</a>
+                <a class="nav-item" data-section="interview">Intervista e Profilazione</a>
+                <a class="nav-item" data-section="construction">Costruzione Portfolio</a>
+                <a class="nav-item" data-section="analysis">Analisi Strumenti</a>
+                <a class="nav-item" data-section="value">Value Investing</a>
+                <a class="nav-item" data-section="optimization">Ottimizzazione</a>
+                <a class="nav-item" data-section="management">Gestione e Monitoraggio</a>
+                <a class="nav-item" data-section="special">Comandi Speciali</a>
+            </nav>
+
+            <main class="content">
+                <!-- Quick Start Section -->
+                <section class="section" id="quickstart">
+                    <h2 class="section-title">Quick Start - Comandi Essenziali</h2>
+                    <div class="quick-cards">
+                        <div class="card" data-category="base">
+                            <button class="favorite-btn" data-command="inizia intervista">⭐</button>
+                            <h3 class="card-title">Inizia Intervista</h3>
+                            <p class="card-description">Avvia il processo di profilazione completo con 12 domande guidate</p>
+                            <div class="command-box">
+                                <span class="command-text">inizia intervista</span>
+                                <button class="copy-btn" data-command="inizia intervista">📋 Copia</button>
+                            </div>
+                            <div class="tag quick">QUICK</div>
+                            <div class="tag">BASE</div>
+                        </div>
+                        
+                        <div class="card" data-category="portfolio">
+                            <button class="favorite-btn" data-command="portfolio opzione A">⭐</button>
+                            <h3 class="card-title">Portfolio Diretto</h3>
+                            <p class="card-description">Costruzione immediata del portfolio con opzioni A/B/C/D</p>
+                            <div class="command-box">
+                                <span class="command-text">portfolio opzione A 50000 EUR</span>
+                                <button class="copy-btn" data-command="portfolio opzione A 50000 EUR">📋 Copia</button>
+                            </div>
+                            <div class="tag quick">QUICK</div>
+                            <div class="tag etf">ETF</div>
+                        </div>
+                        
+                        <div class="card" data-category="analysis">
+                            <button class="favorite-btn" data-command="analizza MSFT">⭐</button>
+                            <h3 class="card-title">Analisi Rapida</h3>
+                            <p class="card-description">Analisi dettagliata di qualsiasi strumento finanziario</p>
+                            <div class="command-box">
+                                <span class="command-text">analizza MSFT</span>
+                                <button class="copy-btn" data-command="analizza MSFT">📋 Copia</button>
+                            </div>
+                            <div class="tag quick">QUICK</div>
+                            <div class="tag stock">STOCK</div>
+                        </div>
+                        
+                        <div class="card" data-category="value">
+                            <button class="favorite-btn" data-command="screening value">⭐</button>
+                            <h3 class="card-title">Screening Value</h3>
+                            <p class="card-description">Trova opportunità sottovalutate in stile Buffett</p>
+                            <div class="command-box">
+                                <span class="command-text">screening value</span>
+                                <button class="copy-btn" data-command="screening value">📋 Copia</button>
+                            </div>
+                            <div class="tag quick">QUICK</div>
+                            <div class="tag value">VALUE</div>
+                        </div>
+                        
+                        <div class="card" data-category="base">
+                            <button class="favorite-btn" data-command="help">⭐</button>
+                            <h3 class="card-title">Help System</h3>
+                            <p class="card-description">Mostra tutti i comandi disponibili e la documentazione</p>
+                            <div class="command-box">
+                                <span class="command-text">help</span>
+                                <button class="copy-btn" data-command="help">📋 Copia</button>
+                            </div>
+                            <div class="tag quick">QUICK</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Interview Section -->
+                <section class="section" id="interview">
+                    <h2 class="section-title">Intervista e Profilazione</h2>
+                    <table class="command-table">
+                        <thead>
+                            <tr>
+                                <th>Comando</th>
+                                <th>Descrizione</th>
+                                <th>Esempio</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-category="base">
+                                <td><code>inizia intervista</code></td>
+                                <td>Avvia processo guidato con 12 domande</td>
+                                <td>inizia intervista per profilo conservativo</td>
+                                <td>
+                                    <button class="copy-btn" data-command="inizia intervista">📋</button>
+                                    <button class="favorite-btn" data-command="inizia intervista">⭐</button>
+                                </td>
+                            </tr>
+                            <tr data-category="base">
+                                <td><code>reset intervista</code></td>
+                                <td>Ricomincia la profilazione da capo</td>
+                                <td>reset intervista</td>
+                                <td>
+                                    <button class="copy-btn" data-command="reset intervista">📋</button>
+                                    <button class="favorite-btn" data-command="reset intervista">⭐</button>
+                                </td>
+                            </tr>
+                            <tr data-category="base">
+                                <td><code>salta a preferenze</code></td>
+                                <td>Vai direttamente alla fase 2</td>
+                                <td>salta a preferenze di investimento</td>
+                                <td>
+                                    <button class="copy-btn" data-command="salta a preferenze">📋</button>
+                                    <button class="favorite-btn" data-command="salta a preferenze">⭐</button>
+                                </td>
+                            </tr>
+                            <tr data-category="base">
+                                <td><code>mostra profilo</code></td>
+                                <td>Visualizza il profilo attuale</td>
+                                <td>mostra profilo investitore</td>
+                                <td>
+                                    <button class="copy-btn" data-command="mostra profilo">📋</button>
+                                    <button class="favorite-btn" data-command="mostra profilo">⭐</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Portfolio Construction Section -->
+                <section class="section" id="construction">
+                    <h2 class="section-title">Costruzione Portfolio</h2>
+                    <table class="command-table">
+                        <thead>
+                            <tr>
+                                <th>Opzione</th>
+                                <th>Strategia</th>
+                                <th>Comando Esempio</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-category="portfolio">
+                                <td><strong>Opzione A</strong></td>
+                                <td>100% ETF passivi - Massima diversificazione</td>
+                                <td><code>portfolio opzione A con 50000 EUR</code></td>
+                                <td>
+                                    <button class="copy-btn" data-command="portfolio opzione A con 50000 EUR">📋</button>
+                                    <button class="favorite-btn" data-command="portfolio opzione A">⭐</button>
+                                </td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><strong>Opzione B</strong></td>
+                                <td>100% Stock picking - Selezione attiva titoli</td>
+                                <td><code>portfolio opzione B focus tech</code></td>
+                                <td>
+                                    <button class="copy-btn" data-command="portfolio opzione B focus tech">📋</button>
+                                    <button class="favorite-btn" data-command="portfolio opzione B">⭐</button>
+                                </td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><strong>Opzione C</strong></td>
+                                <td>Core-satellite misto (70% ETF + 30% stocks)</td>
+                                <td><code>portfolio opzione C 70/30</code></td>
+                                <td>
+                                    <button class="copy-btn" data-command="portfolio opzione C 70/30">📋</button>
+                                    <button class="favorite-btn" data-command="portfolio opzione C">⭐</button>
+                                </td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><strong>Opzione D</strong></td>
+                                <td>Multi-asset completo con alternative</td>
+                                <td><code>portfolio opzione D conservativo</code></td>
+                                <td>
+                                    <button class="copy-btn" data-command="portfolio opzione D conservativo">📋</button>
+                                    <button class="favorite-btn" data-command="portfolio opzione D">⭐</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Analysis Section -->
+                <section class="section" id="analysis">
+                    <h2 class="section-title">Analisi Strumenti</h2>
+                    <div class="quick-cards">
+                        <div class="card" data-category="analysis">
+                            <h3 class="card-title">📊 Analisi ETF</h3>
+                            <div class="command-box">
+                                <span class="command-text">analizza ETF VWCE</span>
+                                <button class="copy-btn" data-command="analizza ETF VWCE">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">confronta VWCE vs IWDA</span>
+                                <button class="copy-btn" data-command="confronta VWCE vs IWDA">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">top ETF emergenti</span>
+                                <button class="copy-btn" data-command="top ETF emergenti">📋 Copia</button>
+                            </div>
+                            <div class="tag etf">ETF</div>
+                        </div>
+                        
+                        <div class="card" data-category="analysis">
+                            <h3 class="card-title">📈 Analisi Azioni</h3>
+                            <div class="command-box">
+                                <span class="command-text">analizza azione AAPL</span>
+                                <button class="copy-btn" data-command="analizza azione AAPL">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">fondamentali MSFT</span>
+                                <button class="copy-btn" data-command="fondamentali MSFT">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">tecnici NVDA</span>
+                                <button class="copy-btn" data-command="tecnici NVDA">📋 Copia</button>
+                            </div>
+                            <div class="tag stock">STOCK</div>
+                        </div>
+                        
+                        <div class="card" data-category="analysis">
+                            <h3 class="card-title">🔍 Analisi Settoriale</h3>
+                            <div class="command-box">
+                                <span class="command-text">analisi settore tech</span>
+                                <button class="copy-btn" data-command="analisi settore tech">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">confronta settori 2024</span>
+                                <button class="copy-btn" data-command="confronta settori 2024">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">trend healthcare</span>
+                                <button class="copy-btn" data-command="trend healthcare">📋 Copia</button>
+                            </div>
+                            <div class="tag">SECTOR</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Value Investing Section -->
+                <section class="section value-section" id="value">
+                    <h2 class="section-title">💎 Value Investing (Buffett-Munger Framework)</h2>
+                    <div class="quick-cards">
+                        <div class="card" data-category="value">
+                            <h3 class="card-title">Analisi Value Completa</h3>
+                            <p class="card-description">Applica il framework Buffett completo a qualsiasi titolo</p>
+                            <div class="command-box">
+                                <span class="command-text">analisi value BRK.B</span>
+                                <button class="copy-btn" data-command="analisi value BRK.B">📋 Copia</button>
+                            </div>
+                            <div class="tag value">VALUE</div>
+                        </div>
+                        
+                        <div class="card" data-category="value">
+                            <h3 class="card-title">Moat Analysis</h3>
+                            <p class="card-description">Valuta il vantaggio competitivo sostenibile</p>
+                            <div class="command-box">
+                                <span class="command-text">moat analysis COST</span>
+                                <button class="copy-btn" data-command="moat analysis COST">📋 Copia</button>
+                            </div>
+                            <div class="tag value">VALUE</div>
+                        </div>
+                        
+                        <div class="card" data-category="value">
+                            <h3 class="card-title">Screening Value</h3>
+                            <p class="card-description">Trova opportunità sottovalutate nel mercato</p>
+                            <div class="command-box">
+                                <span class="command-text">screening value SP500</span>
+                                <button class="copy-btn" data-command="screening value SP500">📋 Copia</button>
+                            </div>
+                            <div class="tag value">VALUE</div>
+                        </div>
+                        
+                        <div class="card" data-category="value">
+                            <h3 class="card-title">Portfolio Concentrated</h3>
+                            <p class="card-description">Crea un portfolio concentrato stile Buffett</p>
+                            <div class="command-box">
+                                <span class="command-text">portfolio value investing</span>
+                                <button class="copy-btn" data-command="portfolio value investing">📋 Copia</button>
+                            </div>
+                            <div class="tag value">VALUE</div>
+                        </div>
+                        
+                        <div class="card" data-category="value">
+                            <h3 class="card-title">Modelli Mentali</h3>
+                            <p class="card-description">Applica i modelli mentali di Charlie Munger</p>
+                            <div class="command-box">
+                                <span class="command-text">applica modelli mentali</span>
+                                <button class="copy-btn" data-command="applica modelli mentali">📋 Copia</button>
+                            </div>
+                            <div class="tag value">VALUE</div>
+                        </div>
+                        
+                        <div class="card" data-category="value">
+                            <h3 class="card-title">Citazioni Contestuali</h3>
+                            <p class="card-description">Saggezza di Buffett per la situazione specifica</p>
+                            <div class="command-box">
+                                <span class="command-text">citazione Buffett volatilità</span>
+                                <button class="copy-btn" data-command="citazione Buffett volatilità">📋 Copia</button>
+                            </div>
+                            <div class="tag value">VALUE</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Optimization Section -->
+                <section class="section" id="optimization">
+                    <h2 class="section-title">Ottimizzazione e Gestione</h2>
+                    <div class="quick-cards">
+                        <div class="card" data-category="portfolio">
+                            <h3 class="card-title">Ottimizzazione Portfolio</h3>
+                            <div class="command-box">
+                                <span class="command-text">ottimizza portfolio</span>
+                                <button class="copy-btn" data-command="ottimizza portfolio">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">migliora efficienza</span>
+                                <button class="copy-btn" data-command="migliora efficienza">📋 Copia</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card" data-category="portfolio">
+                            <h3 class="card-title">Ribilanciamento</h3>
+                            <div class="command-box">
+                                <span class="command-text">ribilancia portfolio</span>
+                                <button class="copy-btn" data-command="ribilancia portfolio">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">piano ribilanciamento trimestrale</span>
+                                <button class="copy-btn" data-command="piano ribilanciamento trimestrale">📋 Copia</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card" data-category="analysis">
+                            <h3 class="card-title">Stress Testing</h3>
+                            <div class="command-box">
+                                <span class="command-text">stress test recessione</span>
+                                <button class="copy-btn" data-command="stress test recessione">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">simula crisi 2008</span>
+                                <button class="copy-btn" data-command="simula crisi 2008">📋 Copia</button>
+                            </div>
+                        </div>
+                        
+                        <div class="card" data-category="analysis">
+                            <h3 class="card-title">Performance Tracking</h3>
+                            <div class="command-box">
+                                <span class="command-text">performance YTD</span>
+                                <button class="copy-btn" data-command="performance YTD">📋 Copia</button>
+                            </div>
+                            <div class="command-box">
+                                <span class="command-text">confronta benchmark</span>
+                                <button class="copy-btn" data-command="confronta benchmark">📋 Copia</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Management Section -->
+                <section class="section" id="management">
+                    <h2 class="section-title">Gestione e Monitoraggio</h2>
+                    <table class="command-table">
+                        <thead>
+                            <tr>
+                                <th>Comando</th>
+                                <th>Azione</th>
+                                <th>Esempio</th>
+                                <th>Copy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-category="portfolio">
+                                <td><code>aggiungi [TICKER] [importo]</code></td>
+                                <td>Aggiungi posizione al portfolio</td>
+                                <td>aggiungi VWCE 5000 EUR</td>
+                                <td><button class="copy-btn" data-command="aggiungi VWCE 5000 EUR">📋</button></td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><code>vendi [TICKER] [%]</code></td>
+                                <td>Vendi percentuale della posizione</td>
+                                <td>vendi AAPL 25%</td>
+                                <td><button class="copy-btn" data-command="vendi AAPL 25%">📋</button></td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><code>sostituisci [OLD] con [NEW]</code></td>
+                                <td>Sostituisci una posizione</td>
+                                <td>sostituisci IWDA con VWCE</td>
+                                <td><button class="copy-btn" data-command="sostituisci IWDA con VWCE">📋</button></td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><code>aumenta [asset] al [%]</code></td>
+                                <td>Modifica allocazione</td>
+                                <td>aumenta tech al 30%</td>
+                                <td><button class="copy-btn" data-command="aumenta tech al 30%">📋</button></td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><code>switch a opzione [A/B/C/D]</code></td>
+                                <td>Cambia strategia portfolio</td>
+                                <td>switch a opzione C</td>
+                                <td><button class="copy-btn" data-command="switch a opzione C">📋</button></td>
+                            </tr>
+                            <tr data-category="analysis">
+                                <td><code>costi totali</code></td>
+                                <td>Calcola TER complessivo</td>
+                                <td>costi totali portfolio</td>
+                                <td><button class="copy-btn" data-command="costi totali portfolio">📋</button></td>
+                            </tr>
+                            <tr data-category="portfolio">
+                                <td><code>tax harvesting</code></td>
+                                <td>Ottimizzazione fiscale</td>
+                                <td>tax harvesting strategy</td>
+                                <td><button class="copy-btn" data-command="tax harvesting strategy">📋</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <!-- Special Commands Section -->
+                <section class="section" id="special">
+                    <h2 class="section-title">Comandi Speciali</h2>
+                    <div class="quick-cards">
+                        <div class="card" data-category="special" style="background: rgba(16, 185, 129, 0.1);">
+                            <h3 class="card-title">🌱 ESG Convert</h3>
+                            <p class="card-description">Converti il portfolio in versione sostenibile ESG</p>
+                            <div class="command-box">
+                                <span class="command-text">ESG convert</span>
+                                <button class="copy-btn" data-command="ESG convert">📋 Copia</button>
+                            </div>
+                            <div class="tag">ESG</div>
+                        </div>
+                        
+                        <div class="card" data-category="special" style="background: rgba(239, 68, 68, 0.1);">
+                            <h3 class="card-title">🚨 Emergenza</h3>
+                            <p class="card-description">Gestione situazioni di panic market</p>
+                            <div class="command-box">
+                                <span class="command-text">emergenza mercato</span>
+                                <button class="copy-btn" data-command="emergenza mercato">📋 Copia</button>
+                            </div>
+                            <div class="tag">CRISIS</div>
+                        </div>
+                        
+                        <div class="card" data-category="special" style="background: rgba(245, 158, 11, 0.1);">
+                            <h3 class="card-title">💰 Strategia Fiscale</h3>
+                            <p class="card-description">Ottimizzazione fiscale avanzata</p>
+                            <div class="command-box">
+                                <span class="command-text">strategia fiscale Italia</span>
+                                <button class="copy-btn" data-command="strategia fiscale Italia">📋 Copia</button>
+                            </div>
+                            <div class="tag">TAX</div>
+                        </div>
+                        
+                        <div class="card" data-category="special">
+                            <h3 class="card-title">📚 Esempi Portfolio</h3>
+                            <p class="card-description">Visualizza portfolio di esempio</p>
+                            <div class="command-box">
+                                <span class="command-text">esempio portfolio pensione</span>
+                                <button class="copy-btn" data-command="esempio portfolio pensione">📋 Copia</button>
+                            </div>
+                            <div class="tag">EXAMPLES</div>
+                        </div>
+                        
+                        <div class="card" data-category="special">
+                            <h3 class="card-title">🎯 Target Date</h3>
+                            <p class="card-description">Portfolio con target date specifico</p>
+                            <div class="command-box">
+                                <span class="command-text">target date 2040</span>
+                                <button class="copy-btn" data-command="target date 2040">📋 Copia</button>
+                            </div>
+                            <div class="tag">RETIREMENT</div>
+                        </div>
+                        
+                        <div class="card" data-category="special">
+                            <h3 class="card-title">📊 Report Completo</h3>
+                            <p class="card-description">Genera report dettagliato portfolio</p>
+                            <div class="command-box">
+                                <span class="command-text">report completo PDF</span>
+                                <button class="copy-btn" data-command="report completo PDF">📋 Copia</button>
+                            </div>
+                            <div class="tag">REPORT</div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <p>Portfolio AI Command Center v2.0</p>
+                    <p style="color: var(--text-secondary); font-size: 12px;">Last Updated: December 2024</p>
+                </div>
+                <div class="footer-links">
+                    <a href="https://github.com" target="_blank">GitHub</a>
+                    <a href="#" onclick="alert('Documentation coming soon!')">Documentation</a>
+                    <a href="#">Built for Claude AI Projects</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.setAttribute('data-theme', savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+        });
+        
+        // Copy to Clipboard
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const command = btn.getAttribute('data-command');
+                try {
+                    await navigator.clipboard.writeText(command);
+                    btn.classList.add('copied');
+                    btn.innerHTML = '✅ Copiato!';
+                    setTimeout(() => {
+                        btn.classList.remove('copied');
+                        btn.innerHTML = '📋 Copia';
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            });
+        });
+        
+        // Search Functionality
+        const searchInput = document.getElementById('searchInput');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = e.target.value.toLowerCase();
+                filterContent(searchTerm);
+            }, 300);
+        });
+        
+        function filterContent(searchTerm) {
+            const allCards = document.querySelectorAll('.card');
+            const allRows = document.querySelectorAll('.command-table tbody tr');
+            
+            allCards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = '';
+                    highlightText(card, searchTerm);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            allRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                    highlightText(row, searchTerm);
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        function highlightText(element, searchTerm) {
+            if (!searchTerm) {
+                element.querySelectorAll('.highlight').forEach(h => {
+                    h.classList.remove('highlight');
+                });
+                return;
+            }
+            // Implementation for highlighting would go here
+        }
+        
+        // Keyboard shortcut for search
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && !searchInput.contains(document.activeElement)) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            if (e.key === 'Escape') {
+                searchInput.value = '';
+                filterContent('');
+                searchInput.blur();
+            }
+        });
+        
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = item.getAttribute('data-section');
+                const targetElement = document.getElementById(targetSection);
+                
+                // Update active state
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Smooth scroll
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+        
+        // Filter Chips
+        const filterChips = document.querySelectorAll('.chip');
+        
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const filter = chip.getAttribute('data-filter');
+                
+                // Update active state
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                
+                // Filter content
+                if (filter === 'all') {
+                    document.querySelectorAll('[data-category]').forEach(el => {
+                        el.style.display = '';
+                    });
+                } else {
+                    document.querySelectorAll('[data-category]').forEach(el => {
+                        if (el.getAttribute('data-category').includes(filter)) {
+                            el.style.display = '';
+                        } else {
+                            el.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Favorites System
+        const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        const favoritesSection = document.getElementById('favoritesSection');
+        const favoritesList = document.getElementById('favoritesList');
+        
+        function updateFavorites() {
+            if (favorites.length > 0) {
+                favoritesSection.classList.remove('hidden');
+                favoritesList.innerHTML = favorites.map(fav => `
+                    <div class="command-box">
+                        <span class="command-text">${fav}</span>
+                        <button class="copy-btn" data-command="${fav}">📋 Copia</button>
+                    </div>
+                `).join('');
+                
+                // Re-attach copy listeners
+                favoritesList.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const command = btn.getAttribute('data-command');
+                        await navigator.clipboard.writeText(command);
+                        btn.classList.add('copied');
+                        btn.innerHTML = '✅ Copiato!';
+                        setTimeout(() => {
+                            btn.classList.remove('copied');
+                            btn.innerHTML = '📋 Copia';
+                        }, 2000);
+                    });
+                });
+            } else {
+                favoritesSection.classList.add('hidden');
+            }
+        }
+        
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const command = btn.getAttribute('data-command');
+            if (favorites.includes(command)) {
+                btn.classList.add('active');
+            }
+            
+            btn.addEventListener('click', () => {
+                const command = btn.getAttribute('data-command');
+                const index = favorites.indexOf(command);
+                
+                if (index > -1) {
+                    favorites.splice(index, 1);
+                    btn.classList.remove('active');
+                } else {
+                    favorites.push(command);
+                    btn.classList.add('active');
+                }
+                
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                updateFavorites();
+            });
+        });
+        
+        updateFavorites();
+        
+        // Animated Counters
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-counter'));
+            const duration = 1000;
+            const step = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 16);
+        }
+        
+        // Intersection Observer for animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.hasAttribute('data-counter')) {
+                        animateCounter(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                }
+            });
+        });
+        
+        document.querySelectorAll('[data-counter]').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Tooltip System
+        const tooltip = document.getElementById('tooltip');
+        
+        document.querySelectorAll('.command-text').forEach(cmd => {
+            cmd.addEventListener('mouseenter', (e) => {
+                tooltip.textContent = 'Click per selezionare, usa il bottone per copiare';
+                tooltip.style.left = e.pageX + 'px';
+                tooltip.style.top = (e.pageY - 30) + 'px';
+                tooltip.classList.add('show');
+            });
+            
+            cmd.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('show');
+            });
+        });
+        
+        // PWA Ready - Service Worker Registration (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Uncomment to enable service worker
+                // navigator.serviceWorker.register('/sw.js');
+            });
+        }
+        
+        // Initialize
+        console.log('Portfolio AI Command Center v2.0 - Ready');
+        console.log('Built for Claude AI Projects');
+    </script>
+</body>
+</html>
