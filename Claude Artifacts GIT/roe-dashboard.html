@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROE Metric #1 - Dashboard Interattivo | Buffett Framework</title>
+    <style>
+        :root {
+            --color-primary: #1f77b4;
+            --color-success: #2ca02c;
+            --color-warning: #ff7f0e;
+            --color-danger: #d62728;
+            --color-light: #f8f9fa;
+            --color-dark: #1a1a1a;
+            --color-border: #e0e0e0;
+            --color-text: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--color-light);
+            border-bottom: 2px solid var(--color-border);
+            overflow-x: auto;
+        }
+
+        .nav-tabs button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tabs button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background: white;
+        }
+
+        .nav-tabs button:hover {
+            background: white;
+            color: var(--color-primary);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .formula-box {
+            background: #f0f4ff;
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .benchmark-table th {
+            background: var(--color-primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .benchmark-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .benchmark-table tr:hover {
+            background: var(--color-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+
+        .badge.green { background: #d4edda; color: #155724; }
+        .badge.yellow { background: #fff3cd; color: #856404; }
+        .badge.red { background: #f8d7da; color: #721c24; }
+
+        .card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card.highlight {
+            border-left: 4px solid var(--color-warning);
+            background: #fffbf0;
+        }
+
+        .card.highlight.danger {
+            border-left-color: var(--color-danger);
+            background: #fdf5f5;
+        }
+
+        .card.highlight.success {
+            border-left-color: var(--color-success);
+            background: #f0f8f5;
+        }
+
+        .card h3 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .card p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .calculator {
+            background: var(--color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1);
+        }
+
+        button.btn {
+            background: var(--color-primary);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button.btn:hover {
+            background: #1560a0;
+            box-shadow: 0 4px 12px rgba(31, 119, 180, 0.3);
+        }
+
+        .result-box {
+            background: #f0f4ff;
+            border: 2px solid var(--color-primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .scoring-matrix {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        .scoring-matrix td {
+            padding: 15px;
+            border: 1px solid var(--color-border);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .scoring-matrix th {
+            background: var(--color-primary);
+            color: white;
+            padding: 15px;
+            border: 1px solid var(--color-border);
+        }
+
+        .matrix-cell {
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .case-study {
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .case-study h3 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .case-study .case-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .case-study .case-badge.excellent {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .case-study .case-badge.caution {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .case-study .case-badge.risk {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .metrics-list {
+            background: var(--color-light);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .metrics-list li {
+            margin: 8px 0;
+            padding-left: 25px;
+            list-style: none;
+            position: relative;
+        }
+
+        .metrics-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+
+        .question-box {
+            background: #e3f2fd;
+            border-left: 4px solid var(--color-primary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+        }
+
+        .question-box strong {
+            color: var(--color-primary);
+        }
+
+        .progress-tracker {
+            background: var(--color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .progress-status {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin-right: 15px;
+            font-size: 0.85em;
+        }
+
+        .progress-status.done { background: var(--color-success); }
+        .progress-status.learning { background: var(--color-warning); }
+        .progress-status.todo { background: #ccc; }
+
+        .red-flag {
+            background: #fdf5f5;
+            border-left: 4px solid var(--color-danger);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+
+        .red-flag strong {
+            color: var(--color-danger);
+        }
+
+        .footer {
+            background: var(--color-light);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid var(--color-border);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8em; }
+            .nav-tabs { flex-wrap: wrap; }
+            .nav-tabs button { flex: 0 1 auto; padding: 12px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 ROE (Return on Equity)</h1>
+            <p>Metrica #1 - Framework Buffett | Dashboard Interattivo Completo</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="active" onclick="switchTab('concept')">📖 Concetto</button>
+            <button onclick="switchTab('benchmark')">📈 Benchmark</button>
+            <button onclick="switchTab('redflags')">🚨 Red Flags</button>
+            <button onclick="switchTab('framework')">🔍 Framework 5-Step</button>
+            <button onclick="switchTab('dupoint')">📊 DuPont</button>
+            <button onclick="switchTab('calculator')">🧮 Calcolatore</button>
+            <button onclick="switchTab('scoring')">⚖️ Scoring</button>
+            <button onclick="switchTab('cases')">🎯 Casi Reali</button>
+            <button onclick="switchTab('questions')">❓ Domande</button>
+            <button onclick="switchTab('progress')">📋 Tracker</button>
+        </div>
+
+        <div class="content">
+
+            <!-- TAB 1: CONCETTO -->
+            <div id="concept" class="section active">
+                <h2>🎯 Definizione e Concetto</h2>
+                
+                <div class="formula-box">
+                    ROE = (Utile Netto / Patrimonio Netto) × 100
+                </div>
+
+                <div class="card">
+                    <h3>Cosa misura?</h3>
+                    <p>ROE misura <strong>quanti euro di utile genera ogni euro di capitale proprio investito dagli azionisti</strong>.</p>
+                    <p>È una proxy sintetica della <strong>qualità del business</strong> e della <strong>capacità del management</strong> di far lavorare il capitale degli azionisti.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card highlight success">
+                        <h3>✅ Cosa NON è</h3>
+                        <ul style="margin-left: 20px;">
+                            <li>Non è il "profitto" assoluto</li>
+                            <li>Non rivela rischio di leverage</li>
+                            <li>Non è comparabile senza contesto</li>
+                            <li>Non misura cash generation</li>
+                        </ul>
+                    </div>
+                    <div class="card highlight success">
+                        <h3>✅ Cosa È</h3>
+                        <ul style="margin-left: 20px;">
+                            <li>Metrica di redditività relativa</li>
+                            <li>Misura efficienza management</li>
+                            <li>Rivela moat competitivo</li>
+                            <li>Base per crescita organica</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>💡 Significato Operativo (Buffett Style)</h3>
+                    <p><strong>"Se un'azienda ha ROE 20%, significa che se reinveste il 50% degli utili, può crescere il valore per azionista del 10% annuo indefinitamente."</strong></p>
+                    <p style="margin-top: 10px; color: #666;">Questo è il "compounding magic" di Buffett: ROE sostenibile ad alto livello = crescita di ricchezza azionista per decenni.</p>
+                </div>
+            </div>
+
+            <!-- TAB 2: BENCHMARK -->
+            <div id="benchmark" class="section">
+                <h2>📈 Benchmark Buffett</h2>
+                
+                <p style="margin-bottom: 15px;"><strong>Gli standard di qualità assoluti:</strong></p>
+                
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>ROE Level</th>
+                            <th>Interpretazione</th>
+                            <th>Valutazione</th>
+                            <th>Descrizione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>≥ 20%</strong></td>
+                            <td>Eccellente</td>
+                            <td><span class="badge green">🟢 GREEN</span></td>
+                            <td>Moat forte, pricing power, management eccellente</td>
+                        </tr>
+                        <tr>
+                            <td><strong>15-20%</strong></td>
+                            <td>Buono</td>
+                            <td><span class="badge green">🟢 GREEN</span></td>
+                            <td>Vantaggio competitivo, crescita sostenibile</td>
+                        </tr>
+                        <tr>
+                            <td><strong>12-15%</strong></td>
+                            <td>Sufficiente</td>
+                            <td><span class="badge yellow">🟡 YELLOW</span></td>
+                            <td>Adeguato per molti settori, monitorare</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8-12%</strong></td>
+                            <td>Debole</td>
+                            <td><span class="badge yellow">🟡 YELLOW</span></td>
+                            <td>Nessun moat evidente, mediocre management</td>
+                        </tr>
+                        <tr>
+                            <td><strong>&lt; 8%</strong></td>
+                            <td>Scarso</td>
+                            <td><span class="badge red">🔴 RED</span></td>
+                            <td>Nessun vantaggio competitivo, EVITARE</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">📊 Benchmark per Settore</h3>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Alta ROE (Asset-Light)</h3>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Software/Tech:</strong> 25-40%</li>
+                            <li><strong>Pharma/Healthcare:</strong> 15-25%</li>
+                            <li><strong>Media/Broadcasting:</strong> 20-30%</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Media/Bassa ROE (Capital-Heavy)</h3>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Retail:</strong> 10-15%</li>
+                            <li><strong>Manufacturing:</strong> 10-18%</li>
+                            <li><strong>Banks:</strong> 8-12%</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <strong>💡 Domanda Critica:</strong><br>
+                    "Quanto dovrei aspettarmi di ROE per QUESTO settore?" La risposta cambia tutto. Un ROE 12% è eccellente per una banca (leverage-constrained) ma scarso per il software.
+                </div>
+            </div>
+
+            <!-- TAB 3: RED FLAGS -->
+            <div id="redflags" class="section">
+                <h2>🚨 Red Flags & Manipolazione</h2>
+
+                <div class="red-flag">
+                    <strong>🚨 Red Flag #1: ROE Gonfiato da Leverage</strong>
+                    <p style="margin-top: 10px;">Quando un'azienda RIDUCE equity (aumentando debito), ROE sale matematicamente senza migliore operativo.</p>
+                    <p style="margin-top: 5px;"><strong>Segnale:</strong> ROE alto (>20%) + D/E alto (>1.0) = RISK</p>
+                    <p style="margin-top: 5px;"><strong>Test:</strong> DuPont analysis obbligatorio. Calcola ROE "normalized" a D/E = 0.5.</p>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 Red Flag #2: ROE Crescente ma Margini in Calo</strong>
+                    <p style="margin-top: 10px;">Se Operating Margin SCENDE mentre ROE SALE = company sta usando più leverage, non migliorando operativi.</p>
+                    <p style="margin-top: 5px;"><strong>Segnale:</strong> ROE 18%→20% ma Op. Margin 15%→12% = UNSUSTAINABLE</p>
+                    <p style="margin-top: 5px;"><strong>Rischio:</strong> In caso di aumento tassi, ROE crolla rapidamente.</p>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 Red Flag #3: Manipolazione Contabile</strong>
+                    <p style="margin-top: 10px;">One-time gains (asset sales, accounting changes) gonfiando Net Income senza sostenibilità.</p>
+                    <p style="margin-top: 5px;"><strong>Test Qualità:</strong> NI dovrebbe essere 80-100% di Operating Cash Flow.</p>
+                    <p style="margin-top: 5px;"><strong>Red Flag:</strong> NI > 120% di OCF = Substantial accruals. Persistente 2+ anni = EVITARE.</p>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>⚠️ Checklist Veloce</h3>
+                    <div style="margin-left: 20px;">
+                        <input type="checkbox"> ROE stabile o volatile? (stabile = buono)
+                        <br><input type="checkbox"> ROE sopra media settoriale? (sì = vantaggio)
+                        <br><input type="checkbox"> DuPont: da operations o leverage? (operations = sostenibile)
+                        <br><input type="checkbox"> NI backed by cash? (NI/OCF 0.8-1.0 = healthy)
+                        <br><input type="checkbox"> Sostenibile se competitor attacca? (sì = moat reale)
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: FRAMEWORK 5-STEP -->
+            <div id="framework" class="section">
+                <h2>🔍 Framework di Analisi: 5 Step</h2>
+
+                <div class="card">
+                    <h3>Step 1️⃣: Consistenza nel Tempo (10 Anni)</h3>
+                    <p><strong>Azione:</strong> Traccia ROE storico per 10 anni. Stabilità = moat duraturo. Volatilità = ciclico.</p>
+                    <p style="margin-top: 10px;"><strong>Benchmark:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>✅ Buona: 18% → 19% → 17% → 20% → 18% (stabile)</li>
+                        <li>⚠️ Media: 15% → 20% → 12% → 25% → 18% (volatile)</li>
+                        <li>❌ Cattiva: 20% → 18% → 15% → 10% → 8% (decrescente)</li>
+                    </ul>
+                    <div class="question-box" style="margin-top: 15px;">
+                        <strong>Domanda Critica:</strong><br>
+                        "Posso prevedere ROE tra 5 anni con confidenza?"
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Step 2️⃣: Benchmark vs. Competitor</h3>
+                    <p><strong>Azione:</strong> Confronta company ROE con sector median.</p>
+                    <p style="margin-top: 10px;"><strong>Interpretazione:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>🟢 ROE > Sector Median + 5pp = Competitive advantage</li>
+                        <li>🟡 ROE ≈ Sector Median ±2pp = Adequate position</li>
+                        <li>🔴 ROE < Sector Median - 5pp = Competitive disadvantage</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Step 3️⃣: DuPont Analysis</h3>
+                    <p><strong>Formula:</strong> ROE = Net Margin × Asset Turnover × Financial Leverage</p>
+                    <p style="margin-top: 10px; color: #666;"><em>Scomponi ROE in 3 componenti. Rivela se viene da operations o leverage.</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>Step 4️⃣: Earnings Quality (NI vs. Cash)</h3>
+                    <p><strong>Test:</strong> NI / OCF ratio (dovrebbe essere 80-100%)</p>
+                    <p style="margin-top: 10px;"><strong>NI > 120% di OCF = Red Flag</strong> (earnings non backed by cash)</p>
+                </div>
+
+                <div class="card">
+                    <h3>Step 5️⃣: Sostenibilità (Moat Assessment)</h3>
+                    <p><strong>Domanda:</strong> "Se competitor attaccasse aggressivamente, potrebbe mantenere ROE ≥15%?"</p>
+                    <p style="margin-top: 10px;"><strong>Fonti Sostenibili:</strong> Brand moat, Network effects, Cost advantages, IP/Patents</p>
+                    <p style="margin-top: 5px;"><strong>Fonti Insostenibili:</strong> One-time events, Leverage, Cyclical peaks</p>
+                </div>
+            </div>
+
+            <!-- TAB 5: DUPOINT -->
+            <div id="dupoint" class="section">
+                <h2>📊 DuPont Analysis</h2>
+
+                <div class="formula-box">
+                    ROE = (NI/Revenue) × (Revenue/Assets) × (Assets/Equity)<br>
+                    ROE = Net Profit Margin × Asset Turnover × Financial Leverage
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>1️⃣ Net Profit Margin</h3>
+                        <p><strong>Cosa rivela:</strong> Redditività operativa e pricing power</p>
+                        <p style="margin-top: 10px;"><strong>Interpretazione:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>Software: 25-35% (high margin)</li>
+                            <li>Retail: 2-5% (low margin)</li>
+                            <li>Manufacturing: 5-15% (medium)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>2️⃣ Asset Turnover</h3>
+                        <p><strong>Cosa rivela:</strong> Efficienza capitale (asset-light vs. heavy)</p>
+                        <p style="margin-top: 10px;"><strong>Interpretazione:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>Software: 4-6× (asset-light)</li>
+                            <li>Retail: 1-2× (capital-heavy)</li>
+                            <li>Manufacturing: 0.8-1.5× (very heavy)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card highlight">
+                    <h3>3️⃣ Financial Leverage</h3>
+                    <p><strong>Cosa rivela:</strong> Quanto ROE dipende da debito</p>
+                    <p style="margin-top: 10px;"><strong>Interpretazione:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>0.8-1.0 = Conservativo, basso debito</li>
+                        <li>1.0-2.0 = Moderate, leverage normale</li>
+                        <li>2.0+ = Aggressivo, HIGH RISK</li>
+                    </ul>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>⚠️ DuPont Example</h3>
+                    <p><strong>Company A - ROE 20%:</strong><br>
+                    = 8% Margin × 3.0× AT × 0.83× Leverage<br>
+                    <span style="color: var(--color-success);">✅ Operations-driven (GOOD)</span></p>
+                    
+                    <p style="margin-top: 15px;"><strong>Company B - ROE 20%:</strong><br>
+                    = 2% Margin × 1.5× AT × 6.67× Leverage<br>
+                    <span style="color: var(--color-danger);">🔴 Financially engineered (RISKY)</span></p>
+                    
+                    <p style="margin-top: 10px;"><em>Stesso ROE, rischi completamente diversi!</em></p>
+                </div>
+            </div>
+
+            <!-- TAB 6: CALCOLATORE -->
+            <div id="calculator" class="section">
+                <h2>🧮 Calcolatore ROE Interattivo</h2>
+
+                <div class="calculator">
+                    <h3>Calcola ROE</h3>
+                    
+                    <div class="form-group">
+                        <label>Net Income (Utile Netto) - €M:</label>
+                        <input type="number" id="netIncome" placeholder="es. 50" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Total Equity (Patrimonio Netto) - €M:</label>
+                        <input type="number" id="equity" placeholder="es. 250" step="0.1">
+                    </div>
+
+                    <button class="btn" onclick="calculateROE()">Calcola ROE</button>
+
+                    <div id="roeResult" class="result-box">
+                        <div class="result-row">
+                            <span>ROE:</span>
+                            <span class="result-value" id="roeValue">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Valutazione:</span>
+                            <span class="result-value" id="roeRating">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator" style="margin-top: 30px;">
+                    <h3>DuPont Analysis</h3>
+                    
+                    <div class="form-group">
+                        <label>Net Income (€M):</label>
+                        <input type="number" id="dupont_ni" placeholder="es. 50" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Revenue (Ricavi) - €M:</label>
+                        <input type="number" id="revenue" placeholder="es. 500" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Total Assets (Totale Attivo) - €M:</label>
+                        <input type="number" id="assets" placeholder="es. 400" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Total Equity (Patrimonio) - €M:</label>
+                        <input type="number" id="dupont_equity" placeholder="es. 250" step="0.1">
+                    </div>
+
+                    <button class="btn" onclick="calculateDuPoint()">Calcola DuPont</button>
+
+                    <div id="dupointResult" class="result-box">
+                        <div class="result-row">
+                            <span>Net Profit Margin:</span>
+                            <span class="result-value" id="margin">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Asset Turnover:</span>
+                            <span class="result-value" id="turnover">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Financial Leverage:</span>
+                            <span class="result-value" id="leverage">-</span>
+                        </div>
+                        <div class="result-row" style="margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px;">
+                            <span><strong>ROE (Result):</strong></span>
+                            <span class="result-value" id="roe_dupont">-</span>
+                        </div>
+                        <div id="dupointAnalysis" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 0.9em;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: SCORING -->
+            <div id="scoring" class="section">
+                <h2>⚖️ Scoring Matrix</h2>
+
+                <p style="margin-bottom: 15px;"><strong>Come interpretare:</strong> La matrice mostra ROE quality basato su due fattori: ROE level E Debt/Equity ratio.</p>
+
+                <table class="scoring-matrix">
+                    <thead>
+                        <tr>
+                            <th>ROE Level</th>
+                            <th>D/E &lt; 0.5</th>
+                            <th>D/E 0.5-1.0</th>
+                            <th>D/E &gt; 1.0</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>&gt; 20%</strong></td>
+                            <td class="matrix-cell" style="background: #d4edda;">
+                                <strong>🟢 GREEN (2)</strong><br>
+                                <small>Exceptional</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #fff3cd;">
+                                <strong>🟡 YELLOW (1)</strong><br>
+                                <small>Caution</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #f8d7da;">
+                                <strong>🔴 RED (0)</strong><br>
+                                <small>Risky</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>15-20%</strong></td>
+                            <td class="matrix-cell" style="background: #d4edda;">
+                                <strong>🟢 GREEN (2)</strong><br>
+                                <small>Excellent</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #d4edda;">
+                                <strong>🟢 GREEN (2)</strong><br>
+                                <small>Good</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #fff3cd;">
+                                <strong>🟡 YELLOW (1)</strong><br>
+                                <small>Questionable</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>10-15%</strong></td>
+                            <td class="matrix-cell" style="background: #fff3cd;">
+                                <strong>🟡 YELLOW (1)</strong><br>
+                                <small>Adequate</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #fff3cd;">
+                                <strong>🟡 YELLOW (1)</strong><br>
+                                <small>Fair</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #f8d7da;">
+                                <strong>🔴 RED (0)</strong><br>
+                                <small>Weak</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>&lt; 10%</strong></td>
+                            <td class="matrix-cell" style="background: #f8d7da;">
+                                <strong>🔴 RED (0)</strong><br>
+                                <small>Poor</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #f8d7da;">
+                                <strong>🔴 RED (0)</strong><br>
+                                <small>Poor</small>
+                            </td>
+                            <td class="matrix-cell" style="background: #f8d7da;">
+                                <strong>🔴 RED (0)</strong><br>
+                                <small>Poor</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 20px;">
+                    <h3>📋 Legenda</h3>
+                    <div class="grid-2">
+                        <div class="card">
+                            <p><span class="badge green">🟢 GREEN (2 pts)</span><br>Quality ROE from operations, low leverage, SAFE</p>
+                        </div>
+                        <div class="card">
+                            <p><span class="badge yellow">🟡 YELLOW (1 pt)</span><br>Context-dependent, requires deeper analysis</p>
+                        </div>
+                        <div class="card">
+                            <p><span class="badge red">🔴 RED (0 pts)</span><br>Either low ROE or high leverage, AVOID</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 8: CASI REALI -->
+            <div id="cases" class="section">
+                <h2>🎯 Casi Reali: ROE Quality Assessment</h2>
+
+                <div class="case-study">
+                    <h3>✅ Case 1: Apple - Exceptional Quality</h3>
+                    <span class="case-badge excellent">🟢 GREEN - EXCEPTIONAL</span>
+                    
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <div style="margin: 5px 0;"><strong>ROE:</strong> ~25% (10-year average: 24-26%)</div>
+                        <div style="margin: 5px 0;"><strong>D/E Ratio:</strong> 0.35 (molto conservativo)</div>
+                        <div style="margin: 5px 0;"><strong>Operating Margin:</strong> ~30% (pricing power)</div>
+                        <div style="margin: 5px 0;"><strong>Trend:</strong> Stabile e crescente</div>
+                        <div style="margin: 5px 0;"><strong>NI/OCF:</strong> 0.85 (eccellente)</div>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>DuPont Breakdown:</strong><br>
+                    25% = 25% Margin × 2.8× AT × 0.36× Leverage<br>
+                    <span style="color: var(--color-success);">✅ OPERATIONS-DRIVEN</span></p>
+
+                    <p style="margin-top: 10px;"><strong>Assessment:</strong> Moat evidente (brand + ecosystem). ROE sostenibile per decade.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>🟡 Case 2: Financial Services - Leverage-Driven (CAUTION)</h3>
+                    <span class="case-badge caution">🟡 YELLOW - HIGH RISK</span>
+                    
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <div style="margin: 5px 0;"><strong>ROE:</strong> 18% (sembra decente)</div>
+                        <div style="margin: 5px 0;"><strong>D/E Ratio:</strong> 2.50 (elevato!)</div>
+                        <div style="margin: 5px 0;"><strong>Operating Margin:</strong> 8% (basso)</div>
+                        <div style="margin: 5px 0;"><strong>NI/OCF:</strong> 0.70 (quality concern)</div>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>DuPont Breakdown:</strong><br>
+                    18% = 8% Margin × 1.2× AT × 1.88× Leverage<br>
+                    <span style="color: var(--color-danger);">🔴 FINANCIALLY ENGINEERED (75% dal leverage!)</span></p>
+
+                    <p style="margin-top: 10px;"><strong>Warning:</strong> Vulnerabile a aumento tassi. Se rates salgono, ROE crolla.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>✅ Case 3: Software Company - Asset-Light Excellence</h3>
+                    <span class="case-badge excellent">🟢 GREEN - SUSTAINABLE</span>
+                    
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <div style="margin: 5px 0;"><strong>ROE:</strong> 28% (consistent 25-30% for 10 years)</div>
+                        <div style="margin: 5px 0;"><strong>D/E Ratio:</strong> 0.20 (very conservative)</div>
+                        <div style="margin: 5px 0;"><strong>Operating Margin:</strong> 35% (pricing power!)</div>
+                        <div style="margin: 5px 0;"><strong>Business Model:</strong> SaaS recurring, low CapEx</div>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>DuPont Breakdown:</strong><br>
+                    28% = 28% Margin × 4.5× AT × 0.22× Leverage<br>
+                    <span style="color: var(--color-success);">✅ ASSET-LIGHT EXCELLENCE</span></p>
+
+                    <p style="margin-top: 10px;"><strong>Assessment:</strong> Could maintain 20%+ even in recession. Premium valuation justified.</p>
+                </div>
+            </div>
+
+            <!-- TAB 9: DOMANDE -->
+            <div id="questions" class="section">
+                <h2>❓ 7 Domande Critiche per Analisi ROE</h2>
+
+                <div class="card">
+                    <h3>1. Questo ROE è consistente o volatile?</h3>
+                    <p style="color: #666;"><em>Perché: ROE consistente = moat duraturo; volatile = temporaneo</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>2. Il ROE è SOPRA la media settoriale?</h3>
+                    <p style="color: #666;"><em>Perché: ROE > peer average = competitive advantage = premium valuation warranted</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>3. DuPont: da dove viene il ROE? Operations o leverage?</h3>
+                    <p style="color: #666;"><em>Perché: Operations-driven = sostenibile; leverage-driven = rischioso</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>4. Gli utili sono supportati da cash (NI ≈ OCF)?</h3>
+                    <p style="color: #666;"><em>Perché: NI può essere manipolato; OCF è la verità</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>5. Mantenerebbe ROE ≥15% se competizione s'intensificasse?</h3>
+                    <p style="color: #666;"><em>Perché: Test del valore reale del moat</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>6. È sostenibile dai fundamentals o da financial engineering?</h3>
+                    <p style="color: #666;"><em>Perché: Engineering è vulnerabile; fundamentals sono durevoli</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>7. Se normalizzassi D/E a 0.5, quale sarebbe ROE?</h3>
+                    <p style="color: #666;"><em>Perché: Rivela quanto ROE dipende da leverage vs. operations</em></p>
+                </div>
+
+                <div class="question-box" style="margin-top: 20px;">
+                    <strong>💡 Meta-Question:</strong><br>
+                    "Se dovessi scegliere tra un ROE 30% leverage-dependent e un ROE 18% operations-driven, quale sceglieresti?" <br>
+                    <span style="color: #666; font-size: 0.9em; margin-top: 10px; display: block;">Risposta corretta: 18% operations-driven. Buffett lo farebbe sempre.</span>
+                </div>
+            </div>
+
+            <!-- TAB 10: PROGRESS TRACKER -->
+            <div id="progress" class="section">
+                <h2>📋 Study Tracker - Monitora il Tuo Progresso</h2>
+
+                <div class="progress-tracker">
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Definizione ROE</strong> - Formula, significato operativo<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Benchmark Buffett</strong> - 5 livelli di qualità<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>3 Red Flags Principali</strong> - Leverage, Margins, Accounting<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>5 Step di Analisi</strong> - Framework completo<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Praticato</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>DuPont Analysis</strong> - Decomposizione in 3 componenti<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Praticato</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Calcolatore ROE</strong> - Tool interattivo<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Disponibile</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Scoring Matrix</strong> - ROE vs. D/E grid<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 Letto</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>4 Casi Reali</strong> - Apple, FinServices, Auto, Software<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 Letto</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status learning">⚠</div>
+                        <div>
+                            <strong>7 Domande Critiche</strong> - Verifica comprensione<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 In corso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status todo">○</div>
+                        <div>
+                            <strong>Esercizio Pratico Full</strong> - Analizzare vera company<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: ⬜ Da fare</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3>🎯 Prossimi Step Consigliati</h3>
+                    <ol style="margin-left: 20px;">
+                        <li style="margin: 10px 0;">Completa le 7 domande critiche (rispondere con parole tue)</li>
+                        <li style="margin: 10px 0;">Usa il calcolatore su 3-5 aziende reali che conosci</li>
+                        <li style="margin: 10px 0;">Passa a <strong>Metrica 2: FCF (Free Cash Flow)</strong> - "La verità sul profitto reale"</li>
+                        <li style="margin: 10px 0;">Integra ROE con Metrica 3 (Gross Margin), Metrica 4 (ROA), Metrica 5 (CFO)</li>
+                        <li style="margin: 10px 0;">Completa tutto Tier 1 (Business Quality - 40%)</li>
+                    </ol>
+                </div>
+
+                <div class="card highlight success" style="margin-top: 20px;">
+                    <h3>✅ Mastery Checkpoint</h3>
+                    <p><strong>Sei 🟩 Praticato quando:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Puoi calcolare ROE e D/E manualmente</li>
+                        <li>Puoi eseguire DuPont Analysis su bilancio reale</li>
+                        <li>Puoi identificare red flags in 2 minuti</li>
+                        <li>Puoi rispondere alle 7 domande critiche</li>
+                        <li>Puoi score una azienda come GREEN/YELLOW/RED con razionale</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Sei ⭐ Masterizzato quando:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Puoi insegnare ROE analysis a colleghi</li>
+                        <li>Puoi analizzare azienda nuova in 15 minuti</li>
+                        <li>Puoi predire ROE trend con confidenza</li>
+                        <li>Puoi distinguere moat sostenibile da temporaneo</li>
+                        <li>Puoi integrare ROE con altre metriche (Tier 2-5)</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p><strong>📊 ROE Dashboard Interattivo</strong> | Framework Buffett | Metrica #1 Tier 1</p>
+            <p style="margin-top: 10px; color: #999;">Dashboard completa per studio fondamentale di Financial Statement Analysis</p>
+            <p style="margin-top: 10px; color: #999;">Prossimo: Metrica 2 - FCF (Free Cash Flow) | Tier 1 Business Quality (40%)</p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+
+            // Remove active from buttons
+            const buttons = document.querySelectorAll('.nav-tabs button');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            // Show selected section
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+
+        function calculateROE() {
+            const ni = parseFloat(document.getElementById('netIncome').value);
+            const equity = parseFloat(document.getElementById('equity').value);
+
+            if (!ni || !equity || equity <= 0) {
+                alert('Inserisci valori validi');
+                return;
+            }
+
+            const roe = (ni / equity) * 100;
+            let rating = '';
+            let color = '';
+
+            if (roe >= 20) {
+                rating = '🟢 ECCELLENTE (≥20%)';
+                color = 'green';
+            } else if (roe >= 15) {
+                rating = '🟢 BUONO (15-20%)';
+                color = 'green';
+            } else if (roe >= 12) {
+                rating = '🟡 SUFFICIENTE (12-15%)';
+                color = 'orange';
+            } else if (roe >= 8) {
+                rating = '🟡 DEBOLE (8-12%)';
+                color = 'orange';
+            } else {
+                rating = '🔴 SCARSO (<8%)';
+                color = 'red';
+            }
+
+            document.getElementById('roeValue').textContent = roe.toFixed(2) + '%';
+            document.getElementById('roeRating').textContent = rating;
+            document.getElementById('roeResult').classList.add('show');
+        }
+
+        function calculateDuPoint() {
+            const ni = parseFloat(document.getElementById('dupont_ni').value);
+            const revenue = parseFloat(document.getElementById('revenue').value);
+            const assets = parseFloat(document.getElementById('assets').value);
+            const equity = parseFloat(document.getElementById('dupont_equity').value);
+
+            if (!ni || !revenue || !assets || !equity) {
+                alert('Inserisci tutti i valori');
+                return;
+            }
+
+            const margin = (ni / revenue) * 100;
+            const turnover = revenue / assets;
+            const leverage = assets / equity;
+            const roe = (margin / 100) * turnover * leverage * 100;
+
+            document.getElementById('margin').textContent = margin.toFixed(2) + '%';
+            document.getElementById('turnover').textContent = turnover.toFixed(2) + '×';
+            document.getElementById('leverage').textContent = leverage.toFixed(2) + '×';
+            document.getElementById('roe_dupont').textContent = roe.toFixed(2) + '%';
+
+            let analysis = '';
+            if (leverage < 1.0) {
+                analysis = '<strong>✅ CONSERVATIVE LEVERAGE</strong> - Strong capital structure';
+            } else if (leverage < 1.5) {
+                analysis = '<strong>🟡 MODERATE LEVERAGE</strong> - Reasonable debt level';
+            } else {
+                analysis = '<strong>🔴 HIGH LEVERAGE</strong> - Significant debt dependence';
+            }
+
+            if (margin > 15) {
+                analysis += '<br><strong>✅ STRONG MARGIN</strong> - Good pricing power and efficiency';
+            } else if (margin > 8) {
+                analysis += '<br><strong>🟡 MODERATE MARGIN</strong> - Average profitability';
+            } else {
+                analysis += '<br><strong>🔴 WEAK MARGIN</strong> - Low profitability';
+            }
+
+            document.getElementById('dupointAnalysis').innerHTML = analysis;
+            document.getElementById('dupointResult').classList.add('show');
+        }
+    </script>
+</body>
+</html>

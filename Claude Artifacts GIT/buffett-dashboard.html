@@ -194,6 +194,12 @@
                 font-size: 1.8em;
             }
         }
+    
+        .kpi-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; overflow-y: auto; }
+        .kpi-modal-overlay.active { display: block; }
+        .kpi-modal-content { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; background: white; border-radius: 12px; overflow: hidden; }
+        .kpi-modal-close { position: fixed; top: 20px; right: 30px; width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; z-index: 10001; }
+        .kpi-iframe { width: 100%; height: 90vh; border: none; }
     </style>
 </head>
 <body>
@@ -233,6 +239,22 @@
             " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(58, 123, 213, 0.6)';" 
                onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(58, 123, 213, 0.4)';">
                 📈 Metrics Deep Dive
+            </a>
+            <a href="#" onclick="openKPIAnalysis(); return false;" style="
+                display: inline-block;
+                padding: 12px 30px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 25px;
+                font-weight: bold;
+                font-size: 1.1em;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                transition: all 0.3s ease;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            " onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)';"
+               onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)';">
+                KPI Analysis
             </a>
         </div>
     </div>
@@ -1631,6 +1653,17 @@
                 });
             });
         });
+    
+        function openKPIAnalysis() { var m=document.getElementById('kpiModal'); var i=document.getElementById('kpiIframe'); i.src='roe-dashboard.html'; m.classList.add('active'); document.body.style.overflow='hidden'; }
+        function closeKPIAnalysis(e) { if(e)e.stopPropagation(); var m=document.getElementById('kpiModal'); var i=document.getElementById('kpiIframe'); m.classList.remove('active'); i.src=''; document.body.style.overflow='auto'; }
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeKPIAnalysis(); });
     </script>
+
+    <div id="kpiModal" class="kpi-modal-overlay" onclick="closeKPIAnalysis(event)">
+        <button class="kpi-modal-close" onclick="closeKPIAnalysis(event)">&times;</button>
+        <div class="kpi-modal-content" onclick="event.stopPropagation()">
+            <iframe id="kpiIframe" class="kpi-iframe" src=""></iframe>
+        </div>
+    </div>
 </body>
 </html>
