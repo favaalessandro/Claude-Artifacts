@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrica 6: Operating Margin - Dashboard Studio Buffett</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-orange-500: rgba(249, 115, 22, 1);
+            --color-orange-600: rgba(234, 88, 12, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-green-500: rgba(34, 197, 94, 1);
+            --color-yellow-500: rgba(234, 179, 8, 1);
+            --color-blue-500: rgba(59, 130, 246, 1);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family-base);
+            background: var(--color-cream-50);
+            color: var(--color-slate-900);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            margin: 10px 0 0 0;
+            font-size: 15px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+            background: white;
+            padding: 0 0 0 0;
+            border-radius: 0;
+        }
+
+        .tab-btn {
+            padding: 14px 18px;
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--color-slate-500);
+            border-bottom: 4px solid transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn:hover {
+            color: var(--color-orange-500);
+        }
+
+        .tab-btn.active {
+            color: var(--color-orange-500);
+            border-bottom-color: var(--color-orange-500);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            background: white;
+            padding: 28px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--color-orange-500);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-top: 1px solid #f0f0f0;
+        }
+
+        h2 {
+            margin: 0 0 18px 0;
+            font-size: 22px;
+            color: var(--color-orange-600);
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        h3 {
+            margin: 16px 0 12px 0;
+            font-size: 16px;
+            color: var(--color-slate-900);
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .formula {
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%);
+            padding: 18px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 14px 0;
+            border-left: 4px solid var(--color-orange-500);
+            border: 1px solid #ffe0cc;
+            font-weight: 500;
+            line-height: 1.7;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 18px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin: 18px 0;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.08);
+            border-color: var(--color-orange-500);
+        }
+
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 13px;
+        }
+
+        .benchmark-table th {
+            background: var(--color-orange-500);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .benchmark-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .benchmark-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .industry {
+            font-weight: 700;
+            color: var(--color-slate-900);
+        }
+
+        .margin-excellent {
+            color: var(--color-green-500);
+            font-weight: 700;
+        }
+
+        .margin-good {
+            color: var(--color-blue-500);
+            font-weight: 700;
+        }
+
+        .margin-adequate {
+            color: var(--color-yellow-500);
+            font-weight: 700;
+        }
+
+        .margin-poor {
+            color: var(--color-red-500);
+            font-weight: 700;
+        }
+
+        .red-flag {
+            background: #fee2e2;
+            border-left: 5px solid var(--color-red-500);
+            padding: 14px;
+            margin: 14px 0;
+            border-radius: 6px;
+            border: 1px solid #fecaca;
+        }
+
+        .red-flag-title {
+            font-weight: 700;
+            color: var(--color-red-500);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .red-flag-title::before {
+            content: "⚠️";
+            font-size: 18px;
+        }
+
+        .green-flag {
+            background: #dcfce7;
+            border-left: 5px solid var(--color-green-500);
+            padding: 14px;
+            margin: 14px 0;
+            border-radius: 6px;
+            border: 1px solid #bbf7d0;
+        }
+
+        .yellow-flag {
+            background: #fef3c7;
+            border-left: 5px solid var(--color-yellow-500);
+            padding: 14px;
+            margin: 14px 0;
+            border-radius: 6px;
+            border: 1px solid #fde68a;
+        }
+
+        .blue-flag {
+            background: #dbeafe;
+            border-left: 5px solid var(--color-blue-500);
+            padding: 14px;
+            margin: 14px 0;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .list-check {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .list-check li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .list-check li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--color-orange-500);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .calculator {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 24px;
+            border-radius: 10px;
+            margin: 18px 0;
+            border: 1px solid #bae6fd;
+        }
+
+        .input-group {
+            margin: 14px 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--color-slate-900);
+            letter-spacing: 0.2px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--color-orange-500);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        button {
+            background: var(--color-orange-500);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        button:hover {
+            background: var(--color-orange-600);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(249, 115, 22, 0.25);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 18px;
+            border: 2px solid var(--color-orange-500);
+            border-left: 5px solid var(--color-orange-500);
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-orange-600);
+            margin: 12px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .framework-step {
+            background: #fafafa;
+            padding: 18px;
+            margin: 14px 0;
+            border-radius: 8px;
+            border-left: 5px solid var(--color-orange-500);
+            border: 1px solid #e8e8e8;
+        }
+
+        .step-num {
+            display: inline-block;
+            background: var(--color-orange-500);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 700;
+            font-size: 13px;
+            margin-right: 10px;
+        }
+
+        .socratic-qa {
+            background: #fffbeb;
+            padding: 16px;
+            margin: 14px 0;
+            border-radius: 8px;
+            border-left: 5px solid var(--color-yellow-500);
+            border: 1px solid #fef08a;
+        }
+
+        .socratic-q {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .socratic-a {
+            color: #78350f;
+            font-size: 13px;
+            margin-left: 0;
+            padding-top: 10px;
+            border-top: 1px solid #fde68a;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        .example-box {
+            background: white;
+            border: 2px solid var(--color-orange-500);
+            padding: 18px;
+            margin: 14px 0;
+            border-radius: 8px;
+            border-left: 5px solid var(--color-orange-500);
+        }
+
+        .example-title {
+            font-weight: 700;
+            color: var(--color-orange-600);
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .scoring-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 9px 0;
+            font-size: 13px;
+        }
+
+        .indicator {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .indicator-green {
+            background: var(--color-green-500);
+        }
+
+        .indicator-yellow {
+            background: var(--color-yellow-500);
+        }
+
+        .indicator-red {
+            background: var(--color-red-500);
+        }
+
+        .buffett-quote {
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%);
+            border-left: 5px solid var(--color-orange-500);
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid #ffe0cc;
+            font-style: italic;
+            color: var(--color-slate-900);
+            line-height: 1.7;
+        }
+
+        .buffett-quote::before {
+            content: '"';
+            font-size: 36px;
+            color: var(--color-orange-500);
+            line-height: 0;
+            margin-right: 4px;
+        }
+
+        .data-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            margin: 8px 0;
+        }
+
+        .data-label {
+            font-weight: 700;
+            color: var(--color-slate-900);
+            font-size: 13px;
+        }
+
+        .data-value {
+            color: var(--color-orange-600);
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                gap: 4px;
+            }
+
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            header {
+                padding: 24px;
+            }
+
+            .data-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 METRICA 6: Operating Margin</h1>
+            <p class="subtitle">Management Efficiency &amp; Operating Leverage - Complete Buffett Framework</p>
+            <div class="metric-badge">🎯 Business Quality Tier 1 - Weight 40%</div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'concept')">📐 CONCETTO</button>
+            <button class="tab-btn" onclick="switchTab(event, 'implications')">💡 IMPLICAZIONI</button>
+            <button class="tab-btn" onclick="switchTab(event, 'examples')">📈 ESEMPI</button>
+            <button class="tab-btn" onclick="switchTab(event, 'framework')">🎯 FRAMEWORK</button>
+            <button class="tab-btn" onclick="switchTab(event, 'calculator')">🧮 CALC</button>
+            <button class="tab-btn" onclick="switchTab(event, 'verification')">✓ VERIFICA</button>
+        </div>
+
+        <!-- TAB 1: CONCETTO -->
+        <div id="concept" class="tab-content active">
+            <div class="section">
+                <h2>Definizione e Formula</h2>
+                <p><strong>Operating Margin</strong> misura la percentuale di ricavi che diventa profitto operativo prima di costi finanziari e tasse.</p>
+                <div class="formula">
+                    Operating Margin = (Operating Income / Revenue) × 100<br>
+                    <br>
+                    oppure<br>
+                    <br>
+                    Operating Margin = (EBIT / Revenue) × 100
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Componenti Essenziali</h3>
+                        <ul class="list-check">
+                            <li><strong>Operating Income (EBIT)</strong>: Ricavi - COGS - SGA - RD - Deprec.</li>
+                            <li><strong>Revenue</strong>: Fatturato totale (tutti i prodotti/servizi)</li>
+                            <li><strong>Percentuale</strong>: Frazione di ogni euro che rimane come profit operativo</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Cosa Misura in Termini Operativi</h3>
+                        <p><strong>🔍 Ogni euro di ricavi:</strong></p>
+                        <ul class="list-check">
+                            <li>Quanto rimane dopo TUTTI i costi operativi</li>
+                            <li>Indipendente da struttura finanziaria (debiti, tasse)</li>
+                            <li>Rivela qualità della gestione e cost discipline</li>
+                            <li>Indica pricing power e competitive advantage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎯 Benchmark Buffett</h2>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Livello</th>
+                            <th>Operating Margin</th>
+                            <th>Qualità</th>
+                            <th>Interpretazione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="margin-excellent">Eccellente</span></td>
+                            <td><span class="margin-excellent">&gt; 20%</span></td>
+                            <td>2.0 pts</td>
+                            <td>Moat duraturo, pricing power, eccellenza operativa</td>
+                        </tr>
+                        <tr>
+                            <td><span class="margin-good">Buono</span></td>
+                            <td><span class="margin-good">15-20%</span></td>
+                            <td>1.5 pts</td>
+                            <td>Competitive advantage, buon controllo costi</td>
+                        </tr>
+                        <tr>
+                            <td><span class="margin-adequate">Adeguato</span></td>
+                            <td><span class="margin-adequate">10-15%</span></td>
+                            <td>1.0 pts</td>
+                            <td>Normale per settore, esecuzione standard</td>
+                        </tr>
+                        <tr>
+                            <td><span class="margin-poor">Debole</span></td>
+                            <td><span class="margin-poor">5-10%</span></td>
+                            <td>0.5 pts</td>
+                            <td>Poco margine di errore, pressione competitiva</td>
+                        </tr>
+                        <tr>
+                            <td><span class="margin-poor">Scarso</span></td>
+                            <td><span class="margin-poor">&lt; 5%</span></td>
+                            <td>0 pts</td>
+                            <td>Critico, business model insufficiente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Benchmark per Settore (2024)</h2>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Settore</th>
+                            <th>Operating Margin</th>
+                            <th>Caratteristiche</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="industry">Real Estate (REIT)</td>
+                            <td><span class="margin-excellent">~30%</span></td>
+                            <td>Proprietà, elevati margini passivi</td>
+                            <td>Stabile</td>
+                        </tr>
+                        <tr>
+                            <td class="industry">Software/Cloud</td>
+                            <td><span class="margin-excellent">22-35%</span></td>
+                            <td>High operating leverage, costi variabili bassi</td>
+                            <td>Migliorando</td>
+                        </tr>
+                        <tr>
+                            <td class="industry">Bevande/Staples</td>
+                            <td><span class="margin-good">17-18%</span></td>
+                            <td>Pricing power forte, brand moat</td>
+                            <td>Stabile decadi</td>
+                        </tr>
+                        <tr>
+                            <td class="industry">Pharma</td>
+                            <td><span class="margin-good">18-20%</span></td>
+                            <td>Brevetti, pricing power da moat</td>
+                            <td>Stabile</td>
+                        </tr>
+                        <tr>
+                            <td class="industry">Industriali</td>
+                            <td><span class="margin-adequate">15-16%</span></td>
+                            <td>Capital-intensive, margini moderati</td>
+                            <td>Pressione</td>
+                        </tr>
+                        <tr>
+                            <td class="industry">Retail Tradizionale</td>
+                            <td><span class="margin-poor">2-6%</span></td>
+                            <td>E-commerce disruption, commoditized</td>
+                            <td>Declinando</td>
+                        </tr>
+                        <tr>
+                            <td class="industry">Automotive</td>
+                            <td><span class="margin-adequate">8-12%</span></td>
+                            <td>Transizione EV, inflazione costi</td>
+                            <td>Pressione</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>🔗 Collegamento con Metriche Correlate</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Gross Profit Margin (Metrica 3)</h3>
+                        <p><strong>Relazione:</strong> Gross Margin mostra pricing power; Operating Margin aggiunge controllo dei costi SGA/RD.</p>
+                        <ul class="list-check">
+                            <li>Gross alto + OpMargin basso = SGA/RD fuori controllo</li>
+                            <li>Gross alto + OpMargin alto = Eccellenza operativa</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Operating Leverage</h3>
+                        <p><strong>Il Concetto Chiave:</strong> Ricavi crescono → Costi fissi non crescono → OpMargin espande</p>
+                        <ul class="list-check">
+                            <li>Software: Alta leverage (costi fissi alti)</li>
+                            <li>Retail: Bassa leverage (costi variabili alti)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>ROIC (Metrica 30)</h3>
+                        <p><strong>Relazione:</strong> OpMargin alto → Margine operativo disponibile per shareholder returns</p>
+                        <ul class="list-check">
+                            <li>OpMargin non garantisce ROIC (dipende da asset efficiency)</li>
+                            <li>Ma senza OpMargin decente, ROIC impossibile</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>FCF (Metrica 2)</h3>
+                        <p><strong>Relazione:</strong> OpMargin → Operating Income → Operating Cash Flow → FCF</p>
+                        <ul class="list-check">
+                            <li>OpMargin alto ma CFO basso = Red flag qualità earnings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Principio Buffett - La Visione Strategica</h2>
+                <div class="buffett-quote">
+                    Operating margin rivela vera business efficiency e management quality. Gross margin mostra pricing power; operating margin mostra cost discipline. I migliori business hanno sia high gross margins CHE high operating margins. Operating margin che migliora mentre ricavi crescono indica operating leverage—il fondamento della creazione di valore a lungo termine.
+                </div>
+                <div style="margin-top: 14px; padding: 12px; background: #f0f9ff; border-radius: 6px; border-left: 4px solid var(--color-blue-500);">
+                    <p style="margin: 0; font-size: 13px;"><strong>🎯 Implicazione Strategica:</strong> Una azienda con Operating Margin 30% stabile per 10 anni ha dimostrato: moat duraturo, pricing power indistruttibile, e management excellence rara.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: IMPLICAZIONI PER L'ANALISI -->
+        <div id="implications" class="tab-content">
+            <div class="section">
+                <h2>💡 Impatto su Decisioni d'Investimento</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>OpMargin Alto (20%+)</h3>
+                        <ul class="list-check">
+                            <li><strong>Pricing Power:</strong> Clienti disposti a pagare premium</li>
+                            <li><strong>Cost Control:</strong> Management disciplinato</li>
+                            <li><strong>Resilienza:</strong> Margine di sicurezza per downturns</li>
+                            <li><strong>Durable Moat:</strong> Difficile per competitor imitare</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>OpMargin Basso (&lt;5%)</h3>
+                        <ul class="list-check">
+                            <li><strong>Rischio Elevato:</strong> Poco margine di errore</li>
+                            <li><strong>Competitive Commodity:</strong> Pricing power inesistente</li>
+                            <li><strong>Pressione Costi:</strong> Vulnerabile a inflazione</li>
+                            <li><strong>Limitato FCF:</strong> Poco cash per investimenti/dividendi</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Differenze Contabili IAS/IFRS vs US GAAP vs OIC</h2>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Aspetto</th>
+                            <th>IAS/IFRS (Internazionale)</th>
+                            <th>US GAAP</th>
+                            <th>OIC (Italia)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operating Income</strong></td>
+                            <td>EBIT prima di interessi/tasse</td>
+                            <td>Operating income (EBIT)</td>
+                            <td>Reddito operativo (EBIT)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Classificazione Costi</strong></td>
+                            <td>By nature (materiali, salari, etc)</td>
+                            <td>By function (COGS, SGA)</td>
+                            <td>By function (COGS, SGA)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deprec. Incluso</strong></td>
+                            <td>Sì, in OpInc</td>
+                            <td>Sì, in OpInc</td>
+                            <td>Sì, in OpInc</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Impatto OpMargin</strong></td>
+                            <td>Minore variabilità</td>
+                            <td>Standard</td>
+                            <td>Simile a IFRS</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>⚠️ Nota:</strong> Le differenze di presentazione (by nature vs by function) non cambiano OpMargin finale ma influenzano visibilità delle componenti.</p>
+            </div>
+
+            <div class="section">
+                <h2>🚩 Red Flags e Segnali di Allarme Qualità</h2>
+
+                <div class="red-flag">
+                    <div class="red-flag-title">Operating Margin in Calo Mentre Gross Margin Stabile</div>
+                    <p><strong>Problema:</strong> Costi SGA/RD fuori controllo, non pricing o COGS</p>
+                    <ul class="list-check">
+                        <li>Es: Gross margin stabile 50%, OpMargin cala da 25% → 18%</li>
+                        <li><strong>Investigazione:</strong> SGA/Revenue salendo? RD tagliato? Overhead bloated?</li>
+                        <li><strong>Implicazione:</strong> Management non ha disciplina costi / investimento non produce ROI</li>
+                    </ul>
+                </div>
+
+                <div class="red-flag">
+                    <div class="red-flag-title">OpMargin in Aumento Mentre Revenue Stagna</div>
+                    <p><strong>Pericolo:</strong> Tagli di costo (layoff, RD ridotto, deferred maintenance) non veri miglioramenti</p>
+                    <ul class="list-check">
+                        <li>Es: Revenue flat, OpMargin da 10% → 12%</li>
+                        <li><strong>Investigazione:</strong> RD/Revenue cala? CapEx/Revenue scende? Headcount ridotto?</li>
+                        <li><strong>Implicazione:</strong> Margin improvement temporaneo, future growth a rischio</li>
+                    </ul>
+                </div>
+
+                <div class="red-flag">
+                    <div class="red-flag-title">OpMargin Built su One-Time Items</div>
+                    <p><strong>Inganno:</strong> Guadagni non ricorrenti (asset sales, litigation) gonfia OpInc</p>
+                    <ul class="list-check">
+                        <li>Es: OpMargin 18% include 50M one-time gain; ricorrente è 14%</li>
+                        <li><strong>Action:</strong> Normalizzare OpMargin escludendo non-recurring items</li>
+                    </ul>
+                </div>
+
+                <div class="red-flag">
+                    <div class="red-flag-title">3 Anni di Margin Decline Consecutivo</div>
+                    <p><strong>🚨 Segnale Critico:</strong> Perdita di posizione competitiva o cost inflation incontrollata</p>
+                    <ul class="list-check">
+                        <li><strong>Es:</strong> OpMargin trend 20% → 18% → 15% → 12%</li>
+                        <li><strong>Causa Probabile:</strong> Competitor erosion, cost spiral, pricing power loss</li>
+                        <li><strong>Action:</strong> Investigare root cause: industria pressure o company-specific?</li>
+                    </ul>
+                </div>
+
+                <div class="red-flag">
+                    <div class="red-flag-title">OpMargin Unsustainable da Underinvestment</div>
+                    <p><strong>Pericolo:</strong> Company sacrifica future growth per boost margini attuali</p>
+                    <ul class="list-check">
+                        <li><strong>Segnali:</strong>
+                            <ul>
+                                <li>RD/Revenue declining mentre industria innova rapidamente</li>
+                                <li>CapEx/Revenue sotto peer average → deferred maintenance</li>
+                                <li>Marketing budget slashed → brand fade risk</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="red-flag">
+                    <div class="red-flag-title">OpMargin Improvement da Mix Shift Non Sostenibile</div>
+                    <p><strong>Trappola:</strong> Company abbandona low-margin business (una tantum) per apparire più efficiente</p>
+                    <ul class="list-check">
+                        <li>Es: OpMargin boost 15% → 18% discontinuando bassa-margin product line</li>
+                        <li><strong>Rischio:</strong> Mix shift non può continuare; revenue flatten dopo</li>
+                    </ul>
+                </div>
+
+                <div class="red-flag">
+                    <div class="red-flag-title">OpMargin Significativamente Sotto Peer Average</div>
+                    <p><strong>Red Flag:</strong> Structural disadvantage in cost structure o competitive weakness</p>
+                    <ul class="list-check">
+                        <li>Es: Settore median OpMargin 15%, tua company 8%</li>
+                        <li><strong>Domanda:</strong> Scale disadvantage? Inefficient plants? Weak pricing power?</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>✅ Green Flags - Segnali Positivi di Qualità</h2>
+
+                <div class="green-flag">
+                    <strong>✓ Operating Leverage Provato</strong><br>
+                    Revenue cresce 10%, OpMargin migliora 1-2pp (es: 20% → 21.5%). Costi fissi non scalano = leva funziona.
+                </div>
+
+                <div class="green-flag">
+                    <strong>✓ OpMargin Stabile per Decade</strong><br>
+                    Es: 28-30% mantenuti per 10+ anni = durable moat, pricing power indistruttibile, management excellence.
+                </div>
+
+                <div class="green-flag">
+                    <strong>✓ Expansion da Efficienza Reale</strong><br>
+                    Revenue cresce, SGA/Revenue cala (da automation/scale, non layoffs). Vero improvement sostenibile.
+                </div>
+
+                <div class="green-flag">
+                    <strong>✓ Reinvestimento Adeguato</strong><br>
+                    RD spending stabile/growing, CapEx normal per settore, pricing power intact. Margin durabile.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ESEMPI PRATICI -->
+        <div id="examples" class="tab-content">
+            <div class="section">
+                <h2>📈 Esempi Real-World: 5 Scenari</h2>
+            </div>
+
+            <div class="section">
+                <h3>Esempio 1: Apple - Eccellenza Operativa</h3>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr><th>Metrica</th><th>Valore</th><th>Interpretazione</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operating Margin</strong></td>
+                            <td><span class="margin-excellent">~30%</span></td>
+                            <td>Eccezionale, tra i migliori al mondo</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trend 10 anni</strong></td>
+                            <td><span class="margin-excellent">Stabile 28-30%</span></td>
+                            <td>Consistenza rarissima a scala di $400B revenue</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revenue CAGR</strong></td>
+                            <td>~8%</td>
+                            <td>Crescita solida nonostante maturità</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpIncome Growth</strong></td>
+                            <td>~8% (matching revenue)</td>
+                            <td>Margine stabile = proporz. growth</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpInc to CFO</strong></td>
+                            <td>~92% conversion</td>
+                            <td>Earnings quality eccellente</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="example-box">
+                    <div class="example-title">📊 Analisi</div>
+                    <p><strong>Verdict: GREEN - Best-in-class</strong></p>
+                    <ul class="list-check">
+                        <li>Pricing power dimostrata (margine stabile a scala $400B)</li>
+                        <li>Cost discipline eccezionale (SGA/Revenue 7%, RD/Revenue 6-7% stable)</li>
+                        <li>Operational leverage funziona: ricavi crescono, margin stabile = valore creato</li>
+                        <li>Sustainability: 10 anni di 28-30% dimostra durable moat</li>
+                        <li>Verdict di Buffett:</li> "Questo è il tipo di azienda che voglio. Margin stabile, pricing power, management disciplinato."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Esempio 2: Microsoft - Operating Leverage in Azione</h3>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr><th>Metrica</th><th>Valore</th><th>Interpretazione</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operating Margin</strong></td>
+                            <td><span class="margin-excellent">~35%</span></td>
+                            <td>Tra le più alte del software globale</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trend 10 anni</strong></td>
+                            <td>Migliore da 25% → 35% (expanding)</td>
+                            <td>Operating leverage lavorando: margin sale</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revenue CAGR</strong></td>
+                            <td>~10%</td>
+                            <td>Cloud (Azure) + AI growth</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpMargin Expansion</strong></td>
+                            <td>~1pp anno</td>
+                            <td>Software leverage: costi fissi non scalano</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpInc Growth</strong></td>
+                            <td>~18% CAGR</td>
+                            <td>Crescita più veloce di revenue (leverage!!)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="example-box">
+                    <div class="example-title">📊 Analisi</div>
+                    <p><strong>Verdict: GREEN - Eccezionale con leverage</strong></p>
+                    <ul class="list-check">
+                        <li>Opex (SGA+RD) crescono lentamente (8%) vs revenue (10%) = leverage nascente</li>
+                        <li>Cloud/Subscription model naturalmente high-margin</li>
+                        <li>Margin expansion sostenibile da Azure+AI growth trajectory</li>
+                        <li>RD spending adequate (20% revenue) per innovazione cloud/AI</li>
+                        <li><strong>Verdict Buffett:</strong> "Crescita + margin expansion + durable moat. Esattamente quello che cerco."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Esempio 3: Coca-Cola - Durable Moat, Pricing Power</h3>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr><th>Metrica</th><th>Valore</th><th>Interpretazione</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operating Margin</strong></td>
+                            <td><span class="margin-good">~30%</span></td>
+                            <td>Eccezionale per bevande (settore ~15%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trend Decadi</strong></td>
+                            <td>Stabile 25-32% per 20+ anni</td>
+                            <td>Pricing power provata = brand moat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revenue Growth</strong></td>
+                            <td>~4% CAGR</td>
+                            <td>Mature market, ma margin compensates</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpMargin vs Peers</strong></td>
+                            <td>2x industry median (30% vs 15%)</td>
+                            <td>Pricing power da brand + distribution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sustainability</strong></td>
+                            <td>RD adequate (2%), CapEx normal</td>
+                            <td>Tidak cutting future untuk current margin</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="example-box">
+                    <div class="example-title">📊 Analisi</div>
+                    <p><strong>Verdict: GREEN - Durable Moat Prototipo</strong></p>
+                    <ul class="list-check">
+                        <li>OpMargin 2x industry = pricing power straordinaria da moat</li>
+                        <li>Stabilità per 20 anni dimostra durabilità (non temporary)</li>
+                        <li>Anche a revenue growth 4%, margin stability → eccellente valore</li>
+                        <li>Questo è ESATTAMENTE cosa Buffett cerca: brand moat + pricing power + margin durabilità</li>
+                        <li><strong>Buffett Principle:</strong> "Coca-Cola non cresce fast, ma margin è indistruttibile. Quello che voglio."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Esempio 4: Amazon - Strategic Low Margin</h3>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr><th>Metrica</th><th>Valore</th><th>Interpretazione</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operating Margin</strong></td>
+                            <td><span class="margin-poor">~6-8%</span></td>
+                            <td>Basso per azienda di questa scala</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trend 10 anni</strong></td>
+                            <td>Improving da 0% → 6-8%</td>
+                            <td>Strategico: reinvest per scale, non maximizza margin attuale</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revenue Growth</strong></td>
+                            <td>~25% CAGR</td>
+                            <td>Esplosivo: deliberate low margin per market share</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reinvestment</strong></td>
+                            <td>SGA + RD + CapEx crescono 10-12%</td>
+                            <td>Grosso profitti reinvestiti in growth, not maximizing OpMargin</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AWS Impact</strong></td>
+                            <td>OpMargin 30%+ for AWS alone</td>
+                            <td>High margin AWS subsidizes low-margin retail (strategy)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="example-box">
+                    <div class="example-title">📊 Analisi</div>
+                    <p><strong>Verdict: YELLOW - Strategic Tradeoff, Not Weakness</strong></p>
+                    <ul class="list-check">
+                        <li>Low OpMargin è SCELTA STRATEGICA (dominare market), non incompetenza</li>
+                        <li>AWS (margin 30%) subsidizes retail (margin 3-5%) = overall OpMargin improving</li>
+                        <li>Question critica: Will margin expansion continue come AWS grows?</li>
+                        <li>Risk: If growth slows ma margin stays low, becomes problematic</li>
+                        <li><strong>Buffett Perspective:</strong> "Se margin improvement continues, acceptable. Se stagna a 6%, concern."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Esempio 5: Struggling Retailer - Red Flags</h3>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr><th>Metrica</th><th>Valore</th><th>Interpretazione</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Operating Margin</strong></td>
+                            <td><span class="margin-poor">~2%</span></td>
+                            <td>Critico: nessun margine di errore</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trend 5 anni</strong></td>
+                            <td>Declining da 5% → 2%</td>
+                            <td>Margin compression accelerando</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revenue Trend</strong></td>
+                            <td>Flat a declinante</td>
+                            <td>Nessuna top-line growth buffer</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gross Margin</strong></td>
+                            <td>32%, stable</td>
+                            <td>Pricing power OK, problema è SGA/OpEx</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SGA/Revenue</strong></td>
+                            <td>Salendo (store costs non scalano)</td>
+                            <td>E-commerce pressure, store economics deteriorating</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="example-box">
+                    <div class="example-title">📊 Analisi</div>
+                    <p><strong>Verdict: RED - Business Model Stressed</strong></p>
+                    <ul class="list-check">
+                        <li>OpMargin 2% = niente spazio errore; una cost spike = losses</li>
+                        <li>Margin decline da 5% → 2% in 5 anni = accelerating deterioration</li>
+                        <li>E-commerce disruption = structural margin compression (non cyclical)</li>
+                        <li>Store footprint non scalabile in era digital = fixed cost burden</li>
+                        <li>Unless business model reinvents, trajectory unsustainable</li>
+                        <li><strong>Buffett Verdict:</strong> "Evitare. Structural deterioration, non temporary. Margin towards zero."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🧮 Esercizio Pratico: Calcola tuo Scenario</h2>
+                <p>Usa il tab "Calcolatore" per fare calcoli in real-time su aziende che studi.</p>
+            </div>
+        </div>
+
+        <!-- TAB 4: FRAMEWORK ANALISI -->
+        <div id="framework" class="tab-content">
+            <div class="section">
+                <h2>🎯 5-Step Framework Completo</h2>
+                <p><strong>Applica questi 5 step in sequenza per valutare Operating Margin quality.</strong></p>
+            </div>
+
+            <div class="section">
+                <div class="framework-step">
+                    <span class="step-num">1</span>
+                    <h3>Calcola OpMargin Effettivo e Normalizzato</h3>
+                    <div class="formula">
+                        Step 1a: OpMargin = (Operating Income / Revenue) × 100
+                        Step 1b: Normalizza escludendo one-time items
+                        Es: Reported OpMargin 18%, includes 50M one-time gain
+                        → Normalized OpMargin = (180M - 50M) / 1000M = 13%
+                    </div>
+                    <p><strong>Domanda Chiave:</strong> Quale percentuale di ogni euro rimane come profit operativo dopo TUTTI costi operativi?</p>
+                    <p><strong>Red Flag:</strong> Large gap (>2pp) tra reported e normalized margin → accounting distortion risk</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="framework-step">
+                    <span class="step-num">2</span>
+                    <h3>Analizza 10-Year Trend - Direzione e Stabilità</h3>
+                    <ul class="list-check">
+                        <li><strong>Migliorando:</strong> Operating leverage funziona, competitive position migliorante</li>
+                        <li><strong>Stabile:</strong> Efficient business, prevedibile, moat durabile</li>
+                        <li><strong>Declinante:</strong> Perdita di posizione competitiva o inflazione costi non controllata</li>
+                        <li><strong>Volatile:</strong> Unstable business, difficile da predicere</li>
+                    </ul>
+                    <p><strong>Interpretation:</strong></p>
+                    <ul class="list-check">
+                        <li>OpMargin 20% → 25% (improving) = Leverage, good management</li>
+                        <li>OpMargin 20% → 18% → 16% (declining 3 anni) = Competitive pressure</li>
+                        <li>OpMargin 20% ± 1pp (stable) = Efficient, predictable</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="framework-step">
+                    <span class="step-num">3</span>
+                    <h3>Benchmark vs Peer Group e Industry Median</h3>
+                    <p><strong>Questione Critica:</strong> È OpMargin eccellente in assoluto o solo OK relativo al settore?</p>
+                    <table class="benchmark-table" style="margin: 12px 0; font-size: 12px;">
+                        <thead>
+                            <tr><th>Scenario</th><th>Your OpMargin</th><th>Peer Median</th><th>Interpretazione</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Competitive Advantage</td>
+                                <td>20%</td>
+                                <td>12%</td>
+                                <td>Pricing power, cost advantage, or quality product mix</td>
+                            </tr>
+                            <tr>
+                                <td>At Par</td>
+                                <td>12%</td>
+                                <td>12%</td>
+                                <td>Executing equally to peers, no advantage</td>
+                            </tr>
+                            <tr>
+                                <td>Disadvantage</td>
+                                <td>8%</td>
+                                <td>12%</td>
+                                <td>Structural weakness, scale disadvantage, or execution problem</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Action:</strong> Se sotto peer median, investigare WHY. Temporary o structural?</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="framework-step">
+                    <span class="step-num">4</span>
+                    <h3>Analizza Operating Leverage - Revenue vs OpMargin Growth</h3>
+                    <div class="formula">
+                        Leverage Test:
+                        Revenue Growth: 10% year-over-year
+                        OpMargin Change: +1pp (es 20% → 21%)
+                        Interpretation: LEVERAGE WORKING
+                        
+                        vs.
+                        
+                        No Leverage:
+                        Revenue Growth: 10%
+                        OpMargin Change: 0pp (stays 20%)
+                        Interpretation: Margin flat = costs growing with revenue (no leverage)
+                        
+                        vs.
+                        
+                        Negative Leverage:
+                        Revenue Growth: 10%
+                        OpMargin Change: -1pp (20% → 19%)
+                        Interpretation: Costs growing faster than revenue (problem)
+                    </div>
+                    <p><strong>Key:</strong> Se ricavi crescono ma OpMargin migliora (o almeno stabile), business scalabile. Se margin cala, business hits scaling limits.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="framework-step">
+                    <span class="step-num">5</span>
+                    <h3>Valuta Sustainability - RD, CapEx, Pricing Power</h3>
+                    <p><strong>Domanda Critica:</strong> Può questa margin essere mantenuta/migliorata indefinitamente senza sacrificare future growth?</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h4>✅ Sustainable Margin Profile</h4>
+                            <ul class="list-check">
+                                <li>RD/Revenue stable/growing (investment in future)</li>
+                                <li>CapEx/Revenue normal for industry</li>
+                                <li>Pricing power intact (can raise prices)</li>
+                                <li>Market share stable/growing</li>
+                                <li>Depreciation moderate (not high deferred maintenance)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h4>⚠️ Unsustainable Margin Profile</h4>
+                            <ul class="list-check">
+                                <li>RD/Revenue declining (cutting innovation)</li>
+                                <li>CapEx/Revenue below peer median (deferred maintenance)</li>
+                                <li>Pricing power erosion (margin from cost-cutting)</li>
+                                <li>Market share declining</li>
+                                <li>Depreciation very high (aging asset base)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📋 Operating Margin Scoring Checklist</h2>
+                <table class="benchmark-table">
+                    <thead>
+                        <tr><th>Componente</th><th>Green (2 pts)</th><th>Yellow (1 pt)</th><th>Red (0 pts)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Livello Assoluto</strong></td>
+                            <td>≥20% OR at/above peer median</td>
+                            <td>10-20% and at peer median</td>
+                            <td>&lt;10% or &gt;20pp below peer median</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trend (10 anni)</strong></td>
+                            <td>Improving or stable, ≤±1pp volatility</td>
+                            <td>Stable but stagnant, ±2pp volatility</td>
+                            <td>Declining or highly volatile ≥3pp swings</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Leverage Test</strong></td>
+                            <td>Revenue growing, OpMargin improving/stable</td>
+                            <td>Revenue stable, OpMargin flat</td>
+                            <td>Revenue growing but OpMargin declining</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpMargin Composition</strong></td>
+                            <td>From revenue growth + efficiency, no cost-cutting</td>
+                            <td>Mixed: some growth, some cost control</td>
+                            <td>From cost-cutting only, revenue flat</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sustainability</strong></td>
+                            <td>RD adequate, CapEx normal, pricing power intact</td>
+                            <td>RD declining slightly, CapEx adequate</td>
+                            <td>RD/CapEx significant cuts, pricing power eroding</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Peer Comparison</strong></td>
+                            <td>Above peer median, competitive advantage</td>
+                            <td>At peer median, executing normally</td>
+                            <td>Below peer median, structural disadvantage</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px;"><strong>Total Score (0-12):</strong></p>
+                <ul class="list-check">
+                    <li><strong>10-12 pts (Green):</strong> Exceptional operating quality, sustainable competitive advantage</li>
+                    <li><strong>7-9 pts (Green/Yellow):</strong> Good operating margin, monitor trends</li>
+                    <li><strong>4-6 pts (Yellow):</strong> Adequate but watch for deterioration</li>
+                    <li><strong>0-3 pts (Red):</strong> Concerning, requires investigation or avoid</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- TAB 5: CALCOLATORE INTERATTIVO -->
+        <div id="calculator" class="tab-content">
+            <div class="section">
+                <h2>🧮 Calcolatore Operating Margin</h2>
+                <div class="calculator">
+                    <div class="input-group">
+                        <label>Nome Azienda:</label>
+                        <input type="text" id="company_name" placeholder="Es: Apple, Microsoft, TuaSPA">
+                    </div>
+                    <div class="input-group">
+                        <label>Operating Income (EBIT in milioni €):</label>
+                        <input type="number" id="op_income" placeholder="Es: 114000">
+                    </div>
+                    <div class="input-group">
+                        <label>Revenue (Ricavi in milioni €):</label>
+                        <input type="number" id="revenue" placeholder="Es: 383000">
+                    </div>
+                    <div class="input-group">
+                        <label>Peer Industry Average OpMargin (%):</label>
+                        <input type="number" id="peer_margin" placeholder="Es: 15" step="0.1">
+                    </div>
+
+                    <h3 style="margin-top: 20px;">One-Time Items (Opzionale)</h3>
+                    <div class="input-group">
+                        <label>One-Time Gains/Losses in OpIncome (milioni €):</label>
+                        <input type="number" id="one_time" placeholder="Es: 50 (gains) o -30 (losses)">
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Investimenti e Costi</h3>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>SGA Expenses (% of Revenue):</label>
+                            <input type="number" id="sga_pct" placeholder="Es: 20" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>RD Expenses (% of Revenue):</label>
+                            <input type="number" id="rd_pct" placeholder="Es: 8" step="0.1">
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Dati Storici (per analizzare trend)</h3>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>OpMargin 1 anno fa (%):</label>
+                            <input type="number" id="margin_1yr" placeholder="Es: 29" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label>OpMargin 5 anni fa (%):</label>
+                            <input type="number" id="margin_5yr" placeholder="Es: 26" step="0.1">
+                        </div>
+                    </div>
+
+                    <button onclick="calculateMargin()">Calcola Operating Margin</button>
+                </div>
+
+                <div id="calc-results" style="display: none;">
+                    <div class="result">
+                        <h3 id="company-display"></h3>
+                        
+                        <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                            <h4>Margin Attuale</h4>
+                            <div class="result-value" id="margin-current"></div>
+                            <p id="margin-interpretation" style="font-size: 13px; margin: 8px 0;"></p>
+                        </div>
+
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                            <h4>Analisi Dettagliata</h4>
+                            <table class="benchmark-table" style="margin: 10px 0;">
+                                <thead>
+                                    <tr><th>Metrica</th><th>Valore</th><th>Analisi</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Margin Reported</strong></td>
+                                        <td id="margin-reported"></td>
+                                        <td id="analysis-reported"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Margin Normalizzato</strong></td>
+                                        <td id="margin-normalized"></td>
+                                        <td id="analysis-normalized"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>vs Peer Average</strong></td>
+                                        <td id="margin-vs-peer"></td>
+                                        <td id="analysis-peer"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Trend 1 anno</strong></td>
+                                        <td id="trend-1yr"></td>
+                                        <td id="analysis-1yr"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Trend 5 anni</strong></td>
+                                        <td id="trend-5yr"></td>
+                                        <td id="analysis-5yr"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="warnings-box" style="margin: 15px 0;"></div>
+
+                        <div style="background: #dbeafe; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                            <h4>📊 Verdict Preliminare</h4>
+                            <p id="verdict-text" style="font-weight: 500;"></p>
+                            <p id="recommendation" style="font-size: 13px; margin-top: 8px;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📋 Guida all'Uso del Calcolatore</h2>
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 6px;">
+                    <p><strong>Come usare:</strong></p>
+                    <ol style="margin: 10px 0; padding-left: 20px;">
+                        <li>Inserisci Operating Income e Revenue dal financial statement</li>
+                        <li>Inserisci peer industry median per contexto (es: 15% per retail)</li>
+                        <li>Se presente, includi one-time items per normalizzazione</li>
+                        <li>Inserisci SGA% e RD% per analizzare composizione costi</li>
+                        <li>Se hai dati storici, includi margin 1yr e 5yr fa per analisi trend</li>
+                        <li>Clicca "Calcola" e leggi verdict dettagliato</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: VERIFICA E DOMANDE -->
+        <div id="verification" class="tab-content">
+            <div class="section">
+                <h2>❓ Domande Socratiche - Test Comprensione</h2>
+                <p><strong>Rispondi mentalmente a queste domande per testare la tua comprensione concettuale:</strong></p>
+            </div>
+
+            <div class="section">
+                <div class="socratic-qa">
+                    <div class="socratic-q">Q1: Se Operating Margin è 20%, cosa significa in termini pratici? (Ogni euro di...?)</div>
+                    <div class="socratic-a">
+                        <strong>Risposta:</strong> Ogni euro di ricavi genera 20 centesimi di profitto operativo (prima di interessi e tasse). Detto altrimenti: 80 centesimi vanno a costi operativi (COGS, SGA, RD, Deprec.), 20 rimangono come profit prima di finanziamento e tassazione.
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="socratic-qa">
+                    <div class="socratic-q">Q2: Come mai Operating Margin è più importante di Gross Margin per analizzare qualità del business?</div>
+                    <div class="socratic-a">
+                        <strong>Risposta:</strong> Gross Margin mostra pricing power (ricavi vs COGS). Ma Operating Margin aggiunge il controllo dei costi operativi (SGA + RD). Un business può avere Gross Margin eccellente ma OpMargin debole se non controlla overhead. OpMargin rivela true management quality e operational discipline.
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="socratic-qa">
+                    <div class="socratic-q">Q3: Se OpMargin migliora mentre Revenue è flat/calante, è un buon segnale?</div>
+                    <div class="socratic-a">
+                        <strong>Risposta:</strong> NO. È red flag. Significa la company sta tagliando costi (layoffs, RD ridotto) per boost margini. È unsustainable. Se revenue cala, business in trouble; se costi tagliati artificialmente, future growth a rischio. Un vero improvement è quando margin migliora mentre revenue cresce (operating leverage).
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="socratic-qa">
+                    <div class="socratic-q">Q4: Cosa differenzia una OpMargin "durable" (sostenibile) da una temporanea?</div>
+                    <div class="socratic-a">
+                        <strong>Risposta:</strong> Durable margin: RD spending adequate per industria, CapEx normal, pricing power intact, margin stabile per 10+ anni, competitive advantage chiaro. Temporary margin: RD/CapEx in calo, margin salendo da cost-cutting, margin high da one-time items, pressure competitiva visibile. Una durable margin indica moat; una temporary indica underinvestment.
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="socratic-qa">
+                    <div class="socratic-q">Q5: Se azienda A ha OpMargin 12% e azienda B ha OpMargin 18%, quale è migliore?</div>
+                    <div class="socratic-a">
+                        <strong>Risposta:</strong> Dipende dal settore. Se entrambe sono tech, B è chiaramente migliore. Se A è retail e B è pharma, dipende dai peer median di ciascun settore. A potrebbe essere best-in-class per retail (se peer median è 5%) mentre B potrebbe essere above-average ma non exceptional per pharma (peer median 20%). SEMPRE contestualizzare vs industry benchmark.
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="socratic-qa">
+                    <div class="socratic-q">Q6: Come mai Operating Leverage è il "fondamento della creazione di valore a lungo termine" per Buffett?</div>
+                    <div class="socratic-a">
+                        <strong>Risposta:</strong> Operating Leverage significa che quando ricavi crescono, non tutti costi crescono proporzionalmente (i costi fissi non scalano). Es: Software company, ricavi +10%, OpMargin migliora da 30% → 32%. Questo automatis crea più profitto assoluto senza più capitale investito. Compound questo su 10 anni → snowball effect → enorme creazione di valore. È la differenza tra crescita con scalabilità (buono) e crescita che richiede proporzionale investimento (mediocre).
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>✏️ Esercizio Procedurale Guidato</h2>
+                <p><strong>Analizza questa azienda Step-by-Step:</strong></p>
+                
+                <div style="background: #fff7ed; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <h4>📌 Dati Azienda X (Tech Manufacturing)</h4>
+                    <table style="width: 100%; font-size: 13px;">
+                        <tr><td><strong>Revenue (Year 5):</strong></td><td>€1,500M</td></tr>
+                        <tr><td><strong>Operating Income:</strong></td><td>€375M</td></tr>
+                        <tr><td><strong>Revenue (Year 1, 5 anni fa):</strong></td><td>€1,000M</td></tr>
+                        <tr><td><strong>Operating Income (Year 1):</strong></td><td>€200M</td></tr>
+                        <tr><td><strong>Gross Margin (Year 5):</strong></td><td>50%</td></tr>
+                        <tr><td><strong>SGA/Revenue:</strong></td><td>Year 1: 20%, Year 5: 17%</td></tr>
+                        <tr><td><strong>RD/Revenue:</strong></td><td>Year 1: 10%, Year 5: 10%</td></tr>
+                        <tr><td><strong>Peer Median OpMargin:</strong></td><td>20%</td></tr>
+                    </table>
+                </div>
+
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <h4>Step 1️⃣ : Calcola OpMargin Attuale</h4>
+                    <div class="formula">
+                        OpMargin Year 5 = (375M / 1,500M) × 100 = 25%
+                    </div>
+                    <p><strong>Q: Come è questo comparat all'industria?</strong><br>A: Sopra il peer median 20% → Competitive Advantage ✓</p>
+                </div>
+
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <h4>Step 2️⃣ : Analizza Trend 5 Anni</h4>
+                    <div class="formula">
+                        Year 1 OpMargin = (200M / 1,000M) × 100 = 20%
+                        Year 5 OpMargin = 25%
+                        Trend: 20% → 25% (IMPROVING) ✓
+                    </div>
+                    <p><strong>Q: Qual è il CAGR?</strong><br>A: Revenue CAGR = (1500/1000)^(1/4) - 1 = 8.4%<br>OpIncome CAGR = (375/200)^(1/4) - 1 = 13.4%<br>OpIncome growing FASTER than revenue = Operating Leverage Working! ✓</p>
+                </div>
+
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <h4>Step 3️⃣ : Valuta Composizione e Sustainability</h4>
+                    <table style="width: 100%; font-size: 12px;">
+                        <tr>
+                            <td><strong>Componente</strong></td>
+                            <td><strong>Year 1</strong></td>
+                            <td><strong>Year 5</strong></td>
+                            <td><strong>Interpretazione</strong></td>
+                        </tr>
+                        <tr>
+                            <td>SGA/Revenue</td>
+                            <td>20%</td>
+                            <td>17%</td>
+                            <td>DECLINING → Better leverage ✓</td>
+                        </tr>
+                        <tr>
+                            <td>RD/Revenue</td>
+                            <td>10%</td>
+                            <td>10%</td>
+                            <td>STABLE → Adequate innovation investment ✓</td>
+                        </tr>
+                        <tr>
+                            <td>Gross Margin</td>
+                            <td>~45% (implied)</td>
+                            <td>50%</td>
+                            <td>IMPROVING → Pricing power ✓</td>
+                        </tr>
+                    </table>
+                    <p><strong>Verdict:</strong> OpMargin improvement da REALE leverage e efficiency, non cost-cutting. Sustainable. ✓</p>
+                </div>
+
+                <div style="background: #dbeafe; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <h4>⭐ Scoring e Conclusione</h4>
+                    <table style="width: 100%; font-size: 13px;">
+                        <tr>
+                            <td><strong>Criterio</strong></td>
+                            <td><strong>Punteggio</strong></td>
+                            <td><strong>Motivo</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Livello Assoluto</td>
+                            <td>2/2</td>
+                            <td>25% >> peer median 20%</td>
+                        </tr>
+                        <tr>
+                            <td>Trend</td>
+                            <td>2/2</td>
+                            <td>Improving 20% → 25%, stabil</td>
+                        </tr>
+                        <tr>
+                            <td>Operating Leverage</td>
+                            <td>2/2</td>
+                            <td>OpIncome CAGR 13.4% > Revenue CAGR 8.4%</td>
+                        </tr>
+                        <tr>
+                            <td>Sustainability</td>
+                            <td>2/2</td>
+                            <td>RD adequate, Gross improving, SGA controlled</td>
+                        </tr>
+                        <tr>
+                            <td>Peer Comparison</td>
+                            <td>2/2</td>
+                            <td>25% vs 20% = +5pp advantage</td>
+                        </tr>
+                        <tr style="font-weight: 700;">
+                            <td>TOTALE</td>
+                            <td>10/10</td>
+                            <td>GREEN - Exceptional quality</td>
+                        </tr>
+                    </table>
+                    <p style="margin-top: 10px;"><strong>🎯 Buffett Verdict:</strong> "Questo è esattamente quello che cerco. OpMargin expanding, leverage working, management disciplinato. Business è scalabile e durabile."</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📚 Classificazione Giudizio Analitico - Mini Case Study</h2>
+                <p><strong>Ti vengono presentate 3 aziende. Classifica da BEST a WORST dal punto di vista Operating Margin:</strong></p>
+
+                <div style="background: #fff7ed; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <p><strong>Azienda A (Software Cloud):</strong> OpMargin 32%, trend stable 30-32% for 10 years, peer median 25%, Gross Margin 72%, RD 15% revenue, Revenue growing 15% annually, OpMargin stable despite scale.</p>
+                    <p><strong>Azienda B (Beverage):</strong> OpMargin 18%, trend stable 17-19% for 20 years, peer median 15%, pricing power strong, revenue growth 3%, RD minimal but appropriate for industry.</p>
+                    <p><strong>Azienda C (Retail):</strong> OpMargin 5%, trend declining 8% → 5% over 5 years, peer median 8%, Revenue growth flat, SGA/Revenue rising, online disruption evident.</p>
+                </div>
+
+                <div style="background: #f0fdf4; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <p><strong>✅ Ranking Corretto:</strong></p>
+                    <ol>
+                        <li><strong>🥇 Azienda A:</strong> OpMargin 32% vs peer 25% (7pp premium), expanding leverage, software high-margin model, optimal sustainability. BEST.</li>
+                        <li><strong>🥈 Azienda B:</strong> OpMargin 18% vs peer 15% (3pp premium), durable 20-year track record, pricing power proven, moat evident. Crescita lenta ma margin durabile. GOOD.</li>
+                        <li><strong>🥉 Azienda C:</strong> OpMargin 5% vs peer 8% (3pp DISCOUNT), declining trend, structural pressure from disruption, no margin of safety. AVOID.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🔍 Checklista Final di Controllo</h2>
+                <div style="background: #f9fafb; padding: 15px; border-radius: 6px;">
+                    <p><strong>Prima di investire, verifica questi punti:</strong></p>
+                    <ul class="list-check">
+                        <li>Ho calcolato OpMargin rimuovendo one-time items? (Normalized margin)</li>
+                        <li>Ho confrontato con peer median? (Context-specific)</li>
+                        <li>Ho analizzato trend 10 anni? (Direction & stability)</li>
+                        <li>Ho verificato operating leverage? (OpIncome CAGR vs Revenue CAGR)</li>
+                        <li>RD/CapEx spending sono adeguati? (Non underinvested)</li>
+                        <li>Margin improvement è da efficiency o cost-cutting? (Sustainability)</li>
+                        <li>Ho fatto stress-test? (Se margin cala 200bp, business still OK?)</li>
+                        <li>Ho verificato OpIncome vs CFO conversion? (Earnings quality check)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(event, tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function calculateMargin() {
+            const opIncome = parseFloat(document.getElementById('op_income').value);
+            const revenue = parseFloat(document.getElementById('revenue').value);
+            const peerMargin = parseFloat(document.getElementById('peer_margin').value);
+            const oneTime = parseFloat(document.getElementById('one_time').value) || 0;
+            const sgaPct = parseFloat(document.getElementById('sga_pct').value) || 0;
+            const rdPct = parseFloat(document.getElementById('rd_pct').value) || 0;
+            const margin1yr = parseFloat(document.getElementById('margin_1yr').value);
+            const margin5yr = parseFloat(document.getElementById('margin_5yr').value);
+
+            if (!opIncome || !revenue || isNaN(peerMargin)) {
+                alert('Per favore compila OpIncome, Revenue e Peer Margin');
+                return;
+            }
+
+            const reportedMargin = (opIncome / revenue) * 100;
+            const normalizedOpIncome = opIncome - oneTime;
+            const normalizedMargin = (normalizedOpIncome / revenue) * 100;
+            const vsePeer = reportedMargin - peerMargin;
+
+            let interpretation = '';
+            let colorClass = '';
+            if (reportedMargin >= 20) {
+                interpretation = 'Eccellente - Competitive advantage';
+                colorClass = 'margin-excellent';
+            } else if (reportedMargin >= 15) {
+                interpretation = 'Buono - Sopra media';
+                colorClass = 'margin-good';
+            } else if (reportedMargin >= 10) {
+                interpretation = 'Adeguato - In linea con settore';
+                colorClass = 'margin-adequate';
+            } else if (reportedMargin >= 5) {
+                interpretation = 'Debole - Poco margine di errore';
+                colorClass = 'margin-poor';
+            } else {
+                interpretation = 'Critico - Business model insufficiente';
+                colorClass = 'margin-poor';
+            }
+
+            // Trend analysis
+            let trend1yrText = 'N/A';
+            let trend1yrAnalysis = '';
+            if (!isNaN(margin1yr)) {
+                const change1yr = reportedMargin - margin1yr;
+                trend1yrText = change1yr > 0 ? `+${change1yr.toFixed(2)}pp` : `${change1yr.toFixed(2)}pp`;
+                if (change1yr > 1) trend1yrAnalysis = 'Improving ✓';
+                else if (change1yr > -1) trend1yrAnalysis = 'Stable';
+                else trend1yrAnalysis = 'Declining ⚠️';
+            }
+
+            let trend5yrText = 'N/A';
+            let trend5yrAnalysis = '';
+            if (!isNaN(margin5yr)) {
+                const change5yr = reportedMargin - margin5yr;
+                trend5yrText = change5yr > 0 ? `+${change5yr.toFixed(2)}pp` : `${change5yr.toFixed(2)}pp`;
+                if (change5yr > 0) trend5yrAnalysis = 'Long-term improvement ✓';
+                else trend5yrAnalysis = 'Long-term decline ⚠️';
+            }
+
+            // Warnings
+            let warningsHTML = '';
+            if (Math.abs(normalizedMargin - reportedMargin) > 2) {
+                warningsHTML += `<div class="red-flag">
+                    <strong style="color: var(--color-red-500);">⚠️ One-Time Items Distortion</strong>
+                    <p>Normalized margin (${normalizedMargin.toFixed(2)}%) differs from reported by ${Math.abs(normalizedMargin - reportedMargin).toFixed(2)}pp. Investigate if recurring or temporary.</p>
+                </div>`;
+            }
+
+            if (reportedMargin < peerMargin - 2) {
+                warningsHTML += `<div class="red-flag">
+                    <strong style="color: var(--color-red-500);">⚠️ Below Peer Median</strong>
+                    <p>Your margin (${reportedMargin.toFixed(2)}%) is ${Math.abs(vsePeer).toFixed(2)}pp below peer average (${peerMargin}%). Investigate structural disadvantage.</p>
+                </div>`;
+            }
+
+            if (!isNaN(margin1yr) && reportedMargin < margin1yr - 1.5) {
+                warningsHTML += `<div class="red-flag">
+                    <strong style="color: var(--color-red-500);">⚠️ Year-over-Year Decline</strong>
+                    <p>Margin declined ${(margin1yr - reportedMargin).toFixed(2)}pp in one year. Watch for deteriorating trend.</p>
+                </div>`;
+            }
+
+            if (sgaPct > 0 && sgaPct > 25) {
+                warningsHTML += `<div class="yellow-flag">
+                    <strong style="color: #d97706;">⚠️ High SGA Spending</strong>
+                    <p>SGA at ${sgaPct}% of revenue is relatively high. Check if related to growth investments or overhead bloat.</p>
+                </div>`;
+            }
+
+            // Recommendation
+            let verdictText = '';
+            let recommendation = '';
+            if (reportedMargin >= 20 && !isNaN(margin1yr) && reportedMargin >= margin1yr) {
+                verdictText = '🟢 GREEN - Exceptional Operating Quality';
+                recommendation = 'Strong competitive advantage. Operating leverage working. Likely durable moat.';
+            } else if (reportedMargin >= 15 && vsePeer > -2) {
+                verdictText = '🟢 GREEN - Good Operating Performance';
+                recommendation = 'At or above peer average. Adequate margin with investment sustainability.';
+            } else if (reportedMargin >= 10) {
+                verdictText = '🟡 YELLOW - Adequate, Monitor Trends';
+                recommendation = 'Acceptable margin but limited safety. Watch for deterioration or competitive pressure.';
+            } else {
+                verdictText = '🔴 RED - Below Adequate Threshold';
+                recommendation = 'Margin too low. Limited room for error. Investigate business model or avoid.';
+            }
+
+            // Display results
+            document.getElementById('company-display').textContent = document.getElementById('company_name').value || 'Your Company';
+            document.getElementById('margin-current').textContent = `${reportedMargin.toFixed(2)}%`;
+            document.getElementById('margin-interpretation').textContent = interpretation;
+
+            document.getElementById('margin-reported').textContent = `${reportedMargin.toFixed(2)}%`;
+            document.getElementById('analysis-reported').textContent = `Directly from financial data`;
+
+            document.getElementById('margin-normalized').textContent = `${normalizedMargin.toFixed(2)}%`;
+            document.getElementById('analysis-normalized').textContent = oneTime !== 0 ? `Adjusted for ${Math.abs(oneTime)}M one-time impact` : 'No adjustments needed';
+
+            document.getElementById('margin-vs-peer').textContent = `${vsePeer > 0 ? '+' : ''}${vsePeer.toFixed(2)}pp`;
+            document.getElementById('analysis-peer').textContent = vsePeer > 0 ? 'Above peer median - competitive advantage' : 'Below peer median - relative disadvantage';
+
+            document.getElementById('trend-1yr').textContent = trend1yrText;
+            document.getElementById('analysis-1yr').textContent = trend1yrAnalysis;
+
+            document.getElementById('trend-5yr').textContent = trend5yrText;
+            document.getElementById('analysis-5yr').textContent = trend5yrAnalysis;
+
+            document.getElementById('warnings-box').innerHTML = warningsHTML;
+
+            document.getElementById('verdict-text').textContent = verdictText;
+            document.getElementById('recommendation').textContent = recommendation;
+
+            document.getElementById('calc-results').style.display = 'block';
+            document.getElementById('calc-results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.getElementById('op_income').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculateMargin();
+        });
+    </script>
+</body>
+</html>

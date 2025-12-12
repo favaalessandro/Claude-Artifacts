@@ -1,0 +1,1579 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💼 Metrica 12: Operating Income - The Management Quality Mirror - Dashboard Interattivo</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-amber-400: rgba(245, 158, 11, 1);
+            --color-amber-500: rgba(217, 119, 6, 1);
+            --color-amber-600: rgba(180, 83, 9, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-green-400: rgba(74, 222, 128, 1);
+            --color-green-500: rgba(34, 197, 94, 1);
+            --color-blue-400: rgba(96, 165, 250, 1);
+            --color-blue-500: rgba(59, 130, 246, 1);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-amber-500);
+            --color-primary-hover: var(--color-amber-600);
+            --color-border: rgba(217, 119, 6, 0.2);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--color-amber-500), var(--color-amber-600));
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .metric-score {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge.green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--color-green-500);
+        }
+
+        .badge.yellow {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--color-amber-600);
+        }
+
+        .badge.red {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-red-500);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .framework-step {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+        }
+
+        .framework-step h4 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .framework-step p {
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .example-box {
+            background: var(--color-gray-200);
+            border-left: 4px solid var(--color-blue-400);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: var(--color-text);
+        }
+
+        .red-flag {
+            background: rgba(192, 21, 47, 0.08);
+            border-left: 4px solid var(--color-red-500);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            color: var(--color-text);
+        }
+
+        .red-flag strong {
+            color: var(--color-red-500);
+        }
+
+        .key-insight {
+            background: rgba(217, 119, 6, 0.08);
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .key-insight strong {
+            color: var(--color-primary);
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .scoring-table th,
+        .scoring-table td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .scoring-table th {
+            background: linear-gradient(135deg, var(--color-amber-500), var(--color-amber-600));
+            color: white;
+            font-weight: 600;
+        }
+
+        .scoring-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scoring-table tr:hover {
+            background: rgba(217, 119, 6, 0.05);
+        }
+
+        .question-list {
+            list-style: none;
+        }
+
+        .question-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .question-list li strong {
+            color: var(--color-text);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .question-list li:last-child {
+            border-bottom: none;
+        }
+
+        .interactive-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+            background: var(--color-background);
+            font-family: var(--font-family-base);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            background: var(--color-gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .result-score {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-size: 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, rgba(217,119,6,0.08), rgba(217,119,6,0.04));
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .metric-box strong {
+            color: var(--color-primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .tab-btn {
+                border-bottom: 1px solid var(--color-border);
+                border-right: none;
+            }
+
+            .tab-btn.active {
+                border-bottom-color: var(--color-primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>💼 Metrica 12: Operating Income - The Management Quality Mirror</h1>
+            <p><strong>The True Test of Management Discipline & Operational Excellence</strong></p>
+            <p>Come il Reddito Operativo (EBIT) rivela la qualità manageriale, il controllo dei costi, e la capacità di creare valore operativo sostenibile</p>
+            <div class="metric-score">
+                <strong>Tier 2 - Financial Strength (25% weight)</strong>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="overview">Panoramica</button>
+            <button class="tab-btn" data-tab="definition">Definizioni & Formule</button>
+            <button class="tab-btn" data-tab="buffett-view">La Visione Buffett</button>
+            <button class="tab-btn" data-tab="management-quality">Qualità Manageriale</button>
+            <button class="tab-btn" data-tab="analysis">Framework Analisi</button>
+            <button class="tab-btn" data-tab="red-flags">Red Flags</button>
+            <button class="tab-btn" data-tab="scoring">Scoring & Assessment</button>
+            <button class="tab-btn" data-tab="case-studies">Case Studies</button>
+            <button class="tab-btn" data-tab="calculator">Calcolatore</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">💡 Perché il Reddito Operativo è Critico</h2>
+
+                <div class="key-insight">
+                    <strong>Warren Buffett:</strong> "Operating Income è dove vedi la vera capacità del management. È relativamente facile generare gross profit se hai un buon prodotto con pricing power, ma controllare le spese operative richiede disciplina, efficienza, e sound decision-making. Operating Income ti dice quanto profitto il business genera dal suo core operations, indipendentemente da come è finanziato o tassato."
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">👨‍💼 Cosa Rivela il Reddito Operativo</div>
+                        <div class="card-value">
+                            <strong>Il Vero Specchio della Qualità Manageriale</strong><br>
+                            Il Reddito Operativo (EBIT) = Revenue − Operating Expenses<br><br>
+                            Non è manipolato da:<br>
+                            • Decisioni di finanziamento (interesse sul debito)<br>
+                            • Situazione fiscale (tasse, variazioni imposta)<br>
+                            • Accounting gimmicks (one-time gains)<br><br>
+                            <strong>Mostra SOLO:</strong><br>
+                            • Capacità di controllare i costi<br>
+                            • Efficienza operativa<br>
+                            • Allocazione intelligente delle spese<br>
+                            • Qualità del management<br><br>
+                            <strong>Questo è il numero che conta.</strong>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📈 Operating Income vs. Gross Profit</div>
+                        <div class="card-value">
+                            <strong>Confronto Critico:</strong><br><br>
+                            Gross Profit = Revenue − COGS<br>
+                            (Pricing power, product quality)<br><br>
+                            Operating Income = Revenue − All Operating Expenses<br>
+                            (Cost control, management efficiency)<br><br>
+                            <strong>I migliori business hanno ENTRAMBI alti:</strong><br>
+                            ✅ Alto Gross Profit = pricing power<br>
+                            ✅ Alto Operating Income = cost discipline<br><br>
+                            <strong>Red Flags Combinate:</strong><br>
+                            🔴 Gross profit stabile ma OpInc declina = cost bloat<br>
+                            🔴 Gross profit cresce ma OpInc cala = OpEx esplosione<br>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚙️ Il Test Ultimato: OpInc vs. Revenue</div>
+                        <div class="card-value">
+                            <strong>Scenario Ideale (Operating Leverage):</strong><br>
+                            Revenue +10% YoY<br>
+                            Operating Income +15% YoY<br>
+                            = Profitti crescono FASTER di revenue<br>
+                            = Management eccezionale<br><br>
+                            <strong>Scenario Normale:</strong><br>
+                            Revenue +10%, OpInc +10%<br>
+                            = Proporzionale, accettabile<br><br>
+                            <strong>Red Flag (Negative Leverage):</strong><br>
+                            Revenue +10%, OpInc +5%<br>
+                            = Spese operative fuori controllo<br>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🎯 I Tre Tipi di Operating Income Growth</div>
+                        <div class="card-value">
+                            <strong>1. Growing OpInc with Growing Revenue</strong><br>
+                            Se OpInc > Revenue = operating leverage (eccellente)<br>
+                            Se OpInc < Revenue = margin compression (problema)<br><br>
+                            <strong>2. Growing OpInc with Flat Revenue</strong><br>
+                            Da efficiency improvements SGA ↓ = buono<br>
+                            Da RD cuts innovazione ↓ = pericoloso<br><br>
+                            <strong>3. Stable OpInc with Growing Revenue</strong><br>
+                            Se strategic reinvestment = positivo<br>
+                            Se da cost inflation = negativo<br><br>
+                            Key: Capire IL PERCHÉ dietro ogni trend
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔑 5 Dimensioni Critiche della Qualità del Reddito Operativo</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">1️⃣ Absolute Dollar Growth (CAGR)</div>
+                        <div class="card-value">
+                            <strong>Metrica: Operating Income 10Y CAGR</strong><br><br>
+                            <span class="badge green">Eccellente: >10% CAGR</span><br>
+                            Management creando profitti crescenti<br><br>
+                            <span class="badge yellow">Buono: 7-10% CAGR</span><br>
+                            Healthy growth, disciplined operations<br><br>
+                            <span class="badge red">Scarso: <7% CAGR</span><br>
+                            Minimal profit growth; operational problems
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">2️⃣ Growth vs. Revenue (Leverage Test)</div>
+                        <div class="card-value">
+                            <strong>Comparazione Critica: OpInc CAGR vs. Revenue CAGR</strong><br><br>
+                            <strong>OpInc CAGR > Revenue CAGR</strong><br>
+                            Operating leverage; management efficiency; excellent<br><br>
+                            <strong>OpInc CAGR = Revenue CAGR</strong><br>
+                            Proportional growth; acceptable<br><br>
+                            <strong>OpInc CAGR < Revenue CAGR</strong><br>
+                            Margin compression; cost inflation; red flag
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">3️⃣ Operating Margin (OpInc/Revenue)</div>
+                        <div class="card-value">
+                            <strong>Percentuale Chiave: OpInc / Revenue</strong><br><br>
+                            Show efficiency ratio<br>
+                            Trend reveals operational trajectory<br><br>
+                            Expanding OpMargin = improving management<br>
+                            Stable OpMargin = consistent execution<br>
+                            Declining OpMargin = deteriorating efficiency<br><br>
+                            <strong>Cross-check vs peers & history</strong><br>
+                            Below peers = competitive weakness
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">4️⃣ Operating Expense Control</div>
+                        <div class="card-value">
+                            <strong>La Vera Prova della Disciplina</strong><br><br>
+                            SGA (Selling, General, Administrative)<br>
+                            Should decline as % of revenue = leverage<br><br>
+                            RD (Research & Development)<br>
+                            Determines future competitive position<br><br>
+                            Ideal Balance:<br>
+                            ✅ SGA declining % of revenue<br>
+                            ✅ RD stable or growing<br>
+                            = Cutting overhead, investing in future<br><br>
+                            🔴 Both declining = cost-cutting (risky)
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">5️⃣ Cash Conversion Validation</div>
+                        <div class="card-value">
+                            <strong>Operating Income → Operating Cash Flow</strong><br><br>
+                            <span class="badge green">Healthy</span><br>
+                            OpInc → CFO ~85-100% conversion<br>
+                            Real, sustainable profitability<br><br>
+                            <span class="badge red">Red Flag</span><br>
+                            OpInc → CFO <<70% conversion<br>
+                            Accruals problem, earnings quality issue<br><br>
+                            <strong>The Ultimate Truth Test:</strong><br>
+                            Does OpInc convert to actual cash?
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: DEFINITION -->
+        <div id="definition" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📐 Definizioni Formali & Formule</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">Operating Income (EBIT): Definizione</div>
+                    <div class="card-value">
+                        <strong>Operating Income = Revenue − Cost of Goods Sold (COGS) − Operating Expenses</strong><br><br>
+                        <strong>Alternative Formula:</strong><br>
+                        Operating Income = Gross Profit − SGA − RD − Depreciation − Other OpEx<br><br>
+                        <strong>Also Called:</strong><br>
+                        EBIT (Earnings Before Interest and Taxes)<br>
+                        Operating Profit<br><br>
+                        <strong>Significato:</strong><br>
+                        Profitto generato dalle core operations del business, prima di:<br>
+                        • Interest expense (decisione di finanziamento)<br>
+                        • Taxes (situazione fiscale)<br>
+                        • One-time items (non-recurring)<br><br>
+                        <strong>Questo è il numero "puro" della qualità operativa.</strong>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">💰 Operating Income (Dollari Assoluti)</div>
+                        <div class="card-value">
+                            <strong>Formula:</strong><br>
+                            OpInc = Revenue − COGS − OpEx<br><br>
+                            <strong>Cosa Misura:</strong><br>
+                            Importo in $ di profitto operativo puro<br><br>
+                            <strong>Significato del Trend:</strong><br>
+                            • Crescente = profitti manageriali in crescita<br>
+                            • Stagnante = costi non controllati<br>
+                            • Decrescente = deterioramento operativo<br><br>
+                            <strong>CRITICO:</strong><br>
+                            Questo è ASSOLUTO, non percentuale
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📈 Operating Income CAGR</div>
+                        <div class="card-value">
+                            <strong>Formula:</strong><br>
+                            CAGR = (Ending Value / Beginning Value)^(1/years) − 1<br><br>
+                            <strong>Cosa Misura:</strong><br>
+                            Tasso di crescita annuale composto su 10 anni<br><br>
+                            <strong>Benchmark:</strong><br>
+                            • >10% CAGR: Eccezionale<br>
+                            • 7-10%: Buono<br>
+                            • 5-7%: Accettabile<br>
+                            • <5%: Concernente<br><br>
+                            <strong>Interpretazione:</strong><br>
+                            Più alta la CAGR, migliore il controllo operativo
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚙️ Operating Margin (OpInc/Revenue)</div>
+                        <div class="card-value">
+                            <strong>Formula:</strong><br>
+                            OpMargin = (OpInc / Revenue) × 100<br><br>
+                            <strong>Cosa Misura:</strong><br>
+                            % di ogni ricavo che diventa profitto operativo<br><br>
+                            <strong>Scenario Ideale:</strong><br>
+                            OpMargin = 20%+ (eccellente)<br>
+                            OpMargin = 15-20% (buono)<br>
+                            OpMargin = 10-15% (accettabile)<br><br>
+                            <strong>Red Flag:</strong><br>
+                            OpMargin < 10% (commodity business?)
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💹 Operating Leverage Ratio</div>
+                        <div class="card-value">
+                            <strong>Formula (Implicit):</strong><br>
+                            Leverage = OpInc Growth / Revenue Growth<br><br>
+                            <strong>Cosa Misura:</strong><br>
+                            Quanto il profitto operativo cresce vs. revenue<br><br>
+                            <strong>Scenario Ideale:</strong><br>
+                            Revenue +8%, OpInc +12% = 1.5x leverage<br>
+                            (Ogni $1 di revenue growth = $1.50 OpInc growth)<br><br>
+                            <strong>Red Flag:</strong><br>
+                            Revenue +8%, OpInc +4% = 0.5x leverage<br>
+                            (Costs eating the gains)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: BUFFETT VIEW -->
+        <div id="buffett-view" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🦅 La Visione Buffett del Reddito Operativo</h2>
+
+                <div class="key-insight">
+                    <strong>Buffett's Core Principle:</strong> "Operating Income è il numero che rivela la vera qualità del management. Non è manipolato da decisioni di finanziamento o tasse. È il profitto grezzo generato dalle operazioni quotidiane del business. Un manager abile crea profitti crescenti gestendo i costi meglio mentre il business cresce. Un manager mediocre lascia che i costi crescano in proporzione ai ricavi—nessun leverage. Un cattivo manager tagli i costi importanti (RD, maintenance) per boostrare profitti temporaneamente, distruggendo il valore di lungo termine."
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🟢 Excellent Operating Income</div>
+                        <div class="card-value">
+                            <strong>Profilo:</strong><br>
+                            OpInc CAGR >10%<br>
+                            OpInc growing faster than Revenue<br>
+                            OpMargin stable or expanding<br>
+                            SGA % of Revenue declining<br>
+                            RD steady or growing<br><br>
+                            <strong>Significato:</strong><br>
+                            Management eccezionale<br>
+                            Operational leverage working<br>
+                            Sustainable competitive advantage<br>
+                            Trust this management
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 Adequate Operating Income</div>
+                        <div class="card-value">
+                            <strong>Profilo:</strong><br>
+                            OpInc CAGR 7-10%<br>
+                            OpInc matching Revenue growth<br>
+                            OpMargin stable<br>
+                            SGA % flat or slightly declining<br>
+                            RD stable<br><br>
+                            <strong>Significato:</strong><br>
+                            Competent management<br>
+                            Proportional growth (no leverage)<br>
+                            Acceptable but not exceptional<br>
+                            Monitor for deterioration
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 Poor Operating Income</div>
+                        <div class="card-value">
+                            <strong>Profilo:</strong><br>
+                            OpInc CAGR <5% or declining<br>
+                            OpInc growing slower than Revenue<br>
+                            OpMargin declining<br>
+                            SGA % of Revenue rising<br>
+                            RD declining<br><br>
+                            <strong>Significato:</strong><br>
+                            Management quality questionable<br>
+                            Operational deterioration evident<br>
+                            Competitive advantage eroding<br>
+                            Avoid or investigate deeply
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💀 Red Flag: OpInc Declining</div>
+                        <div class="card-value">
+                            <strong>The Worst Scenario:</strong><br>
+                            Revenue growing ma OpInc DECLINING<br><br>
+                            <strong>Significato:</strong><br>
+                            Operating expenses fuori controllo<br>
+                            Management unable or unwilling to control costs<br>
+                            Structural deterioration<br><br>
+                            <strong>Common Causes:</strong><br>
+                            • Cost inflation pressures<br>
+                            • Poor pricing power<br>
+                            • Management incompetence<br>
+                            • Industry disruption<br><br>
+                            <strong>Buffett Would AVOID.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">👨‍💼 Come Operating Income Rivela Qualità Manageriale</h2>
+
+                <div class="framework-step">
+                    <h4>Il Test di Buffett: Management Quality Indicator</h4>
+                    <p><strong>Before analyzing anything else, look at Operating Income trend</strong></p>
+                    <p>Tre risposte semplici ti dicono quasi tutto ciò che devi sapere:</p>
+                    <div class="example-box">
+1. Is Operating Income growing consistently? → YES = likely good management
+   NO or erratic = likely mediocre management
+
+2. Is OpInc growing faster than Revenue? → YES = operational leverage, excellent
+   NO = proportional, acceptable
+
+3. Are OpEx under control? → YES = costs declining as % of revenue
+   NO = costs ballooning, red flag
+                    </div>
+                    <p><strong>If all 3 YES:</strong> This is a Buffett-quality business. Trust the management.</p>
+                    <p><strong>If any NO:</strong> Red flags present. Investigate deeper before investing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: MANAGEMENT QUALITY -->
+        <div id="management-quality" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">👔 Operating Income Come Specchio della Qualità Manageriale</h2>
+
+                <div class="key-insight">
+                    <strong>Core Insight:</strong> Operating Income tells you whether management is creating value or destroying it. Growing OpInc with stable/growing revenue = creating value. Stagnant OpInc with growing revenue = destroying value through poor cost control. Declining OpInc with growing revenue = management crisis.
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">✅ The Three Tests of Management Quality</div>
+                        <div class="card-value">
+                            <strong>Test 1: Operating Leverage</strong><br>
+                            Does OpInc grow faster than Revenue?<br>
+                            Excellent = OpInc CAGR > Revenue CAGR<br>
+                            Adequate = OpInc CAGR = Revenue CAGR<br>
+                            Poor = OpInc CAGR < Revenue CAGR<br><br>
+                            <strong>Test 2: Cost Discipline</strong><br>
+                            Are OpEx growing slower than Revenue?<br>
+                            Excellent = OpEx declining as % of revenue<br>
+                            Adequate = OpEx flat as % of revenue<br>
+                            Poor = OpEx rising as % of revenue<br><br>
+                            <strong>Test 3: Sustainability</strong><br>
+                            Is OpInc improvement sustainable?<br>
+                            Excellent = from efficiency/leverage<br>
+                            Poor = from cost cuts (RD, maintenance)
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🎯 What Good Management Looks Like</div>
+                        <div class="card-value">
+                            <strong>Year 1:</strong><br>
+                            Revenue $1B, OpInc $200M, OpMargin 20%<br><br>
+                            <strong>Year 5:</strong><br>
+                            Revenue $1.5B, OpInc $375M, OpMargin 25%<br><br>
+                            <strong>Analysis:</strong><br>
+                            Revenue CAGR: 8.4%<br>
+                            OpInc CAGR: 13.4%<br>
+                            OpMargin improved 5pp (20% → 25%)<br><br>
+                            <strong>Conclusion:</strong><br>
+                            Exceptional management<br>
+                            Revenue growing 8%, profits growing 13%<br>
+                            Operating leverage at work
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 What Bad Management Looks Like</div>
+                        <div class="card-value">
+                            <strong>Year 1:</strong><br>
+                            Revenue $1B, OpInc $200M, OpMargin 20%<br><br>
+                            <strong>Year 5:</strong><br>
+                            Revenue $1.5B, OpInc $200M, OpMargin 13.3%<br><br>
+                            <strong>Analysis:</strong><br>
+                            Revenue CAGR: 8.4%<br>
+                            OpInc CAGR: 0% (FLAT!)<br>
+                            OpMargin collapsed 6.7pp<br><br>
+                            <strong>Conclusion:</strong><br>
+                            Terrible management<br>
+                            Revenue growing but profitability stagnant<br>
+                            Costs completely out of control
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💀 What Crisis Management Looks Like</div>
+                        <div class="card-value">
+                            <strong>Year 1:</strong><br>
+                            Revenue $1B, OpInc $200M, OpMargin 20%<br><br>
+                            <strong>Year 5:</strong><br>
+                            Revenue $1.5B, OpInc $100M, OpMargin 6.7%<br><br>
+                            <strong>Analysis:</strong><br>
+                            Revenue CAGR: 8.4%<br>
+                            OpInc CAGR: -12% (DECLINING!)<br>
+                            OpMargin crashed 13.3pp<br><br>
+                            <strong>Conclusion:</strong><br>
+                            Management failure<br>
+                            Business dying despite revenue growth<br>
+                            AVOID—structural problem
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">💼 The Operating Expense Breakdown</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">📊 SGA (Sales, General, Administrative)</div>
+                        <div class="card-value">
+                            <strong>Cosa Include:</strong><br>
+                            • Sales & marketing (customer acquisition)<br>
+                            • Administrative (payroll, offices, IT)<br>
+                            • General overhead<br><br>
+                            <strong>The Test:</strong><br>
+                            SGA should decline as % of revenue<br>
+                            As business scales, overhead leverage kicks in<br><br>
+                            ✅ Year 1: SGA = 25% of revenue<br>
+                            ✅ Year 5: SGA = 20% of revenue<br>
+                            = Good management (operating leverage)<br><br>
+                            🔴 Year 1: SGA = 25% of revenue<br>
+                            🔴 Year 5: SGA = 30% of revenue<br>
+                            = Bad management (costs ballooning)
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔬 RD (Research & Development)</div>
+                        <div class="card-value">
+                            <strong>Cosa Include:</strong><br>
+                            • Product development<br>
+                            • Innovation investments<br>
+                            • Technology advancement<br><br>
+                            <strong>The Trade-Off:</strong><br>
+                            High RD = Future competitiveness<br>
+                            Low RD = Current profitability<br><br>
+                            ✅ Healthy: RD stable or growing<br>
+                            Shows company investing in future<br><br>
+                            🔴 Red Flag: RD declining<br>
+                            Cutting innovation to boost short-term OpInc<br>
+                            = Destroying long-term value
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚖️ The Management Balancing Act</div>
+                        <div class="card-value">
+                            <strong>The Right Balance:</strong><br><br>
+                            ✅ SGA declining as % of revenue<br>
+                            = Better overhead control<br><br>
+                            ✅ RD stable or growing as % of revenue<br>
+                            = Investing in future innovation<br><br>
+                            This shows management is:<br>
+                            • Cutting inefficient costs<br>
+                            • Maintaining innovation capability<br>
+                            • Building sustainable advantage<br><br>
+                            <strong>The Wrong Balance:</strong><br>
+                            🔴 Both SGA and RD declining<br>
+                            = Cost-cutting on ALL fronts<br>
+                            = Destroying value, not creating
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🚩 Red Flags in OpEx Allocation</div>
+                        <div class="card-value">
+                            <strong>Red Flag #1: SGA Exploding</strong><br>
+                            SGA rising as % of revenue<br>
+                            Indicates overhead bloat<br>
+                            Management losing control<br><br>
+                            <strong>Red Flag #2: RD Collapsing</strong><br>
+                            RD declining to boost OpInc<br>
+                            Short-term thinking<br>
+                            Destroying competitive advantage<br><br>
+                            <strong>Red Flag #3: Both Stable but OpInc Stagnant</strong><br>
+                            Costs not declining<br>
+                            No leverage<br>
+                            Management mediocre
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ANALYSIS -->
+        <div id="analysis" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🔧 5-Step Framework: Analyzing Operating Income Quality</h2>
+
+                <div class="framework-step">
+                    <h4>Step 1️⃣: Calculate Operating Income & Track 10-Year CAGR</h4>
+                    <p><strong>Cosa fare:</strong> Compute OpInc in dollari e analizzare il growth rate</p>
+                    <p><strong>Formula:</strong> Operating Income = Revenue − COGS − Operating Expenses</p>
+                    <p><strong>Calculate 10Y CAGR:</strong> (End Value / Start Value)^(1/10) − 1</p>
+                    <p><strong>Benchmark Target:</strong> OpInc CAGR > 10% è excellent; <7% è concerning</p>
+                    <div class="example-box">
+Esempio: Microsoft
+Year 2013: Revenue $77.8B, OpInc $14B
+Year 2023: Revenue $212B, OpInc $84B
+10Y CAGR: (84/14)^(1/10) − 1 = 21% ✅
+
+Assessment: Exceptional OpInc growth; management excellence evident
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 2️⃣: Compare OpInc Growth to Revenue Growth (Operating Leverage Test)</h4>
+                    <p><strong>Cosa fare:</strong> Calcola OpInc CAGR vs. Revenue CAGR per vedere se operating leverage sta funzionando</p>
+                    <p><strong>Ideal Scenario:</strong> OpInc CAGR > Revenue CAGR (margin expansion, leverage working)</p>
+                    <p><strong>Concerning Scenario:</strong> OpInc CAGR < Revenue CAGR (margin compression, costs out of control)</p>
+                    <div class="example-box">
+Confronto: Apple vs. Declining Company
+
+Apple:
+  Revenue CAGR: 8%
+  OpInc CAGR: 12%
+  → OpInc growing 4pp faster = operating leverage 🟢
+
+Declining Company:
+  Revenue CAGR: 10%
+  OpInc CAGR: 4%
+  → OpInc growing slower = margin compression 🔴
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 3️⃣: Assess Operating Margin Trend (OpInc/Revenue %)</h4>
+                    <p><strong>Cosa fare:</strong> Analizzare se operating margin sta migliorando, stagnante, o peggiorando</p>
+                    <p><strong>The Formula:</strong> Operating Margin = Operating Income / Revenue × 100</p>
+                    <p><strong>Preferred Trend:</strong> Expanding or stable margin (indicates management control)</p>
+                    <div class="example-box">
+Operating Margin Analysis:
+
+Excellent Company:
+  Year 1: OpMargin 20%
+  Year 10: OpMargin 25%
+  → Margin expansion, improving leverage 🟢
+
+Deteriorating Company:
+  Year 1: OpMargin 20%
+  Year 10: OpMargin 12%
+  → Margin compression, operational decay 🔴
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 4️⃣: Analyze Operating Expense Components (SGA & RD)</h4>
+                    <p><strong>Cosa fare:</strong> Break down OpEx to understand management's allocation priorities</p>
+                    <p><strong>The Key Question:</strong> Is management cutting overhead (SGA) while maintaining innovation (RD)?</p>
+                    <div class="example-box">
+OpEx Allocation Analysis:
+
+Healthy Company:
+  Year 1: SGA 25% of revenue, RD 8% of revenue
+  Year 5: SGA 22% of revenue, RD 10% of revenue
+  → SGA down (leverage), RD up (future investment) 🟢
+
+Struggling Company:
+  Year 1: SGA 25% of revenue, RD 8% of revenue
+  Year 5: SGA 30% of revenue, RD 5% of revenue
+  → Both rising/falling in wrong directions 🔴
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 5️⃣: Verify Operating Income Conversion to Cash (Reality Check)</h4>
+                    <p><strong>Cosa fare:</strong> Assicurarsi che il reddito operativo si converta in flusso di cassa reale</p>
+                    <p><strong>Red Flag:</strong> OpInc crescente ma Operating Cash Flow stagnante o decrescente</p>
+                    <div class="example-box">
+Reality Check:
+
+Quality Company:
+  OpInc: +15% YoY
+  Operating Cash Flow: +14% YoY ✅
+  → Real, sustainable growth
+
+Trouble Sign:
+  OpInc: +15% YoY
+  Operating Cash Flow: +3% YoY 🔴
+  → Accounting tricks or working capital issues
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RED FLAGS -->
+        <div id="red-flags" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">⚠️ 8 Red Flags nell'Operating Income Analysis</h2>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #1: Operating Income Growing Much Slower Than Revenue</strong><br>
+                    OpInc CAGR 5%, Revenue CAGR 15% = Margin compression severe<br>
+                    Indica: Costi fuori controllo, pricing power persa<br>
+                    Verdict: Operational deterioration, avoid
+                    <div class="example-box">
+Segnale negativo:
+Year 1: Revenue $100M, OpInc $20M (20% margin)
+Year 5: Revenue $202M, OpInc $24M (11.9% margin)
+Revenue +15% CAGR, OpInc only +4.7% CAGR
+Interpretation: Company losing margin consistency through cost bloat
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #2: Operating Income Stagnant While Revenue Growing</strong><br>
+                    OpInc flat, Revenue +10% = Margin compression; costs out of control<br>
+                    Indica: Operational problem, not pricing power<br>
+                    Verdict: Structural issue, watch carefully
+                    <div class="example-box">
+Segnale negativo:
+Year 1: Revenue $100M, OpInc $20M
+Year 5: Revenue $150M, OpInc $20M
+Revenue +8.5% CAGR, OpInc 0% CAGR
+Company growing revenue but profitability frozen = serious problem
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #3: Operating Income Declining While Revenue Growing</strong><br>
+                    Peggio del flag #2—profitto operativo decrescente<br>
+                    Indica: Business model breaking down<br>
+                    Verdict: AVOID completamente
+                    <div class="example-box">
+Segnale negativo:
+Revenue: $100M → $120M → $140M (growing +10%/year)
+OpInc: $20M → $15M → $10M (declining -20%/year)
+Company growing but becoming LESS profitable = catastrophic
+This is operational death spiral
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #4: Operating Expenses Growing Faster Than Revenue</strong><br>
+                    Revenue +8%, OpEx +12% = Negative operating leverage<br>
+                    Indica: Management lost control of cost structure<br>
+                    Verdict: Major warning sign
+                    <div class="example-box">
+Segnale negativo:
+Revenue growth: +10% YoY
+OpEx growth: +15% YoY
+OpInc likely declining or flat while revenue grows
+Management spending rising faster than revenue = disaster
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #5: Operating Margin Persistently Below Peers</strong><br>
+                    OpMargin 10% while peers average 18% = Structural disadvantage<br>
+                    Indica: Weak competitive position, higher costs, less pricing power<br>
+                    Verdict: Competitive problem, investigate cause
+                    <div class="example-box">
+Segnale negativo:
+Industry median OpMargin: 18%
+Company OpMargin: 12%
+Persistent gap for 3+ years = not temporary issue
+Likely structural cost disadvantage or weak moat
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #6: Operating Income Improvement from Cost-Cutting, Not Efficiency</strong><br>
+                    OpMargin up but from RD cuts, not from revenue growth<br>
+                    Indica: Sacrificing future for current profits<br>
+                    Verdict: Unsustainable margin improvement
+                    <div class="example-box">
+Segnale negativo:
+Year 1: Revenue $1B, RD $100M, OpInc $200M, OpMargin 20%
+Year 5: Revenue $1.1B, RD $50M (cut 50%!), OpInc $220M, OpMargin 20%
+OpMargin looks stable but is dependent on RD cuts
+Innovation capability damaged = future at risk
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #7: SGA Expenses Rising as % of Revenue</strong><br>
+                    SGA growing faster than revenue = Overhead bloat<br>
+                    Indica: Loss of operational leverage, poor cost control<br>
+                    Verdict: Management quality declining
+                    <div class="example-box">
+Segnale negativo:
+Year 1: SGA = 25% of revenue
+Year 5: SGA = 30% of revenue
+As company scales, overhead should decline % → instead it rises
+Red flag: Company not achieving expected leverage from scale
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #8: Operating Income Not Converting to Operating Cash Flow</strong><br>
+                    OpInc growing but Operating CFO stagnant = Quality issue<br>
+                    Indica: Accruals problem, working capital deteriorating<br>
+                    Verdict: Earnings quality compromised
+                    <div class="example-box">
+Segnale negativo:
+OpInc: $200M growing at +12% YoY
+Operating CFO: $100M growing at +2% YoY
+Severe divergence = cash not following profits
+Likely causes: Receivables not collected, inventory issues, payables extended
+Trust CFO more than OpInc = real cash is weak
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCORING -->
+        <div id="scoring" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📊 Scoring Guidelines & Assessment Framework</h2>
+
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Dimensione Qualità</th>
+                            <th>Valutazione ✅</th>
+                            <th>Punteggio</th>
+                            <th>Significato</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>OpInc Growth (10Y CAGR)</strong></td>
+                            <td>>10% CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Exceptional; profitti manageriali in crescita</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td></td>
+                            <td>7-10% CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Excellent; healthy profit growth</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>5-7% CAGR</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Acceptable; adequate growth</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td></td>
+                            <td><5% CAGR</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Poor; minimal growth</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpInc vs. Revenue Growth</strong></td>
+                            <td>OpInc CAGR > Revenue CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Operating leverage; excellent</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td></td>
+                            <td>OpInc CAGR ≈ Revenue CAGR</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Proportional growth; acceptable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>OpInc CAGR < Revenue CAGR</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Margin compression; red flag</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td><strong>Operating Margin Trend</strong></td>
+                            <td>Expanding (improving)</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Improving management efficiency</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Stable (maintaining)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Consistent execution</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td></td>
+                            <td>Declining (deteriorating)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Operational weakness</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OpEx Control (SGA/RD)</strong></td>
+                            <td>SGA declining, RD stable/up</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Excellent balance; good management</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td></td>
+                            <td>Both stable as % revenue</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Acceptable; proportional</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>SGA rising or RD declining</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Red flag; poor management</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td><strong>Cash Conversion (OpInc→CFO)</strong></td>
+                            <td>CFO ≈ OpInc growth</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Real growth; cash backing</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>CFO = 70-90% OpInc growth</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Acceptable; some working capital variance</td>
+                        </tr>
+                        <tr style="background: rgba(217,119,6,0.05);">
+                            <td></td>
+                            <td>CFO << OpInc growth</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Red flag; quality issue</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="key-insight" style="margin-top: 30px;">
+                    <strong>Come calcolare il punteggio totale:</strong><br>
+                    Somma i punti da tutte le categorie, max 12 punti.<br>
+                    <br>
+                    <strong>10-12 punti = 🟢 Green (Operating Income Eccezionale)</strong><br>
+                    Profitti crescono velocemente, operating leverage working, management eccellente<br>
+                    <br>
+                    <strong>7-9 punti = 🟡 Yellow (Operating Income Buona)</strong><br>
+                    Crescita acceptable, alcune concerns, monitor trends<br>
+                    <br>
+                    <strong>4-6 punti = 🟡 Yellow (Operating Income Mediocre)</strong><br>
+                    Stagnazione evidente, margin pressure, leveraging issues<br>
+                    <br>
+                    <strong><4 punti = 🔴 Red (Operating Income Compromessa)</strong><br>
+                    Deterioramento operativo, management problems. AVOID.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CASE STUDIES -->
+        <div id="case-studies" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">💼 4 Case Studies Reali - Operating Income Analysis</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">💻 Caso 1: Microsoft - Exceptional Operating Income Quality</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        OpInc 10Y CAGR: 21% | Revenue 10Y CAGR: 12%<br>
+                        OpMargin: 35-40% (stable) | Management: Exceptional<br><br>
+                        <strong>Analisi:</strong><br>
+                        • OpInc crescendo 9pp faster than revenue (operating leverage 1.75x)<br>
+                        • OpMargin stable at 35-40% despite massive scale (rare)<br>
+                        • SGA declining as % of revenue; RD stable and high (good balance)<br>
+                        • OpInc converting well to operating cash flow (85-90%)<br><br>
+                        <strong>Verdetto:</strong> 🟢🟢 GREEN (12/12 pts)<br>
+                        Textbook operating income excellence. Microsoft shows exceptional management discipline. Profits growing dramatically faster than revenue indicates powerful operating leverage. Stable high margins show competitive advantage. SGA efficiency and maintained RD show balanced management. This is Buffett's ideal: growing profitability from operational excellence, not from cutting corners.
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">🍎 Caso 2: Apple - Stable, High-Quality Operating Income</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        OpInc 10Y CAGR: 10% | Revenue 10Y CAGR: 8%<br>
+                        OpMargin: 28-30% (stable) | Management: Excellent<br><br>
+                        <strong>Analisi:</strong><br>
+                        • OpInc growing slightly faster than revenue (1.25x leverage)<br>
+                        • OpMargin stable at 28-30% indicating operational consistency<br>
+                        • Year-over-year stability low volatility predictable business<br>
+                        • OpEx well controlled despite massive scale<br><br>
+                        <strong>Verdetto:</strong> 🟢🟢 GREEN (12/12 pts)<br>
+                        Excellent, predictable operating income. Apple demonstrates consistent, well-managed business with stable high margins. Modest operating leverage (not as dramatic as Microsoft) but reliable and sustainable. Management quality evident from predictability and consistency. This is high-quality, lower-risk operating income profile.
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">🏪 Caso 3: Declining Retailer - Operating Income Deterioration</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        OpInc 10Y CAGR: -2% (DECLINING!) | Revenue 10Y CAGR: 3%<br>
+                        OpMargin: 8% → 2% (collapsing) | Management: Poor<br><br>
+                        <strong>Analisi:</strong><br>
+                        • OpInc actually declining while revenue grows (negative leverage)<br>
+                        • OpMargin collapsed from 8% to 2% (operational death spiral)<br>
+                        • SGA rising as % of revenue (overhead bloat)<br>
+                        • RD declining (cutting innovation to prop up profits)<br><br>
+                        <strong>Verdetto:</strong> 🔴 RED (1/12 pts)<br>
+                        Critical deterioration. Declining operating income despite growing revenue is catastrophic. Collapsing margins indicate severe competitive pressure, cost inflation, or operational incompetence. Management trying to sustain profits by cutting R&D (short-term thinking). This business is in structural decline. AVOID.
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">📱 Caso 4: Amazon - High Growth, Strategic Reinvestment</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        OpInc 10Y CAGR: 18% | Revenue 10Y CAGR: 25%<br>
+                        OpMargin: 2-4% (intentionally low) | Strategy: Growth reinvestment<br><br>
+                        <strong>Analisi:</strong><br>
+                        • OpInc growing 18% (excellent in absolute terms)<br>
+                        • But revenue growing 25% (OpInc < Revenue = margin compression)<br>
+                        • OpMargin intentionally kept low (deliberate strategy)<br>
+                        • Management reinvesting profits into infrastructure, R&D, expansion<br>
+                        • Question: Will reinvestment eventually create leverage in future?<br><br>
+                        <strong>Verdetto:</strong> 🟡 YELLOW (8/12 pts)<br>
+                        Good absolute profit growth, but strategic tradeoff. Amazon deliberately not capturing operating leverage—reinvesting for future dominance. This is a deliberate management choice: sacrifice current profits for future positioning. Question: Is the reinvestment strategy working? Monitor: Does this eventually convert to higher operating leverage? If yes, excellent. If not, value destruction.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CALCULATOR -->
+        <div id="calculator" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🧮 Calcolatore Interattivo - Operating Income Quality Score</h2>
+
+                <div class="interactive-section">
+                    <div class="form-group">
+                        <label>1️⃣ Quale è il Operating Income CAGR (10 anni)?</label>
+                        <input type="number" id="opincCagr" placeholder="es: 12" style="width: 100px;">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);"> (10-year compound growth)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2️⃣ Quale è il Revenue CAGR (10 anni)?</label>
+                        <input type="number" id="revenueCagr" placeholder="es: 8">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);"> (10-year revenue growth)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3️⃣ Quale è il Operating Margin (%) - media ultimi 3 anni?</label>
+                        <input type="number" id="opmargin" placeholder="es: 20">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);"> (operating income / revenue %)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4️⃣ Trend della Operating Margin (ultimi 3 anni)?</label>
+                        <select id="marginTrend" onchange="calculateOpIncScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Expanding (migliorando) ✅</option>
+                            <option value="1">Stable (stabile)</option>
+                            <option value="0">Declining (peggiorando) 🔴</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>5️⃣ Operating Income conversion to Operating Cash Flow?</label>
+                        <select id="cashConversion">
+                            <option value="">Seleziona...</option>
+                            <option value="2">OpInc growth ≈ CFO growth (>85%)</option>
+                            <option value="1">OpInc growth >> CFO growth (70-85%)</option>
+                            <option value="0">OpInc growth >>> CFO growth (<70%)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" onclick="calculateOpIncScore()">📊 Calcola Score</button>
+
+                    <div id="resultBox" class="result-box" style="display: none;">
+                        <div class="result-score" id="scoreValue"></div>
+                        <div class="result-text" id="scoreAssessment"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📈 Guida Interpretazione Score</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🟢 10-12 punti: Eccellente</div>
+                        <div class="card-value">
+                            <strong>OPERATING INCOME QUALITY ECCEZIONALE</strong><br>
+                            ✅ OpInc crescendo veloce (>10% CAGR)<br>
+                            ✅ Crescendo più veloce di revenue (leverage)<br>
+                            ✅ Margin stabile o espandente<br>
+                            ✅ Cash backing real growth<br><br>
+                            <strong>Significato:</strong> Buffett-quality management. Operating income è il vero engine di creazione di valore. Investimento con fiducia.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 7-9 punti: Buono</div>
+                        <div class="card-value">
+                            <strong>OPERATING INCOME QUALITY ACCETTABILE</strong><br>
+                            ✅ OpInc crescendo (7-10% CAGR)<br>
+                            🟡 Crescendo con revenue (proportional)<br>
+                            🟡 Margin stabile<br>
+                            🟡 Monitor cash conversion<br><br>
+                            <strong>Significato:</strong> Good business, ma watch per warning signs. Monitor margin e leverage trends carefully.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 4-6 punti: Mediocre</div>
+                        <div class="card-value">
+                            <strong>OPERATING INCOME QUALITY MEDIOCRE</strong><br>
+                            🟡 OpInc crescendo lentamente (<7% CAGR)<br>
+                            🟡 Margin pressured or declining<br>
+                            🟡 Weak or absent leverage<br><br>
+                            <strong>Significato:</strong> Caution warranted. Operational issues evident. Deeper analysis needed.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 <4 punti: Scadente</div>
+                        <div class="card-value">
+                            <strong>OPERATING INCOME QUALITY SCADENTE</strong><br>
+                            🔴 OpInc stagnant or declining<br>
+                            🔴 Margin collapsing<br>
+                            🔴 Negative leverage evident<br>
+                            🔴 Cash not following profits<br><br>
+                            <strong>Significato:</strong> AVOID. Operating income is foundation; if failing, entire business at risk.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TAB NAVIGATION
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // CALCULATOR FUNCTION
+        function calculateOpIncScore() {
+            const opincCagr = parseFloat(document.getElementById('opincCagr').value) || 0;
+            const revenueCagr = parseFloat(document.getElementById('revenueCagr').value) || 0;
+            const opmargin = parseFloat(document.getElementById('opmargin').value) || 0;
+            const marginTrend = parseInt(document.getElementById('marginTrend').value) || 0;
+            const cashConversion = parseInt(document.getElementById('cashConversion').value) || 0;
+
+            let totalScore = 0;
+
+            // OpInc Growth Score
+            if (opincCagr > 10) totalScore += 2;
+            else if (opincCagr >= 7) totalScore += 2;
+            else if (opincCagr >= 5) totalScore += 1;
+
+            // OpInc vs Revenue Growth
+            if (opincCagr > revenueCagr) totalScore += 2;
+            else if (Math.abs(opincCagr - revenueCagr) <= 2) totalScore += 1;
+
+            // Operating Margin Level
+            if (opmargin >= 20) totalScore += 2;
+            else if (opmargin >= 12) totalScore += 2;
+            else if (opmargin >= 8) totalScore += 1;
+
+            // Margin Trend
+            totalScore += marginTrend;
+
+            // Cash Conversion
+            totalScore += cashConversion;
+
+            const resultBox = document.getElementById('resultBox');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreAssessment = document.getElementById('scoreAssessment');
+
+            if (totalScore > 0) {
+                resultBox.style.display = 'block';
+                scoreValue.textContent = `Punteggio: ${totalScore}/12`;
+
+                let assessment = '';
+                if (totalScore >= 10) {
+                    assessment = '🟢🟢 ECCELLENTE - Operating Income Quality Superiore<br>OpInc crescendo veloce, margin stabile/espandente, operating leverage forte. Management eccezionale creando valore. Buffett-quality business.';
+                } else if (totalScore >= 7) {
+                    assessment = '🟡 BUONO - Operating Income Quality Accettabile<br>OpInc cresce con crescita decente, leverage presente. Monitor trend, ma fondamentalmente sound business.';
+                } else if (totalScore >= 4) {
+                    assessment = '🟡 MEDIOCRE - Operating Income Quality Questionabile<br>OpInc stagnant, leverage weak, margin pressure. Caution required. Investigate management quality.';
+                } else {
+                    assessment = '🔴 SCADENTE - Operating Income Quality Compromessa<br>OpInc declining or stagnant, margin collapsing, negative leverage. AVOID investment. Structural problems evident.';
+                }
+
+                scoreAssessment.innerHTML = assessment;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Metric 8: Revenue Growth - Dashboard Interattivo</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-green-400: rgba(74, 222, 128, 1);
+            --color-green-500: rgba(34, 197, 94, 1);
+            --color-blue-400: rgba(96, 165, 250, 1);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .metric-score {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge.green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--color-green-500);
+        }
+
+        .badge.yellow {
+            background: rgba(230, 129, 97, 0.15);
+            color: var(--color-orange-500);
+        }
+
+        .badge.red {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-red-500);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .framework-step {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+        }
+
+        .framework-step h4 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .framework-step p {
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .example-box {
+            background: var(--color-gray-200);
+            border-left: 4px solid var(--color-blue-400);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: var(--color-text);
+        }
+
+        .red-flag {
+            background: rgba(192, 21, 47, 0.08);
+            border-left: 4px solid var(--color-red-500);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            color: var(--color-text);
+        }
+
+        .red-flag strong {
+            color: var(--color-red-500);
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .scoring-table th,
+        .scoring-table td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .scoring-table th {
+            background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+            color: white;
+            font-weight: 600;
+        }
+
+        .scoring-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scoring-table tr:hover {
+            background: rgba(33, 128, 141, 0.05);
+        }
+
+        .question-list {
+            list-style: none;
+        }
+
+        .question-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .question-list li strong {
+            color: var(--color-text);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .question-list li:last-child {
+            border-bottom: none;
+        }
+
+        .scenario {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .scenario-title {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .scenario-desc {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .assessment {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--color-border);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .interactive-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+            background: var(--color-background);
+            font-family: var(--font-family-base);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            background: var(--color-gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .result-score {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-size: 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .key-insight {
+            background: rgba(33, 128, 141, 0.08);
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .key-insight strong {
+            color: var(--color-primary);
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, rgba(33,128,141,0.08), rgba(33,128,141,0.04));
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .metric-box strong {
+            color: var(--color-primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .tab-btn {
+                border-bottom: 1px solid var(--color-border);
+                border-right: none;
+            }
+
+            .tab-btn.active {
+                border-bottom-color: var(--color-primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📊 Metrica 8: Revenue Growth</h1>
+            <p><strong>Sustainable Expansion & Quality Verification</strong></p>
+            <p>Come crescita organica, sostenibilità della crescita e qualità verificano se il business ha un vero moat</p>
+            <div class="metric-score">
+                <strong>Tier 1 - Business Quality (40% weight)</strong>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="overview">Panoramica</button>
+            <button class="tab-btn" data-tab="definition">Definizione & Formula</button>
+            <button class="tab-btn" data-tab="red-flags">Red Flags ⚠️</button>
+            <button class="tab-btn" data-tab="framework">7-Step Framework</button>
+            <button class="tab-btn" data-tab="types">4 Tipi di Crescita</button>
+            <button class="tab-btn" data-tab="quality">Quality Checks</button>
+            <button class="tab-btn" data-tab="scoring">Scoring</button>
+            <button class="tab-btn" data-tab="scenarios">Case Studies</button>
+            <button class="tab-btn" data-tab="calculator">Calcolatore</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">📌 Perché Revenue Growth Importa Davvero</h2>
+
+                <div class="key-insight">
+                    <strong>Principio Buffett:</strong> "Preferisco crescita lenta, sostenibile e profittevole a crescita esplosiva ma profitless. La crescita non è un obiettivo, è un risultato naturale di un business eccezionale che crea valore per i clienti. Se devi forzare la crescita, significa che non hai un vero moat."
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🎯 Cosa Rivela la Crescita</div>
+                        <div class="card-value">
+                            La crescita dei ricavi NON è semplicemente "più soldi":
+                            <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                                <li>Capacità di attrarre nuovi clienti</li>
+                                <li>Potenza del moat (se crescita organica)</li>
+                                <li>Sostenibilità del modello di business</li>
+                                <li>Forza relativa vs. competitors</li>
+                                <li>Fiducia del mercato nel futuro</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💡 Organica vs. Inorganica</div>
+                        <div class="card-value">
+                            <strong>La vera crescita è organica:</strong><br>
+                            <span style="color: var(--color-text-secondary);">
+                                Qualsiasi manager può comprare crescita tramite M&A.
+                            </span><br><br>
+                            <strong>Crescita organica = moat:</strong>
+                            <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                                <li>Business migliora naturalmente</li>
+                                <li>Clienti tornano, raccomandano</li>
+                                <li>Market share guadagnato naturalmente</li>
+                                <li>Non richiede M&A per crescere</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📈 Tassi di Crescita Realistici</div>
+                        <div class="card-value">
+                            <strong>Per tipo di business:</strong><br>
+                            <span class="badge green">SaaS/Software</span> 20-40%<br>
+                            <span class="badge green">Cloud (AWS)</span> 25-35%<br>
+                            <span class="badge yellow">Tech Maturo</span> 10-20%<br>
+                            <span class="badge yellow">Healthcare</span> 8-15%<br>
+                            <span class="badge yellow">Industriale</span> 5-12%<br>
+                            <span class="badge red">Consumo Maturo</span> 0-5%<br>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚖️ Qualità della Crescita</div>
+                        <div class="card-value">
+                            <strong>Crescita di alta qualità:</strong><br>
+                            ✅ Organica (no M&A)<br>
+                            ✅ Profittevole (margini stabili/crescenti)<br>
+                            ✅ Prevedibile (recurring revenue)<br>
+                            ✅ Sostenibile (non richiede spending eccessivo)<br>
+                            ✅ Verificata da cash (FCF positivo)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔑 4 Segnali Critici di Crescita Sostenibile</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">1️⃣ Organica vs. Inorganica</div>
+                        <div class="card-value">
+                            <strong>Breakdownare la crescita:</strong><br>
+                            • Organica: nuovo business, clienti esistenti expansion<br>
+                            • Inorganica: M&A, acquisizioni<br><br>
+                            <strong>Ideale:</strong> 80%+ organica<br>
+                            <strong>Accettabile:</strong> 60-80% organica<br>
+                            <strong>Red flag:</strong> <50% organica (crescita da M&A)<br><br>
+                            Esempio:<br>
+                            • Microsoft: 95%+ crescita organica 🟢<br>
+                            • Consolidator: 40% organica, 60% M&A 🔴
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">2️⃣ Consistenza Storica</div>
+                        <div class="card-value">
+                            <strong>La crescita deve essere prevedibile:</strong><br>
+                            <span style="color: var(--color-green-500);">Consistente 15%/anno × 10 anni</span> = moat<br><br>
+                            <span style="color: var(--color-orange-500);">Volatile (25% → 5% → 20%)</span> = ciclico<br><br>
+                            <span style="color: var(--color-red-500);">Declino 5+ anni</span> = problema<br><br>
+                            <strong>Verifica:</strong> Plot 10 anni di crescita. Stabilità = qualità
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">3️⃣ Profittabilità della Crescita</div>
+                        <div class="card-value">
+                            <strong>Crescita profittevole vs. loss-making:</strong><br><br>
+                            <strong>Crescita profittevole:</strong><br>
+                            Revenue +15%, OpInc +15% = ✅ Scalabile<br><br>
+                            <strong>Crescita "falsa":</strong><br>
+                            Revenue +15%, OpInc +2% = 🔴 Non sostenibile<br><br>
+                            <strong>Regola d'oro:</strong><br>
+                            OpInc growth ≈ Revenue growth
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">4️⃣ FCF Conversion</div>
+                        <div class="card-value">
+                            <strong>La crescita deve convertire a cash:</strong><br><br>
+                            ✅ Revenue +15%, FCF +15% = crescita reale<br><br>
+                            ❌ Revenue +20%, FCF +1% = problemi working capital<br><br>
+                            ❌ Revenue +20%, FCF -5% = cash burn per crescita<br><br>
+                            <strong>Domanda chiave:</strong><br>
+                            Questa crescita mi porta soldi effettivi?
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: DEFINITION -->
+        <div id="definition" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📐 Definizione Formale & Formule</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">Revenue Growth: Definizione</div>
+                    <div class="card-value">
+                        <strong>Revenue Growth (YoY) = (Revenue Questo Anno - Revenue Anno Scorso) / Revenue Anno Scorso × 100</strong><br><br>
+                        Semplice percentuale di crescita anno su anno.<br><br>
+                        <strong>Esempio:</strong><br>
+                        • 2022 Revenue: $100M<br>
+                        • 2023 Revenue: $115M<br>
+                        • Growth rate: ($115M - $100M) / $100M = 15%
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">📊 Metriche Derivate</div>
+                        <div class="card-value">
+                            <strong>CAGR (5-year)</strong><br>
+                            Crescita media annualizzata su 5 anni<br>
+                            = (Ending Value / Beginning Value)^(1/5) - 1<br><br>
+                            <strong>Organic Growth %</strong><br>
+                            Crescita da business existing, escludendo M&A<br><br>
+                            <strong>Same-Store Sales Growth</strong><br>
+                            Per retailer/franchises: crescita da store comparabili<br><br>
+                            <strong>ARR/MRR Growth</strong><br>
+                            Per SaaS: Annual/Monthly Recurring Revenue growth
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔍 Organic vs. Inorganic Split</div>
+                        <div class="card-value">
+                            <strong>Reported Growth = Organic + Inorganic</strong><br><br>
+                            <strong>Organica:</strong> Clienti nuovi, espansione existing<br>
+                            <strong>Inorganica:</strong> M&A, acquisizioni<br><br>
+                            <strong>Esempio:</strong><br>
+                            Reported: +20% crescita<br>
+                            Organica: +12%<br>
+                            Inorganica: +8% (da acquisizione)<br><br>
+                            <strong>La crescita organica è quella che conta!</strong>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⏰ Timeframe Analysis</div>
+                        <div class="card-value">
+                            <strong>YoY Growth:</strong> Anno su anno<br>
+                            Utile per trend, ma volatile<br><br>
+                            <strong>CAGR (5-yr):</strong> Crescita media 5 anni<br>
+                            Smooths out volatilità<br><br>
+                            <strong>CAGR (10-yr):</strong> Crescita media 10 anni<br>
+                            True long-term growth trajectory<br><br>
+                            <strong>Regola:</strong> 10-year CAGR > 5-year > YoY
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💰 Revenue per Metrica Aggiuntiva</div>
+                        <div class="card-value">
+                            <strong>Revenue per Employee:</strong><br>
+                            = Total Revenue / Number of Employees<br>
+                            Indica efficienza scalabilità<br><br>
+                            <strong>Revenue per Customer:</strong><br>
+                            = Total Revenue / Number of Customers<br>
+                            Mostra pricing power e expansion<br><br>
+                            <strong>Revenue per Store (Retail):</strong><br>
+                            = Total Revenue / Number of Stores<br>
+                            Indica productivity per location
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RED FLAGS -->
+        <div id="red-flags" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">⚠️ 10 Red Flags di Crescita Non Sostenibile</h2>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #1: Crescita Organica Negativa Mascherata da M&A</strong><br>
+                    La crescita riportata è positiva (15%), ma breakdown rivela: organica -5%, inorganica +20% (da acquisizione grande). La crescita è tutta da M&A; il business sottostante in declino.
+                    <div class="example-box">
+Segnale: Growth rate 15%, ma 80% da M&A
+→ Organica negativa = RED FLAG
+→ Sostenibilità: Bassa se non fare M&A continui
+→ Valutazione: Sconto per synthetic growth
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #2: Crescita Declinante (Deceleration)</strong><br>
+                    Crescita: 30% → 25% → 18% → 10% → 5% (chiaramente declinante). Indica che il business sta rallentando naturalmente o affrontando competizione.
+                    <div class="example-box">
+Trend decelerazione:
+- Forte crescita iniziale (tailwind)
+- Graduale rallentamento (maturation)
+- Red flag se declina <5% per società giovane/ad alta crescita
+
+Interpretazione: Il mercato sta saturandosi o compet sta pressando
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #3: Crescita Revenue ma OpInc Declina</strong><br>
+                    Revenue cresce +15%, ma Operating Income cala -5%. Significa che la crescita costa denaro (profitless growth) ed è non sostenibile.
+                    <div class="example-box">
+Segnale negativo:
+- Revenue +15%
+- OpInc -5%
+- Margini comprimendosi per crescita
+
+Cause possibili:
+1. Sconti aggressivi per acquisire clienti
+2. Investimenti in marketing non ancora pagati
+3. Efficienze non materializzate
+4. Competizione forzando margini bassi
+
+Buffett: Growth without profit isn't growth, it's destruction
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #4: Crescita Richiedente Spesa di Capitale Sostenuta</strong><br>
+                    Crescita requirendo continua CapEx alta (Amazon è eccezione). Se ogni dollaro di crescita richiede dollaro di CapEx, la crescita non è sostenibile.
+                    <div class="example-box">
+Red flag indicator:
+- Revenue growth 15%
+- CapEx requirement 15% della revenue growth
+- Ad infinitum = capital intensive, no moat
+
+Vs. software:
+- Revenue growth 15%
+- CapEx requirement <2%
+- Asset-light, scalable = moat evident
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #5: Crescita da Sconti Insostenibili/Price Wars</strong><br>
+                    Crescita acquisendo clienti tramite price wars (aggressivi sconti). Insostenibile una volta che competitors match o quando prezzi non possono scendere ulteriormente.
+                    <div class="example-box">
+Esempio: Retailer abbassa prezzi per crescita volumi
+- Volume cresce +10%
+- Prezzo cala -8%
+- Revenue cresce +1%
+- Margini schiacciati
+
+Sostenibilità: Bassa, prezzo guerra non finisce bene
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #6: Crescita Numeratore (Volume) ma Denominatore (Base Clienti) Declina</strong><br>
+                    Revenue cresce tramite prezzo, ma numero di clienti cala. Eventualmente non ci saranno più clienti a cui aumentare prezzo.
+                    <div class="example-box">
+Esempio: Editore stampa
+- Revenue flat (+1%)
+- Clienti: -8% anno
+- Price/customer: +9%
+
+Interpretazione: Trying to raise prices per offset churn
+Sostenibilità: Bassa, churn inevitabile continua
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #7: Crescita FCF Negativa (Revenue Growth ma Cash Decline)</strong><br>
+                    Revenue cresce ma FCF declina o rimane negativo. Significa che la crescita non genera cash, ma la consuma.
+                    <div class="example-box">
+Segnale di pericolo:
+- Revenue: +15%
+- FCF: -10% (declina)
+- Causa: Working capital bloat, CapEx spikes
+
+Interpretazione:
+- Clienti non pagano
+- Inventory accumula
+- CapEx non ancora pagato
+- Unsustainable
+
+Domanda: Quando diventa positivo FCF? Se mai, RED FLAG
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #8: Crescita Richiamata/Guidata Down da Management</strong><br>
+                    Azienda pubblica rivede giù guidance di crescita futuro. Segnale che momentum rallentando o headwinds emergenti.
+                    <div class="example-box">
+Pattern:
+- Q1: Guide 20% growth
+- Q2: Revise down 15%
+- Q3: Revise down 10%
+
+Red flag indicator: Downward guidance revisions
+Interpretazione: Management losing confidence, headwinds emerging
+Risk: Stock declines, investor trust eroded
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #9: Crescita da Settore Declinante o Sotto Disruptive Pressure</strong><br>
+                    Company crescendo, ma settore in declino strutturale. Ejemplo: print media company crescendo (ma print industria cala 10%+/year). Insostenibile nel lungo termine.
+                    <div class="example-box">
+Rischio: Fighting the tide
+- Company crescita +3%
+- Industry cala -5% YoY
+- Azienda guadagnando market share ma industria morendo
+
+Conclusione: Even if company growing, investimento rischioso
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #10: Crescita Proveniente da Accounting Changes/One-Time Items</strong><br>
+                    Crescita revenue principalmente da: accounting changes, reclassifications, valuta, scope changes. Not real operational growth.
+                    <div class="example-box">
+Segnali di accounting tricks:
+- Revenue crisi ma accounting change boost
+- Valuta headwind offset da reclassification
+- One-time items masking organic decline
+
+Verifica: Adjust for one-time items, valuta impact
+Vero growth organica: Deve escludere questi fattori
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔍 Checklist Red Flags Rapida</h2>
+                
+                <div class="card">
+                    <div class="card-title">Domande a cui Rispondere "SÌ" = Red Flag</div>
+                    <div class="card-value">
+                        <div style="list-style: none; padding-left: 0;">
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> La crescita è principalmente da M&A, non organica?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Crescita revenue ma operating income cala?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> FCF negativo o in declino con revenue crescente?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Crescita declinante (rallentamento visibile)?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Crescita richiedente CapEx/OpEx spesi crescenti?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Volume/clienti calano mentre revenue sale (prezzo)?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Management guidato giù la crescita futura?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Settore in declino (company vincendo market share da dying industry)?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Crescita principalmente da accounting changes, not ops?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Competitori crescendo più veloce (perdi market share)?
+                            </div>
+                        </div>
+                        <p style="margin-top: 20px; color: var(--color-red-500); font-weight: 600;">
+                            🚨 Più di 2 "SÌ" = Problema serio. Più di 4 "SÌ" = Evitare investimento.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: FRAMEWORK -->
+        <div id="framework" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🔧 7-Step Framework Analisi Revenue Growth</h2>
+
+                <div class="framework-step">
+                    <h4>Step 1️⃣: Calcolare Tassi di Crescita (YoY, CAGR 5yr, CAGR 10yr)</h4>
+                    <p><strong>Cosa fare:</strong> Calcola tre misure di crescita per contesto completo.</p>
+                    <p><strong>Formule:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>YoY: (Rev Current - Rev Prior) / Rev Prior</li>
+                        <li>5-yr CAGR: (Rev Year5 / Rev Year0)^(1/5) - 1</li>
+                        <li>10-yr CAGR: (Rev Year10 / Rev Year0)^(1/10) - 1</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Apple
+- 2014 Revenue: $182B
+- 2024 Revenue: $383B
+- 10-yr CAGR: (383/182)^0.1 - 1 = 7.6%
+
+Interpretazione: 7.6% CAGR è solido per azienda $300B+
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 2️⃣: Separare Crescita Organica da Inorganica</h4>
+                    <p><strong>Cosa fare:</strong> Disaggregare reported growth in componenti.</p>
+                    <p><strong>Come trovare:</strong> In 10-K, Company di solito fornisce organic growth breakdown.</p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>% da organica (same-store sales, new customers, expansion)</li>
+                        <li>% da inorganica (M&A acquisizioni)</li>
+                        <li>% da foreign exchange (valuta impact)</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Reported 15% growth breakdown
+- Organica: 12% = real business improvement
+- M&A: +3% = acquisition contribution
+- FX: 0% = no currency impact
+
+Assessment: 12% organica è sustainable base
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 3️⃣: Verificare Consistenza vs. Competitors</h4>
+                    <p><strong>Cosa fare:</strong> Paragona company growth vs. peer group e industry.</p>
+                    <p><strong>Checklist:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Company crescendo più veloce di competitors = gaining share ✅</li>
+                        <li>In linea con competitors = holding share = OK</li>
+                        <li>Più lento di competitors = losing share = RED FLAG</li>
+                        <li>In linea con industria = natural pace</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Software sector
+Industry average growth: 10%
+Company A: 15% = outperforming, gaining share 🟢
+Company B: 10% = in line with industry
+Company C: 5% = underperforming, losing share 🔴
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 4️⃣: Verificare Profittabilità della Crescita</h4>
+                    <p><strong>Cosa fare:</strong> Analizzare se crescita conversione a profitto (operating income e FCF).</p>
+                    <p><strong>Confronto chiave:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Revenue growth rate vs. Operating Income growth rate</li>
+                        <li>Revenue growth vs. FCF growth</li>
+                        <li>Margini stabili o declinanti?</li>
+                    </ul>
+                    <div class="example-box">
+Best case (profittable growth):
+Revenue +15%, OpInc +15%, FCF +15%
+→ Scalable, profitable, sustainable 🟢
+
+Worst case (profitless growth):
+Revenue +15%, OpInc -5%, FCF -10%
+→ Burning cash for growth, unsustainable 🔴
+
+Middle case (margin compression):
+Revenue +15%, OpInc +8% (margini declinanti)
+→ Growth real ma efficiency declining 🟡
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 5️⃣: Analizzare Sostenibilità della Crescita</h4>
+                    <p><strong>Cosa fare:</strong> Valutare se crescita può continuare ai tassi attuali.</p>
+                    <p><strong>Fattori da considerare:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Market size rimasto: Quanto spazio per crescere ancora?</li>
+                        <li>Competitive intensity: Nuovi competitors emergenti?</li>
+                        <li>Customer acquisition cost: Sta aumentando? (segnale di market saturation)</li>
+                        <li>Churn rate: Clienti che restano? (recurring revenue quality)</li>
+                        <li>Market share: Trend di azienda vs. competitor market share</li>
+                    </ul>
+                    <div class="example-box">
+Sostenibilità assessment:
+- Large market (TAM): Grow per molti anni ✅
+- Small market (TAM): Limited growth headroom 🔴
+- Increasing CAC: Market saturation signal 🔴
+- Decreasing CAC: Efficiency improving ✅
+- Market share gaining: Outsizing industry growth 🟢
+- Market share losing: Underperforming 🔴
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 6️⃣: Verificare Qualità della Crescita (Cash Backing)</h4>
+                    <p><strong>Cosa fare:</strong> Assicurare che crescita convertita a actual cash (non just accounting).</p>
+                    <p><strong>Metrica chiave:</strong> Operating Cash Flow vs. Net Income vs. FCF trend</p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>OCF growth ≈ Revenue growth = ✅ Cash-backed growth</li>
+                        <li>OCF declining while Revenue growing = 🔴 Working capital issues</li>
+                        <li>FCF declining while Revenue growing = 🔴 CapEx absorption or cash drain</li>
+                    </ul>
+                    <div class="example-box">
+Growth quality check:
+Company A:
+Revenue +15%, OCF +14%, FCF +13%
+→ High quality, cash-backed 🟢
+
+Company B:
+Revenue +15%, OCF +3%, FCF -5%
+→ Poor quality, cash issues 🔴
+Growth not real, cash-backed
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 7️⃣: Valutare Trend Momentum & Forward Guidance</h4>
+                    <p><strong>Cosa fare:</strong> Analizzare momentum (accelerating vs. decelerating) e management's forward guidance.</p>
+                    <p><strong>Segnali positivi:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Crescita accelerando (15% → 18% → 20%)</li>
+                        <li>Management confident in forward guidance</li>
+                        <li>Raising guidance, not lowering</li>
+                    </ul>
+                    <p style="margin-top: 12px;"><strong>Segnali negativi:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Decelerazione (20% → 15% → 10%)</li>
+                        <li>Management cautious on forward</li>
+                        <li>Lowering guidance = loss of confidence</li>
+                    </ul>
+                    <div class="example-box">
+Momentum analysis:
+Accelerating: 10% → 12% → 14% → 16% (positive) ✅
+Stable: 15% → 14% → 15% → 15% (OK)
+Decelerating: 20% → 15% → 10% → 5% (negative) 🔴
+
+Guidance signal:
+Raise guidance = confident, momentum positive ✅
+Lower guidance = cautious, headwinds emerging 🔴
+Withdrawn guidance = uncertainty/trouble ❌
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: TYPES -->
+        <div id="types" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🎯 4 Tipi di Crescita (Qualità Differente)</h2>
+
+                <div class="scenario">
+                    <div class="scenario-title">1️⃣ Crescita ORGANICA (BEST)</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Crescita da nuovi clienti, clienti existing che spendono di più, mercato naturale expansion.<br><br>
+                        <strong>Fonte:</strong> Business interno che sta migliorando, non acquisizioni<br><br>
+                        <strong>Caratteristiche:</strong>
+                        <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                            <li>Indica moat intrinseco (clienti lo scelgono attivamente)</li>
+                            <li>Margini tipicamente stabili o migliorando</li>
+                            <li>Prevedibile, sostenibile nel lungo termine</li>
+                            <li>Não richiede M&A / capital deployment massivo</li>
+                            <li>Costo di acquisizione cliente declina (efficiency)</li>
+                        </ul>
+                        <strong>Esempio:</strong> Microsoft crescendo 12% anno organico da cloud adoption naturale<br><br>
+                        <strong>Assessment:</strong> 🟢🟢 GREEN - Miglior tipo di crescita. Indica vero business improvement.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">2️⃣ Crescita INORGANICA da M&A (CAUTIOUS)</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Crescita acquisendo altri business (acquisizioni, merger).<br><br>
+                        <strong>Fonte:</strong> Acquisto di revenue/assets da altra azienda, non dal proprio business<br><br>
+                        <strong>Caratteristiche:</strong>
+                        <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                            <li>Non dimostra moat intrinseco</li>
+                            <li>Qualsiasi manager può comprare crescita tramite M&A</li>
+                            <li>Dipende da: trovare acquisizioni, pagarle giustamente, integrarle bene</li>
+                            <li>Spesso maschere un business base che non sta crescendo organicamente</li>
+                            <li>Alto rischio: Molte acquisizioni destroyono valore</li>
+                        </ul>
+                        <strong>Esempio:</strong> Azienda cresce 20% totale: 5% organica + 15% da M&A grande<br><br>
+                        <strong>Assessment:</strong> 🟡 YELLOW - Cautious. Se organica negativa, RED FLAG. Se organica buona + M&A aggiuntiva = OK.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">3️⃣ Crescita da PRICE INCREASES (CAUTION)</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Crescita principalmente da aumenti di prezzo, non volume.<br><br>
+                        <strong>Fonte:</strong> Stessi clienti / volumi ma prezzi più alti<br><br>
+                        <strong>Caratteristiche:</strong>
+                        <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                            <li>Potrebbe indicare pricing power (buono)</li>
+                            <li>Oppure potrebbe essere unsustainable (clienti fuggono nel tempo)</li>
+                            <li>Volume declino masking prezzo increases = red flag</li>
+                            <li>Se prezzo sale ma competitor prezzi no, clienti migreranno</li>
+                            <li>Unsustainable nel lungo termine se strutturale no moat</li>
+                        </ul>
+                        <strong>Esempio:</strong> Retailer: Revenue +8% ma volume -5%, prezzo +13%<br><br>
+                        <strong>Assessment:</strong> 🟡 YELLOW - Monitor. Se pricing power genuino (brand, moat) = OK. Se pricing war = Red Flag.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">4️⃣ Crescita da ACCOUNTING/CURRENCY (AVOID)</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Crescita da accounting changes, foreign exchange, scope changes. Non reale operativo growth.<br><br>
+                        <strong>Fonte:</strong> Valuta favorevole, reclassifications, acquisitions contabili, discontinued operations<br><br>
+                        <strong>Caratteristiche:</strong>
+                        <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                            <li>Non riflette operativo business improvement</li>
+                            <li>One-time in natura, non recurring</li>
+                            <li>Valuta headwind anno prossimo cancella il boost</li>
+                            <li>Maschere underlying operativo stagnation/decline</li>
+                            <li>RED FLAG se occorre ripetutamente</li>
+                        </ul>
+                        <strong>Esempio:</strong> Reported growth 6%, ma senza FX favorevole: organica -2%, acquisizione +3%, FX +5%<br><br>
+                        <strong>Assessment:</strong> 🔴 RED - Non sostenibile. Business reale in declino, mascherato da accounting.
+                    </div>
+                </div>
+
+                <div class="key-insight" style="margin-top: 30px;">
+                    <strong>Ranking di Qualità della Crescita:</strong><br>
+                    🟢🟢 Tier 1: Organica, profittevole, cash-backed, acceleando<br>
+                    🟢 Tier 2: Organica + inorganica supplementare, profittevole<br>
+                    🟡 Tier 3: Principalmente inorganica, o organica da pricing non volume<br>
+                    🔴 Tier 4: Accounting/currency, non operativo, declining organica
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: QUALITY -->
+        <div id="quality" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">✅ 8 Quality Checks per Verificare Crescita Reale</h2>
+
+                <div class="grid">
+                    <div class="metric-box">
+                        <strong>1️⃣ Organic Growth Positive & Accelerating?</strong>
+                        ✅ Organica +15%, accelerando = moat<br>
+                        ❌ Organica -5%, inorganica mascherating = red flag
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>2️⃣ Operating Income Crescente con Revenue?</strong>
+                        ✅ Revenue +15%, OpInc +15% = profittevole<br>
+                        ❌ Revenue +15%, OpInc +2% = profitless
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>3️⃣ FCF Backing Growth?</strong>
+                        ✅ FCF +15% con Revenue +15% = cash real<br>
+                        ❌ FCF -10% con Revenue +15% = cash drain
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>4️⃣ Outgrowing Competitors?</strong>
+                        ✅ Company +15%, Industry +8% = winning<br>
+                        ❌ Company +8%, Industry +15% = losing
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>5️⃣ Volume & Customer Trending Right?</strong>
+                        ✅ Volume +15%, Customers +10% = growth real<br>
+                        ❌ Volume -5%, Price +20% = unsustainable
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>6️⃣ Recurring Revenue Mix Improving?</strong>
+                        ✅ Recurring 80%+, growing = predictable<br>
+                        ❌ Recurring 30%, declining = lumpy
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>7️⃣ Churn Rate Low (Sticky Customers)?</strong>
+                        ✅ Churn <5% anno = clienti happy<br>
+                        ❌ Churn >15% = customers leaving
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>8️⃣ Margin Quality Stable/Improving?</strong>
+                        ✅ Gross margin +2pp con revenue growing<br>
+                        ❌ Margin -3pp = pricing power lost
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCORING -->
+        <div id="scoring" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📊 Scoring Guidelines - Come Valutare</h2>
+
+                <p style="margin-bottom: 20px; color: var(--color-text-secondary); line-height: 1.8;">
+                    Usa questa tabella per assegnare un punteggio a una crescita di revenue basato su qualità, sostenibilità e verifiche di supporto.
+                </p>
+
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Growth Metric</th>
+                            <th>Assessment ✅</th>
+                            <th>Score</th>
+                            <th>Sustainability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Growth Rate</strong></td>
+                            <td>15%+ per year</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Strong growth</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>5-15% per year</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Healthy growth</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>0-5% per year</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Slowing/maturity</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><0% (decline)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Declining</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Organic %</strong></td>
+                            <td>>80% organica</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Real business growth</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>50-80% organica</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Mostly organic + some M&A</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><50% organica</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>M&A-dependent, risky</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>OpInc Growth Match</strong></td>
+                            <td>OpInc growth = Revenue growth</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Profitable, scalable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>OpInc growth > 50% of Revenue growth</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Margin pressure</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>OpInc declining (Revenue growing)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Profitless growth</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>FCF Conversion</strong></td>
+                            <td>FCF growth ≈ Revenue growth</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Cash-backed, sustainable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>FCF growth slower (due CapEx)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Growth investment phase</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>FCF declining (Revenue growing)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Cash drain, unsustainable</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Growth Momentum</strong></td>
+                            <td>Accelerating (15% → 18% → 20%)</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Positive, moat widening</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Stable/Consistent</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Predictable, OK</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Decelerating (20% → 15% → 10%)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Slowing, competitive pressure</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Market Share vs. Peers</strong></td>
+                            <td>Gaining share (growing faster)</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Competitive advantage</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Holding share (in line)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Keeping up</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Losing share (slower growth)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Weak competitive position</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Quality of Revenue Mix</strong></td>
+                            <td>Recurring revenue >70%, growing</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Predictable, sustainable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Mixed (50-70% recurring)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Moderately predictable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>One-time/Lumpy <50% recurring</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Unpredictable, risky</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="key-insight" style="margin-top: 30px;">
+                    <strong>Come calcolare il punteggio totale:</strong><br>
+                    Somma i punti da tutte le categorie, max 14 punti.<br>
+                    <br>
+                    <strong>12-14 punti = 🟢 Green (Eccellente revenue growth quality)</strong><br>
+                    <strong>8-11 punti = 🟡 Yellow (Buona growth, watch per warning signs)</strong><br>
+                    <strong>5-7 punti = 🟡 Yellow (Accettabile, ma qualche rischio)</strong><br>
+                    <strong><5 punti = 🔴 Red (Growth unsustainable o da problemi)</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCENARIOS -->
+        <div id="scenarios" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">💼 6 Case Studies Reali - Revenue Growth Analysis</h2>
+
+                <div class="scenario">
+                    <div class="scenario-title">📱 Caso 1: Microsoft - Organic Growth Eccezionale</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Revenue Growth: 12-15%/year | Organic: 95%+ | Cloud crescita: 25%+<br><br>
+                        <strong>Dettagli:</strong>
+                        • Crescita organica principalmente da cloud adoption naturale<br>
+                        • Operating Income crescendo 15-18% (superior a revenue) = margin expansion<br>
+                        • FCF crescendo 12% con revenue = cash-backed<br>
+                        • Market share: Winning vs. AWS, Google Cloud (ma AWS ancora #1)<br>
+                        • Recurring revenue: 85%+ subscription = predictable<br><br>
+                        <strong>Sostenibilità:</strong> Cloud TAM ancora gigante, AI adoption accelerating
+                    </div>
+                    <div class="assessment">
+                        🟢🟢 GREEN (2/2 pts) - Eccezionale revenue growth quality
+                        <br>Organica ✅ | Profitable ✅ | Cash-backed ✅ | Accelerando ✅
+                        <br><strong>Veredicto:</strong> Best-in-class growth. Organic, profitable, cash-backed. Sostenibile per anni.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">🧪 Caso 2: Moderna (COVID Spike Decline)</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        2020 Revenue: $600M | 2021: $18B | 2022: $19B (peak) | 2023: $6.6B<br><br>
+                        <strong>Dettagli:</strong>
+                        • 2021-2022: Esplosione da COVID booster demand (unsustainable)<br>
+                        • 2023 onwards: Collapse come COVID demand normalized<br>
+                        • Base business (seasonal flu vaccine, other candidates) < $2B<br>
+                        • Alta volatilità: Non prevedibile<br>
+                        • One-time revenue spike mascherato come normal growth<br><br>
+                        <strong>Lezione:</strong> COVID era anomalia, non crescita sostenibile
+                    </div>
+                    <div class="assessment">
+                        🔴 RED (0/2 pts) - Volatile, one-time driven
+                        <br>Spike temporaneo ❌ | Unsustainable ❌ | Declining base ❌
+                        <br><strong>Veredicto:</strong> Lezione su crescita non sostenibile. One-time events non contano per valutazione.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">☁️ Caso 3: Salesforce - Growth Deceleration Worry</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Growth history: 25% → 23% → 20% → 18% → 15% (chiaramente declinante)<br><br>
+                        <strong>Dettagli:</strong>
+                        • Organica: 12-15%, resto da M&A (acquistato Tableau, Slack)<br>
+                        • Crescita decelerazione naturale (azienda matura, TAM saturation)<br>
+                        • M&A strategicamente aggiungendo funcionalità (Tableau analytics)<br>
+                        • Recurring: 95%+ subscription = stable<br>
+                        • FCF positivo e stabile<br><br>
+                        <strong>Interpretazione:</strong> Deceleration normale per azienda $35B+, non red flag
+                    </div>
+                    <div class="assessment">
+                        🟡 YELLOW (1/2 pts) - Growth decelerating ma gestito bene
+                        <br>Decelerazione naturale ✅ | Organica + M&A supplementari ✅ | Recurring revenue ✅
+                        <br><strong>Veredicto:</strong> Not concerning. Azienda maturo con base sostenibile. Decel expected.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">🛍️ Caso 4: Amazon - Growth Reinvestment Phase</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Revenue Growth: 10-15%/year | Organic: 95%+<br>
+                        AWS: +25-30%, Retail: +5-10%<br><br>
+                        <strong>Dettagli:</strong>
+                        • Revenue crescendo organicamente (no M&A significativo)<br>
+                        • Operating margin: AWS alta (25-30%), Retail bassa (2-3%)<br>
+                        • Overall OpInc: Stabile o lievemente declinante (reinvesting in growth)<br>
+                        • FCF: Sempre positivo ma soggetto a capex spikes<br>
+                        • Market share: Dominant in retail, strong in cloud<br><br>
+                        <strong>Strategia:</strong> Reinvesting AWS profits back into retail expansion
+                    </div>
+                    <div class="assessment">
+                        🟢 GREEN (2/2 pts) - Organic growth, strategic reinvestment
+                        <br>Organica ✅ | Profitable da AWS ✅ | Strategic capex ✅
+                        <br><strong>Veredicto:</strong> Excellent growth strategy. AWS profitable, retail reinvestment strategic. Sostenibile.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">📰 Caso 5: Traditional Publisher - Structural Decline</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Revenue: $2B 5 anni fa → $2B oggi (Flat) | Growth rate -3%/year trend<br><br>
+                        <strong>Dettagli:</strong>
+                        • Crescita negativa per 5 anni (structural decline)<br>
+                        • Tentando di compensare tramite price increases (unsustainable)<br>
+                        • Customer churn accelerando (perdendo lettori)<br>
+                        • Digital revenue crescente ma non compensando print decline<br>
+                        • Recurring revenue: 50% (mixed, volatile)<br>
+                        • Margins declinanti (cost pressures)<br><br>
+                        <strong>Lezione:</strong> Secular headwinds destroying business
+                    </div>
+                    <div class="assessment">
+                        🔴 RED (0/2 pts) - Structural decline, unsustainable
+                        <br>Declino strutturale ❌ | Unsustainable pricing ❌ | Headwinds ❌
+                        <br><strong>Veredicto:</strong> EVITARE. Secular headwind vincono. No growth, solo decline.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">💾 Caso 6: SaaS Startup - Profitless Hypergrowth Becoming Profitable</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Revenue Growth: 50%/year | Organic: 100% (no M&A)<br>
+                        Years: Operating loss phase now transitioning to profitable<br><br>
+                        <strong>Dettagli:</strong>
+                        • Crescita 50% (high growth SaaS normal range)<br>
+                        • 5 anni ago: Losing $20M/year (investment phase)<br>
+                        • Now: Breakeven to slight profit<br>
+                        • Recurring revenue: 95%+ (subscription)<br>
+                        • Unit economics: NRR 130% (expansion from existing customers)<br>
+                        • FCF: Now positive dopo years di burn<br><br>
+                        <strong>Progresso:</strong> Classico SaaS path: hypergrowth with losses → profitable at scale
+                    </div>
+                    <div class="assessment">
+                        🟢 GREEN (2/2 pts) - High quality growth now becoming profitable
+                        <br>Organica ✅ | Hypergrowth sustainable ✅ | Becoming profitable ✅
+                        <br><strong>Veredicto:</strong> Excellent trajectory. Profitless growth ending, now profitable. SaaS working.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CALCULATOR -->
+        <div id="calculator" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🧮 Calcolatore Interattivo Revenue Growth Quality Score</h2>
+
+                <div class="interactive-section">
+                    <div class="form-group">
+                        <label>1️⃣ Qual è il revenue growth rate (YoY)?</label>
+                        <select id="growthRate" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">15%+ crescita/anno</option>
+                            <option value="2">5-15% crescita/anno</option>
+                            <option value="1">0-5% crescita/anno</option>
+                            <option value="0">Negativo (decline)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2️⃣ Che % della crescita è organica?</label>
+                        <select id="organic" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">>80% organica</option>
+                            <option value="2">50-80% organica</option>
+                            <option value="0"><50% organica</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3️⃣ Operating Income crescita vs. Revenue crescita?</label>
+                        <select id="opinc" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">OpInc growth = Revenue growth</option>
+                            <option value="1">OpInc growth > 50% of Revenue growth</option>
+                            <option value="0">OpInc declining (revenue growing)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4️⃣ FCF crescita vs. Revenue crescita?</label>
+                        <select id="fcf" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">FCF growth ≈ Revenue growth</option>
+                            <option value="1">FCF growth più lento (CapEx phase)</option>
+                            <option value="0">FCF declining (cash drain)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>5️⃣ Momentum della crescita?</label>
+                        <select id="momentum" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Accelerando (15% → 18% → 20%)</option>
+                            <option value="1">Stabile/Consistente</option>
+                            <option value="0">Decelerazione visibile</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>6️⃣ Market share vs. competitors?</label>
+                        <select id="share" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Guadagnando share (più veloce dei competitor)</option>
+                            <option value="1">Holding share (in linea con industry)</option>
+                            <option value="0">Perdendo share (più lento)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>7️⃣ Qualità della revenue (ricorrente vs. volatile)?</label>
+                        <select id="quality" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Recurring revenue >70%, crescente</option>
+                            <option value="1">Mixed (50-70% recurring)</option>
+                            <option value="0">One-time/Lumpy <50% recurring</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" onclick="calculateScore()">📊 Calcola Score</button>
+
+                    <div id="resultBox" class="result-box" style="display: none;">
+                        <div class="result-score" id="scoreValue"></div>
+                        <div class="result-text" id="scoreAssessment"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📈 Guida Interpretazione Score</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🟢 12-14 punti: Eccellente</div>
+                        <div class="card-value">
+                            <strong>Revenue growth quality superiore</strong><br>
+                            ✅ Crescita organica, sostenibile<br>
+                            ✅ Profittevole, cash-backed<br>
+                            ✅ Market share gaining<br>
+                            ✅ Recurring revenue stabile<br><br>
+                            <strong>Significato:</strong> Vera crescita da moat, non artificiale.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 8-11 punti: Buono</div>
+                        <div class="card-value">
+                            <strong>Revenue growth quality accettabile</strong><br>
+                            ✅ Crescita presente, organica prevalente<br>
+                            ⚠️ Alcuni warning signs<br>
+                            ✅ Trend generalmente positivo<br><br>
+                            <strong>Significato:</strong> Good growth, watch for deterioration.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 5-7 punti: Accettabile</div>
+                        <div class="card-value">
+                            <strong>Revenue growth quality mediocre</strong><br>
+                            ⚠️ Crescita lenta o volatile<br>
+                            ⚠️ M&A-dependent o unsustainable<br>
+                            ⚠️ Margini pressured<br><br>
+                            <strong>Azione:</strong> Monitor closely per deterioramento
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 <5 punti: Povero</div>
+                        <div class="card-value">
+                            <strong>Revenue growth quality scadente</strong><br>
+                            ❌ Declino o growth profitless<br>
+                            ❌ M&A-only strategy<br>
+                            ❌ Losing market share<br><br>
+                            <strong>Azione:</strong> EVITARE investimento
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TAB NAVIGATION
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // CALCULATOR
+        function calculateScore() {
+            const growthRate = parseInt(document.getElementById('growthRate').value) || 0;
+            const organic = parseInt(document.getElementById('organic').value) || 0;
+            const opinc = parseInt(document.getElementById('opinc').value) || 0;
+            const fcf = parseInt(document.getElementById('fcf').value) || 0;
+            const momentum = parseInt(document.getElementById('momentum').value) || 0;
+            const share = parseInt(document.getElementById('share').value) || 0;
+            const quality = parseInt(document.getElementById('quality').value) || 0;
+
+            const totalScore = growthRate + organic + opinc + fcf + momentum + share + quality;
+            const resultBox = document.getElementById('resultBox');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreAssessment = document.getElementById('scoreAssessment');
+
+            if (totalScore > 0) {
+                resultBox.style.display = 'block';
+                scoreValue.textContent = `Punteggio: ${totalScore}/14`;
+
+                let assessment = '';
+                if (totalScore >= 12) {
+                    assessment = '🟢🟢 ECCELLENTE - Revenue Growth Quality Superiore<br>Crescita organica, profittevole, cash-backed. Vera business improvement, non artificiale. Sostenibile per anni.';
+                } else if (totalScore >= 8) {
+                    assessment = '🟡 BUONO - Revenue Growth Quality Accettabile<br>Crescita presente con trend generalmente positivo. Watch per warning signs, ma fondamentalmente sano.';
+                } else if (totalScore >= 5) {
+                    assessment = '🟡 ACCETTABILE - Revenue Growth Quality Mediocre<br>Crescita presente ma con problemi. Monitor strettamente. Risk di deterioramento.';
+                } else {
+                    assessment = '🔴 POVERO - Revenue Growth Quality Scadente<br>Declino, profitless growth, o M&A-dependent. EVITARE investimento.';
+                }
+
+                scoreAssessment.innerHTML = assessment;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROA Metric #4 - Dashboard Interattivo | Buffett Framework</title>
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-dark: #1d4ed8;
+            --color-success: #16a34a;
+            --color-warning: #ea580c;
+            --color-danger: #dc2626;
+            --color-light: #eff6ff;
+            --color-dark: #0c2340;
+            --color-border: #bfdbfe;
+            --color-text: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--color-light);
+            border-bottom: 2px solid var(--color-border);
+            overflow-x: auto;
+        }
+
+        .nav-tabs button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #0c2340;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tabs button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background: white;
+        }
+
+        .nav-tabs button:hover {
+            background: white;
+            color: var(--color-primary);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .formula-box {
+            background: #dbeafe;
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            color: var(--color-dark);
+        }
+
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .benchmark-table th {
+            background: var(--color-primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .benchmark-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .benchmark-table tr:hover {
+            background: var(--color-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+
+        .badge.green { background: #d1fae5; color: #065f46; }
+        .badge.yellow { background: #fef3c7; color: #92400e; }
+        .badge.red { background: #fee2e2; color: #7f1d1d; }
+
+        .card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card.highlight {
+            border-left: 4px solid var(--color-warning);
+            background: #fffbf0;
+        }
+
+        .card.highlight.danger {
+            border-left-color: var(--color-danger);
+            background: #fdf5f5;
+        }
+
+        .card.highlight.success {
+            border-left-color: var(--color-success);
+            background: #f0fdf4;
+        }
+
+        .card h3 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .card p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .calculator {
+            background: var(--color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        button.btn {
+            background: var(--color-primary);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button.btn:hover {
+            background: var(--color-primary-dark);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .result-box {
+            background: #dbeafe;
+            border: 2px solid var(--color-primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .question-box {
+            background: #dbeafe;
+            border-left: 4px solid var(--color-primary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+        }
+
+        .case-study {
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .case-study h3 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .case-study .case-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .case-study .case-badge.excellent { background: #d1fae5; color: #065f46; }
+        .case-study .case-badge.good { background: #bfef45; color: #3d6d1f; }
+        .case-study .case-badge.risk { background: #fee2e2; color: #7f1d1d; }
+
+        .progress-tracker {
+            background: var(--color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .progress-status {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin-right: 15px;
+            font-size: 0.85em;
+        }
+
+        .progress-status.done { background: var(--color-success); }
+        .progress-status.learning { background: var(--color-warning); }
+        .progress-status.todo { background: #cbd5e1; }
+
+        .footer {
+            background: var(--color-light);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--color-dark);
+            border-top: 1px solid var(--color-border);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8em; }
+            .nav-tabs { flex-wrap: wrap; }
+            .nav-tabs button { flex: 0 1 auto; padding: 12px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ ROA (Return on Assets)</h1>
+            <p>Metrica #4 - Framework Buffett | "Asset Efficiency & Operational Excellence"</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="active" onclick="switchTab('concept')">📖 Concetto</button>
+            <button onclick="switchTab('benchmark')">📈 Benchmark</button>
+            <button onclick="switchTab('redflags')">🚨 Red Flags</button>
+            <button onclick="switchTab('framework')">🔍 Framework</button>
+            <button onclick="switchTab('dupont')">🎯 DuPont</button>
+            <button onclick="switchTab('calculator')">🧮 Calcolatore</button>
+            <button onclick="switchTab('quality')">✨ Asset Quality</button>
+            <button onclick="switchTab('cases')">🎯 Casi Reali</button>
+            <button onclick="switchTab('questions')">❓ Domande</button>
+            <button onclick="switchTab('progress')">📋 Tracker</button>
+        </div>
+
+        <div class="content">
+
+            <!-- TAB 1: CONCETTO -->
+            <div id="concept" class="section active">
+                <h2>🎯 Definizione e Concetto</h2>
+                
+                <div class="formula-box">
+                    ROA % = (Net Income / Total Assets) × 100
+                </div>
+
+                <div class="card highlight success">
+                    <h3>Cosa misura?</h3>
+                    <p>Misura <strong>quanti euro di profitto genera ogni euro di asset</strong>. È il test definitivo di efficienza operativa, INDIPENDENTE dalla leva finanziaria (leverage).</p>
+                    <p style="margin-top: 10px;"><strong>Perché è cruciale:</strong> ROE può essere alto anche perché l'azienda è leveraged (più debito). ROA invece rivela la vera efficienza operativa.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>💡 ROA vs. ROE</h3>
+                        <p><strong>ROA</strong> = Profitto generato dagli asset (indipendente da come sono finanziati)</p>
+                        <p style="margin-top: 10px;"><strong>ROE</strong> = Profitto agli azionisti (include effetto del leverage)</p>
+                        <p style="margin-top: 10px;"><strong>Relazione:</strong> ROE = ROA × (Assets/Equity). Se l'azienda si indebita, ROE sale ma ROA rimane uguale.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🔑 Asset Efficiency Test</h3>
+                        <p>Un'azienda con ROA del 20% genera €20 di profitto per ogni €100 di asset. È eccellente.</p>
+                        <p style="margin-top: 10px;">Un'azienda con ROA del 2% genera solo €2 per ogni €100 di asset. È inefficiente, potrebbe avere asset "bloated".</p>
+                    </div>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>⚠️ Asset Bloat Red Flag</h3>
+                    <p>Se una compagnia ha €100M di Net Income ma €500M di asset totali, ROA = 20%.</p>
+                    <p style="margin-top: 10px;">Se ha invece €500M di asset ma solo €5M di NI, ROA = 1%. C'è bloat nei asset (forse inventario obsoleto, goodwill impaired, edifici inutilizzati).</p>
+                </div>
+            </div>
+
+            <!-- TAB 2: BENCHMARK -->
+            <div id="benchmark" class="section">
+                <h2>📈 Benchmark Buffett</h2>
+                
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>ROA %</th>
+                            <th>Valutazione</th>
+                            <th>Interpretazione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>≥ 15%</strong></td>
+                            <td><span class="badge green">🟢 ECCELLENTE</span></td>
+                            <td>Asset utilization straordinaria. Buffett target.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>10-15%</strong></td>
+                            <td><span class="badge green">🟢 MOLTO BUONO</span></td>
+                            <td>Asset-light business o operazioni efficienti.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5-10%</strong></td>
+                            <td><span class="badge yellow">🟡 ADEGUATO</span></td>
+                            <td>Standard industriale per asset-heavy businesses.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>< 5%</strong></td>
+                            <td><span class="badge red">🔴 DEBOLE</span></td>
+                            <td>Asset utilization scarsa. Bloat sospetto.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card">
+                    <h3>📊 ROA per Settore</h3>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Software (SaaS):</strong> 25-40% (minimal assets)</li>
+                        <li><strong>Finance/Insurance:</strong> 1-3% (huge asset base required)</li>
+                        <li><strong>Retail (Walmart):</strong> 6-8% (inventory-heavy)</li>
+                        <li><strong>Manufacturing:</strong> 5-8% (capital-intensive)</li>
+                        <li><strong>Real Estate (REIT):</strong> 2-4% (properties as assets)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAB 3: RED FLAGS -->
+            <div id="redflags" class="section">
+                <h2>🚨 Red Flags</h2>
+
+                <div class="card highlight danger">
+                    <h3>1. ROA Decrescente con Net Income Costante</h3>
+                    <p>Se NI rimane stabile ma ROA cala = asset stanno crescendo senza profitto corrispondente. <strong>RED FLAG:</strong> Asset bloat o acquisizione fallimentare.</p>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>2. Asset Base Crescente Senza Growth Profitti</h3>
+                    <p>Azienda investe in CapEx ma NON vede NI crescere proporzionalmente. CapEx non sta generando ROI atteso. TRAP.</p>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>3. Goodwill/Intangible Assets Elevati</h3>
+                    <p>Se il 40%+ dei Total Assets è Goodwill (acquisizioni), il vero ROA dei business operativi è molto più basso. Analizza i tangible assets separatamente.</p>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>4. ROA >> ROE (Leverage Basso)</h3>
+                    <p>Se ROA = 15% ma ROE = 16%, leverage è minimo. L'azienda NON sta usando il debito. O è conservatrice, o ha difficoltà a prenderlo.</p>
+                </div>
+            </div>
+
+            <!-- TAB 4: FRAMEWORK -->
+            <div id="framework" class="section">
+                <h2>🔍 Framework 5-Step</h2>
+                <div class="card">
+                    <h3>Step 1: Calcola ROA Base</h3>
+                    <p>ROA = NI / Total Assets. Semplice. Confronta con media 5/10 anni.</p>
+                </div>
+                <div class="card">
+                    <h3>Step 2: Analizza Trend di Asset vs. NI</h3>
+                    <p>Asset crescono del 10% ma NI scende del 5%? ROA sta crollando. Investigare cosa sta gonfiando gli asset.</p>
+                </div>
+                <div class="card">
+                    <h3>Step 3: Separa Tangible Assets</h3>
+                    <p>Calcola ROA su Tangible Assets (Total - Intangibles). Questo rivela la vera efficienza operativa.</p>
+                </div>
+                <div class="card">
+                    <h3>Step 4: Benchmarking Peer</h3>
+                    <p>Confronta ROA con competitor diretto. Differenza >5pp indica vantaggio competitivo operativo chiaro.</p>
+                </div>
+                <div class="card">
+                    <h3>Step 5: DuPont Analysis</h3>
+                    <p>Scomponi ROA = (NI/Sales) × (Sales/Assets). Identifica se il problema è margine o asset turnover.</p>
+                </div>
+            </div>
+
+            <!-- TAB 5: DUPONT -->
+            <div id="dupont" class="section">
+                <h2>🎯 DuPont Analysis (ROA Scomposizione)</h2>
+                
+                <div class="formula-box">
+                    ROA = Profit Margin × Asset Turnover
+                    <br><br>
+                    = (Net Income / Sales) × (Sales / Total Assets)
+                </div>
+
+                <div class="grid-2">
+                    <div class="card highlight success">
+                        <h3>Profit Margin (Redditività)</h3>
+                        <p>Quanto profitto rimane da ogni euro di vendita.</p>
+                        <p style="margin-top: 10px;"><strong>Alto Margin:</strong> Pricing power o costi bassi (Moat).</p>
+                        <p style="margin-top: 10px;"><strong>Basso Margin:</strong> Commodity business o inefficienza.</p>
+                    </div>
+                    <div class="card highlight success">
+                        <h3>Asset Turnover (Utilizzazione Asset)</h3>
+                        <p>Quanto revenue generi per ogni euro di asset.</p>
+                        <p style="margin-top: 10px;"><strong>Alto Turnover:</strong> Asset-light (SaaS, Retail ad alta rotazione).</p>
+                        <p style="margin-top: 10px;"><strong>Basso Turnover:</strong> Asset-heavy (Manufacturing, Banks).</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Esempio DuPont</h3>
+                    <p><strong>Company A:</strong> Margin 15%, Turnover 2.0x → ROA = 30%</p>
+                    <p style="margin-top: 5px;">Software business: Basso asset, alto margin, ottima efficienza.</p>
+                    
+                    <p style="margin-top: 10px;"><strong>Company B:</strong> Margin 2%, Turnover 5.0x → ROA = 10%</p>
+                    <p style="margin-top: 5px;">Retail business: Alto turnover asset, basso margin, ancora decente.</p>
+                    
+                    <p style="margin-top: 10px;"><strong>Company C:</strong> Margin 8%, Turnover 0.5x → ROA = 4%</p>
+                    <p style="margin-top: 5px;">Asset-heavy manufacturing: Inefficiente, asset bloccati.</p>
+                </div>
+            </div>
+
+            <!-- TAB 6: CALCOLATORE -->
+            <div id="calculator" class="section">
+                <h2>🧮 Calcolatore ROA</h2>
+                <div class="calculator">
+                    <h3>ROA Base Calculator</h3>
+                    <div class="form-group">
+                        <label>Net Income - €M:</label>
+                        <input type="number" id="ni" placeholder="es. 100" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Assets - €M:</label>
+                        <input type="number" id="assets" placeholder="es. 500" step="0.1">
+                    </div>
+                    <button class="btn" onclick="calculateROA()">Calcola ROA</button>
+
+                    <div id="result" class="result-box">
+                        <div class="result-row">
+                            <span>ROA %:</span>
+                            <span class="result-value" id="roaValue">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Valutazione:</span>
+                            <span class="result-value" id="rating">-</span>
+                        </div>
+                        <div id="analysis" style="margin-top: 10px; font-size: 0.9em; color: #333;"></div>
+                    </div>
+                </div>
+
+                <div class="calculator" style="margin-top: 30px;">
+                    <h3>DuPont Analysis</h3>
+                    <div class="form-group">
+                        <label>Net Income - €M:</label>
+                        <input type="number" id="ni2" placeholder="es. 100" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Sales/Revenue - €M:</label>
+                        <input type="number" id="sales" placeholder="es. 1000" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Assets - €M:</label>
+                        <input type="number" id="assets2" placeholder="es. 500" step="0.1">
+                    </div>
+                    <button class="btn" onclick="calculateDuPont()">Calcola DuPont</button>
+
+                    <div id="dupont-result" class="result-box">
+                        <div class="result-row">
+                            <span>Profit Margin:</span>
+                            <span class="result-value" id="margin">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>Asset Turnover:</span>
+                            <span class="result-value" id="turnover">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>ROA (Combined):</span>
+                            <span class="result-value" id="roa-combined">-</span>
+                        </div>
+                        <div id="dupont-analysis" style="margin-top: 10px; font-size: 0.9em; color: #333;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: ASSET QUALITY -->
+            <div id="quality" class="section">
+                <h2>✨ Asset Quality Test</h2>
+                <div class="grid-2">
+                    <div class="card highlight success">
+                        <h3>Segnali di Asset Quality Alta</h3>
+                        <ul style="margin-left: 20px;">
+                            <li>ROA >15% stabile</li>
+                            <li>Asset crescono lentamente</li>
+                            <li>Asset tangible %</li>
+                            <li>Inventory turns >6x/anno</li>
+                            <li>Receivables collected <30 giorni</li>
+                        </ul>
+                    </div>
+                    <div class="card highlight danger">
+                        <h3>Red Flags Asset Quality</h3>
+                        <ul style="margin-left: 20px;">
+                            <li>ROA <5% o decrescente</li>
+                            <li>Asset crescono velocemente</li>
+                            <li>Goodwill >40% dei tangible</li>
+                            <li>Inventory turns <2x/anno</li>
+                            <li>Receivables >60 giorni</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 8: CASI REALI -->
+            <div id="cases" class="section">
+                <h2>🎯 Casi Reali</h2>
+                
+                <div class="case-study">
+                    <h3>✅ Software Company (Microsoft) - Asset Light Efficiency</h3>
+                    <span class="case-badge excellent">ROA: ~35%</span>
+                    <p style="margin-top: 10px;">SaaS/cloud business model. Minimalissimi asset (data center è scalabile). Enorme profitto da pochi asset. ROA eccezionale perché il business è intrinsecamente efficient.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>✅ Retail (Walmart) - Asset-Heavy ma Efficient</h3>
+                    <span class="case-badge good">ROA: ~7-8%</span>
+                    <p style="margin-top: 10px;">Walmart ha enormi asset (store, inventario). Ma gestisce tutto così bene che ROA è comunque decente. Profit margin basso (2-3%) ma asset turnover alto (3-4x). DuPont = efficienza operativa pura.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>🔴 Banca Universale - Low ROA is Normal</h3>
+                    <span class="case-badge risk">ROA: ~1-1.5%</span>
+                    <p style="margin-top: 10px;">Banche per regolazione devono tenere enormi asset (depositi, riserve). NON è un red flag. È strutturale. Le banche sono valutate su ROE, non ROA, perché il leverage è necessario.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>⚠️ Retailer Struggente (Bloated Assets)</h3>
+                    <span class="case-badge risk">ROA: ~1-2%</span>
+                    <p style="margin-top: 10px;">A differenza di Walmart, questo retailer ha store meno produttivi e inventory obsoleto. ROA basso = asset non sono convertiti in profitto. RED FLAG.</p>
+                </div>
+            </div>
+
+            <!-- TAB 9: DOMANDE -->
+            <div id="questions" class="section">
+                <h2>❓ 7 Domande Critiche</h2>
+                <ol style="margin-left: 20px; line-height: 2.2;">
+                    <li><strong>ROA è stabile o decrescente negli ultimi 10 anni?</strong><br><span style="color: #666; font-size: 0.9em;">Declino = asset bloat o inefficienza operativa.</span></li>
+                    <li><strong>Come si compara al competitor principale?</strong><br><span style="color: #666; font-size: 0.9em;">Differenza >5pp = vantaggio operativo durevole.</span></li>
+                    <li><strong>Total Assets è cresciuto più velocemente di Net Income?</strong><br><span style="color: #666; font-size: 0.9em;">Sì = ROA declining = problema.</span></li>
+                    <li><strong>Qual è il % di Intangible Assets (Goodwill)?</strong><br><span style="color: #666; font-size: 0.9em;">>40% = ricalcola ROA su tangible assets soli.</span></li>
+                    <li><strong>Analizzando il DuPont, il problema è Margin o Turnover?</strong><br><span style="color: #666; font-size: 0.9em;">Determina se è redditività o utilizzazione asset.</span></li>
+                    <li><strong>Inventory days / Receivable days stanno peggiorando?</strong><br><span style="color: #666; font-size: 0.9em;">Sì = working capital deteriorating = cash trapped.</span></li>
+                    <li><strong>Se questa azienda vendesse il 50% degli asset, ROA migliorebbe?</strong><br><span style="color: #666; font-size: 0.9em;">Sì = asset bloat reale. Sono un peso.</span></li>
+                </ol>
+            </div>
+
+            <!-- TAB 10: TRACKER -->
+            <div id="progress" class="section">
+                <h2>📋 Study Tracker - ROA Mastery</h2>
+                <div class="progress-tracker">
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Definizione ROA & Formula</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Buffett Benchmarks (>15% eccellente)</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>4 Red Flags Asset Quality</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status learning">⚠</div>
+                        <div>
+                            <strong>5 Step Framework</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 Praticato</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status learning">⚠</div>
+                        <div>
+                            <strong>DuPont Analysis (Margin × Turnover)</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 In corso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status learning">⚠</div>
+                        <div>
+                            <strong>Calcolatori ROA & DuPont</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 Disponibile</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status learning">⚠</div>
+                        <div>
+                            <strong>4 Casi Reali (SaaS, Retail, Banche, Struggling)</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 Letto</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status todo">○</div>
+                        <div>
+                            <strong>7 Domande Critiche</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: ⬜ In corso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status todo">○</div>
+                        <div>
+                            <strong>Esercizio: Analizza ROA + DuPont per 3 compagnie diverse</strong><br>
+                            <span style="color: #666; font-size: 0.9em;">Status: ⬜ Da fare</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card highlight success" style="margin-top: 20px;">
+                    <h3>✅ ROA Mastery Checkpoint</h3>
+                    <p style="margin-top: 10px;"><strong>Sei 🟩 Praticato quando:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Calcoli ROA manualmente</li>
+                        <li>Identifichi asset bloat in 2 minuti</li>
+                        <li>Comprendi ROA vs. ROE (leverage effect)</li>
+                        <li>Analizzi DuPont (margin vs. turnover)</li>
+                        <li>Rispondi 7 domande critiche</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Sei ⭐ Masterizzato quando:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Insegni ROA/DuPont a colleghi</li>
+                        <li>Vedi business model da ROA% soltanto</li>
+                        <li>Distingui asset-light da asset-heavy</li>
+                        <li>Integri Gross Margin + ROA + FCF per quadro completo</li>
+                        <li>Identifichi quando leverage sta mascherando basso ROA</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p><strong>⚙️ ROA Dashboard Interattivo</strong> | Framework Buffett | Metrica #4 Tier 1</p>
+            <p style="margin-top: 10px; color: #666;">Hai completato: Metrica 1 (ROE) + Metrica 2 (FCF) + Metrica 3 (Gross Margin) + Metrica 4 (ROA) | Prossimo: Metrica 5 (CFO) | Tier 1 Business Quality (80%)</p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+            const buttons = document.querySelectorAll('.nav-tabs button');
+            buttons.forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function calculateROA() {
+            const ni = parseFloat(document.getElementById('ni').value);
+            const assets = parseFloat(document.getElementById('assets').value);
+
+            if (!ni || !assets) {
+                alert('Inserisci valori validi');
+                return;
+            }
+
+            const roa = (ni / assets) * 100;
+
+            document.getElementById('roaValue').textContent = roa.toFixed(2) + '%';
+            document.getElementById('result').classList.add('show');
+
+            let rating = '';
+            let analysis = '';
+            
+            if (roa >= 15) {
+                rating = '🟢 ECCELLENTE (≥15%)';
+                analysis = '✅ Asset efficiency straordinaria. Business ad altissima qualità. Buffett target.';
+            } else if (roa >= 10) {
+                rating = '🟢 MOLTO BUONO (10-15%)';
+                analysis = '✅ Asset-light or molto efficiente. Buona qualità operativa.';
+            } else if (roa >= 5) {
+                rating = '🟡 ADEGUATO (5-10%)';
+                analysis = '🟡 Standard per asset-heavy businesses. Dipende dal settore.';
+            } else {
+                rating = '🔴 DEBOLE (<5%)';
+                analysis = '🔴 Asset utilization scarsa. Possibile bloat. Investigare.';
+            }
+
+            document.getElementById('rating').textContent = rating;
+            document.getElementById('analysis').textContent = analysis;
+        }
+
+        function calculateDuPont() {
+            const ni = parseFloat(document.getElementById('ni2').value);
+            const sales = parseFloat(document.getElementById('sales').value);
+            const assets = parseFloat(document.getElementById('assets2').value);
+
+            if (!ni || !sales || !assets) {
+                alert('Inserisci valori validi');
+                return;
+            }
+
+            const margin = (ni / sales) * 100;
+            const turnover = sales / assets;
+            const roa = (margin / 100) * turnover * 100;
+
+            document.getElementById('margin').textContent = margin.toFixed(2) + '%';
+            document.getElementById('turnover').textContent = turnover.toFixed(2) + 'x';
+            document.getElementById('roa-combined').textContent = roa.toFixed(2) + '%';
+            document.getElementById('dupont-result').classList.add('show');
+
+            let analysis = '';
+            if (margin > 15 && turnover > 1.5) {
+                analysis = '✅ ECCELLENTE: Margin alto + Turnover veloce = ROA eccezionale (Software/Brand Premium).';
+            } else if (margin > 10 && turnover > 1) {
+                analysis = '🟢 BUONO: Combination equilibrata di redditività e efficienza asset.';
+            } else if (margin < 5 && turnover > 2) {
+                analysis = '🟡 RETAIL PATTERN: Margin basso (commoditizzato) ma alto turnover (efficiente).';
+            } else if (margin > 10 && turnover < 0.8) {
+                analysis = '🔴 ASSET-HEAVY PROBLEM: Margin buono ma turnover lento = asset bloccati.';
+            } else {
+                analysis = '🔴 PROBLEMATICO: Sia margin che turnover bassi. Scarsa efficienza complessiva.';
+            }
+
+            document.getElementById('dupont-analysis').textContent = analysis;
+        }
+    </script>
+</body>
+</html>

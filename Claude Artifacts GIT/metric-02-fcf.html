@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCF Metric #2 - Dashboard Interattivo | Buffett Framework</title>
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-success: #16a34a;
+            --color-warning: #ea580c;
+            --color-danger: #dc2626;
+            --color-light: #f1f5f9;
+            --color-dark: #0f172a;
+            --color-border: #e2e8f0;
+            --color-text: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+            color: var(--color-text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--color-light);
+            border-bottom: 2px solid var(--color-border);
+            overflow-x: auto;
+        }
+
+        .nav-tabs button {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #475569;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tabs button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background: white;
+        }
+
+        .nav-tabs button:hover {
+            background: white;
+            color: var(--color-primary);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .formula-box {
+            background: #f0f4ff;
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .benchmark-table th {
+            background: var(--color-primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .benchmark-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .benchmark-table tr:hover {
+            background: var(--color-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+
+        .badge.green { background: #d1fae5; color: #065f46; }
+        .badge.yellow { background: #fef3c7; color: #92400e; }
+        .badge.red { background: #fee2e2; color: #7f1d1d; }
+
+        .card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card.highlight {
+            border-left: 4px solid var(--color-warning);
+            background: #fffbf0;
+        }
+
+        .card.highlight.danger {
+            border-left-color: var(--color-danger);
+            background: #fdf5f5;
+        }
+
+        .card.highlight.success {
+            border-left-color: var(--color-success);
+            background: #f0fdf4;
+        }
+
+        .card h3 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .card p {
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .calculator {
+            background: var(--color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin: 15px 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        button.btn {
+            background: var(--color-primary);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button.btn:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .result-box {
+            background: #f0f4ff;
+            border: 2px solid var(--color-primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .red-flag {
+            background: #fdf5f5;
+            border-left: 4px solid var(--color-danger);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+
+        .red-flag strong {
+            color: var(--color-danger);
+        }
+
+        .case-study {
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .case-study h3 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .case-study .case-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .case-study .case-badge.excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .case-study .case-badge.caution {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .case-study .case-badge.risk {
+            background: #fee2e2;
+            color: #7f1d1d;
+        }
+
+        .question-box {
+            background: #e0e7ff;
+            border-left: 4px solid var(--color-primary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+        }
+
+        .question-box strong {
+            color: var(--color-primary);
+        }
+
+        .progress-tracker {
+            background: var(--color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .progress-status {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            margin-right: 15px;
+            font-size: 0.85em;
+        }
+
+        .progress-status.done { background: var(--color-success); }
+        .progress-status.learning { background: var(--color-warning); }
+        .progress-status.todo { background: #cbd5e1; }
+
+        .footer {
+            background: var(--color-light);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #64748b;
+            border-top: 1px solid var(--color-border);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8em; }
+            .nav-tabs { flex-wrap: wrap; }
+            .nav-tabs button { flex: 0 1 auto; padding: 12px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 FCF (Free Cash Flow)</h1>
+            <p>Metrica #2 - Framework Buffett | "La Verità sul Profitto Reale"</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="active" onclick="switchTab('concept')">📖 Concetto</button>
+            <button onclick="switchTab('benchmark')">📈 Benchmark</button>
+            <button onclick="switchTab('redflags')">🚨 Red Flags</button>
+            <button onclick="switchTab('framework')">🔍 Framework 6-Step</button>
+            <button onclick="switchTab('components')">⚙️ Componenti</button>
+            <button onclick="switchTab('calculator')">🧮 Calcolatore</button>
+            <button onclick="switchTab('quality')">✨ Quality Test</button>
+            <button onclick="switchTab('cases')">🎯 Casi Reali</button>
+            <button onclick="switchTab('questions')">❓ Domande</button>
+            <button onclick="switchTab('progress')">📋 Tracker</button>
+        </div>
+
+        <div class="content">
+
+            <!-- TAB 1: CONCETTO -->
+            <div id="concept" class="section active">
+                <h2>🎯 Definizione e Concetto</h2>
+                
+                <div class="formula-box">
+                    FCF = Operating Cash Flow (OCF) - Capital Expenditures (CapEx)
+                </div>
+
+                <div class="card highlight success">
+                    <h3>Cosa misura?</h3>
+                    <p>FCF misura <strong>il denaro reale disponibile per distribuire agli azionisti senza danneggiare il business</strong>.</p>
+                    <p style="margin-top: 10px;"><strong>Non è il profitto contabile</strong> — è denaro vero, verificabile in banca.</p>
+                    <p style="margin-top: 10px;"><strong>Buffett dice:</strong> "FCF è la metrica che conta davvero. Non puoi ingannare il denaro."</p>
+                </div>
+
+                <div class="card">
+                    <h3>💡 L'Analogia del Contadino (Buffett)</h3>
+                    <p><em>"Immagina un contadino che raccoglie il grano (ricavi) e paga manodopera, fertilizzante, carburante (costi operativi). Quanto denaro rimane per distribuire o reinvestire? QUELLO è il Free Cash Flow."</em></p>
+                    <p style="margin-top: 10px;"><strong>Un'azienda potrebbe mostrare $100M di utile ma solo $40M di FCF.</strong> Qual è il vero "profitto"? Il FCF di $40M.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card highlight danger">
+                        <h3>⚠️ FCF vs. Net Income</h3>
+                        <p><strong>Net Income (Contabile):</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>Può essere manipolato</li>
+                            <li>Contiene accruals (non-cash)</li>
+                            <li>Usa assunzioni contabili</li>
+                            <li>Esempio: $100M NI potrebbe essere solo $60M in cassa reale</li>
+                        </ul>
+                    </div>
+                    <div class="card highlight success">
+                        <h3>✅ FCF (Reale)</h3>
+                        <p><strong>Free Cash Flow (Cassa):</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>Non può essere finto</li>
+                            <li>È denaro vero in banca</li>
+                            <li>Verificabile oggettivamente</li>
+                            <li>Esempio: $60M FCF = denaro reale disponibile</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <strong>🔑 Key Insight:</strong><br>
+                    "Una società potrebbe avere utili incredibili sulla carta ma FCF negativo se la cassa è bloccata in inventario/receivables o se rinveste troppo. FCF rivela il vero status di salute."
+                </div>
+            </div>
+
+            <!-- TAB 2: BENCHMARK -->
+            <div id="benchmark" class="section">
+                <h2>📈 Benchmark Buffett per FCF</h2>
+                
+                <p style="margin-bottom: 15px;"><strong>Standard assoluti di qualità:</strong></p>
+                
+                <table class="benchmark-table">
+                    <thead>
+                        <tr>
+                            <th>Metrica FCF</th>
+                            <th>Benchmark Eccellente</th>
+                            <th>Adeguato</th>
+                            <th>Red Flag</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>FCF Margin (FCF/Revenue)</strong></td>
+                            <td><span class="badge green">🟢 >15%</span></td>
+                            <td><span class="badge yellow">🟡 10-15%</span></td>
+                            <td><span class="badge red">🔴 <5%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>FCF Trend</strong></td>
+                            <td><span class="badge green">🟢 Growing 10+ years</span></td>
+                            <td><span class="badge yellow">🟡 Stable/flat</span></td>
+                            <td><span class="badge red">🔴 Declining or negative</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>FCF Yield (FCF/Market Cap)</strong></td>
+                            <td><span class="badge green">🟢 >5%</span></td>
+                            <td><span class="badge yellow">🟡 3-5%</span></td>
+                            <td><span class="badge red">🔴 <3%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>NI/OCF Ratio</strong></td>
+                            <td><span class="badge green">🟢 0.8-1.0</span></td>
+                            <td><span class="badge yellow">🟡 0.6-1.2</span></td>
+                            <td><span class="badge red">🔴 >1.2 persistent</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>CapEx/Revenue</strong></td>
+                            <td><span class="badge green">🟢 <10%</span></td>
+                            <td><span class="badge yellow">🟡 10-20%</span></td>
+                            <td><span class="badge red">🔴 >20% or deferred</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>FCF Positive Years</strong></td>
+                            <td><span class="badge green">🟢 Every year</span></td>
+                            <td><span class="badge yellow">🟡 Most years</span></td>
+                            <td><span class="badge red">🔴 Negative 2+ consecutive</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3>💎 Buffett's FCF Principle</h3>
+                    <p><strong>"I want to buy businesses that generate high FCF with minimal reinvestment. If a company makes $100M FCF and only needs to reinvest $30M to maintain growth, that's $70M in true economic profit."</strong></p>
+                    <p style="margin-top: 10px;">Questo è il fondamento per identificare aziende "cash cow" che crescono gratuitamente.</p>
+                </div>
+            </div>
+
+            <!-- TAB 3: RED FLAGS -->
+            <div id="redflags" class="section">
+                <h2>🚨 Red Flags & Manipolazione</h2>
+
+                <div class="red-flag">
+                    <strong>🚨 Red Flag #1: Negative o Declining FCF Despite Growing Earnings</strong>
+                    <p style="margin-top: 10px;">Azienda riporta profitti crescenti MA FCF negativo o in calo. Segno di problemi working capital o CapEx eccessivo.</p>
+                    <p style="margin-top: 5px;"><strong>Segnale:</strong> NI +20% ma FCF -10% = PROBLEMA SERIO</p>
+                    <p style="margin-top: 5px;"><strong>Cause Comuni:</strong> Receivables non incassati, inventory accumulating, CapEx deferred maintenance nascosto</p>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 Red Flag #2: NI >> OCF Divergenza (Earnings Quality Issue)</strong>
+                    <p style="margin-top: 10px;">Se Net Income SUPERA significativamente OCF (>120% divergence) = earnings NON backed by cash.</p>
+                    <p style="margin-top: 5px;"><strong>Segnale:</strong> NI $100M ma OCF $60M (ratio 1.67) = ACCRUALS PROBLEM</p>
+                    <p style="margin-top: 5px;"><strong>Rischio:</strong> Possibile manipolazione contabile, working capital trap, unsustainable earnings</p>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 Red Flag #3: High CapEx Masking Low Underlying Profitability</strong>
+                    <p style="margin-top: 10px;">Azienda riporta FCF decente ma su CapEx artificialmente basso (deferred maintenance).</p>
+                    <p style="margin-top: 5px;"><strong>Segnale:</strong> CapEx declining while assets aging OR CapEx spike next year crater FCF</p>
+                    <p style="margin-top: 5px;"><strong>Esempio:</strong> Retailer defers store maintenance, FCF artificially high this year, maintenance backlog explodes next year</p>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 Red Flag #4: One-Time Cash Events Inflating FCF</strong>
+                    <p style="margin-top: 10px;">Asset sales, tax deferrals, working capital squeezes creano temporary FCF spikes non sustainable.</p>
+                    <p style="margin-top: 5px;"><strong>Segnale:</strong> FCF $100M this year but from asset sale, recurring operations only $40M</p>
+                    <p style="margin-top: 5px;"><strong>Test:</strong> 3-year average FCF vs. latest year. Significativa divergence = RED FLAG</p>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>⚠️ FCF Red Flag Checklist</h3>
+                    <div style="margin-left: 20px;">
+                        <input type="checkbox"> FCF positivo ogni anno? (no = PROBLEMA)
+                        <br><input type="checkbox"> FCF cresce con revenue? (no = quality issue)
+                        <br><input type="checkbox"> NI/OCF tra 0.8-1.0? (>1.2 = red flag)
+                        <br><input type="checkbox"> CapEx sostenibile? (deferred maintenance = TRAP)
+                        <br><input type="checkbox"> FCF margin >5%? (no = inefficient)
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: FRAMEWORK 6-STEP -->
+            <div id="framework" class="section">
+                <h2>🔍 Framework di Analisi: 6 Step</h2>
+
+                <div class="card">
+                    <h3>Step 1️⃣: Calcola FCF Margin (FCF/Revenue %)</h3>
+                    <p><strong>Azione:</strong> Scopri quale % di ricavi si converte in denaro reale.</p>
+                    <p style="margin-top: 10px;"><strong>Benchmark:</strong> 10-15%+ per business di qualità</p>
+                    <p style="margin-top: 5px;">Esempio: Revenue $1B, FCF $150M = 15% margin ✅</p>
+                    <div class="question-box" style="margin-top: 10px;">
+                        <strong>Domanda Critica:</strong> "Quanta parte dei ricavi diventa denaro disponibile per azionisti?"
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Step 2️⃣: Verify NI vs. OCF (Earnings Quality Check)</h3>
+                    <p><strong>Azione:</strong> Confronta Net Income a Operating Cash Flow.</p>
+                    <p style="margin-top: 10px;"><strong>Test di Qualità:</strong> NI dovrebbe essere 80-100% di OCF</p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>✅ 80-100% = Earnings conservativi, backed by cash</li>
+                        <li>🟡 100-120% = Some accruals, normale ma watch</li>
+                        <li>🔴 >120% = Substantial accruals, PROBLEMATICO</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Step 3️⃣: Compare FCF to Net Income (Quality Indicator)</h3>
+                    <p><strong>Azione:</strong> Calcola FCF/NI ratio.</p>
+                    <p style="margin-top: 10px;"><strong>Interpretazione:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>✅ FCF >= NI = Conservative accounting (highest quality)</li>
+                        <li>✅ FCF = 80-100% NI = Normal CapEx, healthy</li>
+                        <li>🟡 FCF = 60-80% NI = High CapEx, growth phase</li>
+                        <li>🔴 FCF < 60% NI = Capital intensive, maybe deferred maintenance</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Step 4️⃣: Assess CapEx (Maintenance vs. Growth Split)</h3>
+                    <p><strong>Azione:</strong> Distinguish tra maintenance e growth capital spending.</p>
+                    <p style="margin-top: 10px;"><strong>Proxy:</strong> Maintenance CapEx ≈ Depreciation & Amortization</p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>Total CapEx = Maintenance + Growth CapEx</li>
+                        <li>Growth CapEx reveals reinvestment requirements</li>
+                        <li>High growth CapEx = Future FCF depends on ROI</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Step 5️⃣: Analyze FCF Growth vs. Earnings Growth</h3>
+                    <p><strong>Azione:</strong> Confronta growth rate FCF a growth rate earnings.</p>
+                    <p style="margin-top: 10px;"><strong>Preferred:</strong> FCF growth ≈ Earnings growth (authentic quality)</p>
+                    <p style="margin-top: 5px;"><strong>Red Flag:</strong> Earnings +20% but FCF -5% = manipolazione or CapEx intensity issue</p>
+                </div>
+
+                <div class="card">
+                    <h3>Step 6️⃣: Assess FCF Sustainability (Long-Term Viability)</h3>
+                    <p><strong>Azione:</strong> Valuta se FCF è sostenibile o temporary.</p>
+                    <p style="margin-top: 10px;"><strong>Sustainable Sources:</strong> Moat (pricing power), low CapEx needs, recurring revenue</p>
+                    <p style="margin-top: 5px;"><strong>Unsustainable Sources:</strong> R&D cuts, deferred maintenance, one-time items, stretched receivables</p>
+                    <div class="question-box" style="margin-top: 10px;">
+                        <strong>Buffett's Test:</strong> "Se dovessi scalare questo business 50%, quanto CapEx servirebbe?"
+                        <br>Answer = Asset-light (basso CapEx) = BUONO; Asset-heavy (alto CapEx) = RISCHIOSO
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: COMPONENTI -->
+            <div id="components" class="section">
+                <h2>⚙️ Componenti: OCF e CapEx</h2>
+
+                <div class="grid-2">
+                    <div class="card highlight success">
+                        <h3>Operating Cash Flow (OCF)</h3>
+                        <p><strong>Cosa è:</strong> Denaro generato dalle operazioni quotidiane PRIMA di reinvestimento.</p>
+                        <p style="margin-top: 10px;"><strong>Come Calcolato:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>Net Income</li>
+                            <li>+ Depreciation & Amortization (non-cash)</li>
+                            <li>± Changes in Working Capital</li>
+                            <li>= OCF</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Significa:</strong> Profitto "vero" after accounting adjustments ma before capex</p>
+                    </div>
+                    <div class="card highlight success">
+                        <h3>Capital Expenditures (CapEx)</h3>
+                        <p><strong>Cosa è:</strong> Denaro speso per mantenere e espandere asset.</p>
+                        <p style="margin-top: 10px;"><strong>Categorie:</strong></p>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li><strong>Maintenance CapEx:</strong> Tenere business at current level</li>
+                            <li><strong>Growth CapEx:</strong> Espandere operazioni, acquisire asset</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Trade-off:</strong> CapEx basso = FCF alto NOW ma rischio futuro di obsolescence</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 La Relazione Fondamentale</h3>
+                    <div style="background: #f1f5f9; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                        <p style="margin: 5px 0;"><strong>FCF POSITIVO (Healthy)</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>OCF > CapEx = Business generat cash after reinvestment</li>
+                            <li>Can distribute to shareholders OR reinvest in growth</li>
+                            <li>Example: OCF $100M, CapEx $30M, FCF $70M available</li>
+                        </ul>
+
+                        <p style="margin-top: 15px; margin-bottom: 5px;"><strong>FCF NEGATIVE (Problem)</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>CapEx > OCF = Business burning cash despite profits</li>
+                            <li>Must fund from debt/equity = unsustainable</li>
+                            <li>Example: OCF $50M, CapEx $80M, FCF -$30M (problem!)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <strong>⚠️ Critical Insight:</strong><br>
+                    "High-quality businesses have OCF > CapEx by large margin. Poor businesses struggle to generate OCF OR have bloated CapEx needs."
+                </div>
+            </div>
+
+            <!-- TAB 6: CALCOLATORE -->
+            <div id="calculator" class="section">
+                <h2>🧮 Calcolatore FCF Interattivo</h2>
+
+                <div class="calculator">
+                    <h3>Calcola FCF Base</h3>
+                    
+                    <div class="form-group">
+                        <label>Operating Cash Flow (OCF) - €M:</label>
+                        <input type="number" id="ocf" placeholder="es. 100" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Capital Expenditures (CapEx) - €M:</label>
+                        <input type="number" id="capex" placeholder="es. 20" step="0.1">
+                    </div>
+
+                    <button class="btn" onclick="calculateFCF()">Calcola FCF</button>
+
+                    <div id="fcfResult" class="result-box">
+                        <div class="result-row">
+                            <span>Free Cash Flow (FCF):</span>
+                            <span class="result-value" id="fcfValue">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>FCF Valutazione:</span>
+                            <span class="result-value" id="fcfRating">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>CapEx % di OCF:</span>
+                            <span class="result-value" id="capexRatio">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculator" style="margin-top: 30px;">
+                    <h3>FCF Metrics Completi</h3>
+                    
+                    <div class="form-group">
+                        <label>Free Cash Flow (FCF) - €M:</label>
+                        <input type="number" id="fcf_metric" placeholder="es. 80" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Revenue (Ricavi) - €M:</label>
+                        <input type="number" id="revenue_fcf" placeholder="es. 1000" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Market Capitalization - €M:</label>
+                        <input type="number" id="marketcap" placeholder="es. 1500" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Net Income - €M:</label>
+                        <input type="number" id="ni_fcf" placeholder="es. 100" step="0.1">
+                    </div>
+
+                    <button class="btn" onclick="calculateFCFMetrics()">Calcola Metriche</button>
+
+                    <div id="metricsResult" class="result-box">
+                        <div class="result-row">
+                            <span>FCF Margin (FCF/Revenue):</span>
+                            <span class="result-value" id="fcfMargin">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>FCF Yield (FCF/Market Cap):</span>
+                            <span class="result-value" id="fcfYield">-</span>
+                        </div>
+                        <div class="result-row">
+                            <span>FCF/NI Ratio:</span>
+                            <span class="result-value" id="fcfNiRatio">-</span>
+                        </div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                            <div id="fcfAnalysis" style="font-size: 0.9em;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: QUALITY TEST -->
+            <div id="quality" class="section">
+                <h2>✨ FCF Quality Assessment Test</h2>
+
+                <div class="card highlight success">
+                    <h3>🟢 Signs of High-Quality FCF</h3>
+                    <ul style="margin-left: 20px;">
+                        <li>✅ FCF positive every year (not just some years)</li>
+                        <li>✅ FCF growing consistently (not volatile)</li>
+                        <li>✅ FCF margin stable or improving (>10%)</li>
+                        <li>✅ NI backed by cash (NI/OCF 0.8-1.0)</li>
+                        <li>✅ CapEx low relative to OCF (<10% revenue)</li>
+                        <li>✅ Can predict future FCF with confidence</li>
+                        <li>✅ Moat evident (pricing power, low reinvestment needs)</li>
+                    </ul>
+                </div>
+
+                <div class="card highlight danger">
+                    <h3>🔴 Signs of Low-Quality FCF</h3>
+                    <ul style="margin-left: 20px;">
+                        <li>❌ FCF negative or declining multiple years</li>
+                        <li>❌ FCF volatile (unpredictable)</li>
+                        <li>❌ FCF margin low or declining (<5%)</li>
+                        <li>❌ NI >> OCF (earnings not backed by cash)</li>
+                        <li>❌ CapEx bloated or deferred (hidden problems)</li>
+                        <li>❌ Can't predict future FCF reliably</li>
+                        <li>❌ One-time items inflating FCF</li>
+                    </ul>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3>📝 Quality Checklist: Apple vs. Struggling Retailer</h3>
+                    
+                    <div style="background: #f1f5f9; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                        <p style="margin: 10px 0;"><strong>Apple (HIGH QUALITY):</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>✅ FCF: $110B (positive, huge)</li>
+                            <li>✅ Trend: Growing 5+ years</li>
+                            <li>✅ FCF Margin: 29% (exceptional)</li>
+                            <li>✅ FCF/NI: 110% (cash exceeds earnings)</li>
+                            <li>✅ Moat: Brand + ecosystem (durable)</li>
+                        </ul>
+
+                        <p style="margin-top: 15px; margin-bottom: 10px;"><strong>Struggling Retailer (LOW QUALITY):</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>❌ FCF: Negative (burning cash)</li>
+                            <li>❌ Trend: Declining 3+ years</li>
+                            <li>❌ FCF Margin: -2% (negative)</li>
+                            <li>❌ NI/OCF: 1.5 (working capital building)</li>
+                            <li>❌ Moat: None (commoditized, declining)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 8: CASI REALI -->
+            <div id="cases" class="section">
+                <h2>🎯 Casi Reali: FCF Quality</h2>
+
+                <div class="case-study">
+                    <h3>✅ Case 1: Apple - Exceptional FCF Quality</h3>
+                    <span class="case-badge excellent">🟢 GREEN - FORTRESS CASH</span>
+                    
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <div style="margin: 5px 0;"><strong>OCF:</strong> $122B (huge cash generation)</div>
+                        <div style="margin: 5px 0;"><strong>CapEx:</strong> $12B (only 10% of OCF)</div>
+                        <div style="margin: 5px 0;"><strong>FCF:</strong> $110B (exceptional)</div>
+                        <div style="margin: 5px 0;"><strong>FCF Margin:</strong> 29% (outstanding)</div>
+                        <div style="margin: 5px 0;"><strong>FCF/NI:</strong> 110% (cash exceeds earnings)</div>
+                        <div style="margin: 5px 0;"><strong>Trend:</strong> Growing consistently</div>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>What It Means:</strong></p>
+                    <p>🟢 Apple generates massive real cash with minimal reinvestment. Moat so strong it needs little CapEx to maintain growth. This is the gold standard of FCF quality.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>🟡 Case 2: Amazon - Negative FCF (Growth Phase, Acceptable)</h3>
+                    <span class="case-badge caution">🟡 YELLOW - GROWTH INVESTMENT</span>
+                    
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <div style="margin: 5px 0;"><strong>OCF:</strong> $50B</div>
+                        <div style="margin: 5px 0;"><strong>CapEx:</strong> $60B (data centers, logistics)</div>
+                        <div style="margin: 5px 0;"><strong>FCF:</strong> -$10B (NEGATIVE)</div>
+                        <div style="margin: 5px 0;"><strong>Context:</strong> Heavy infrastructure investment phase</div>
+                        <div style="margin: 5px 0;"><strong>Question:</strong> Will $60B CapEx convert to future FCF?</div>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>Assessment:</strong></p>
+                    <p>🟡 Negative FCF is NOT automatically bad. Amazon invests heavily for future scale. KEY TEST: Does it convert to positive FCF in 3-5 years? If yes, justified. If no, problem.</p>
+                    <p style="margin-top: 10px;"><strong>Action:</strong> Monitor quarterly. If CapEx peaks and FCF turns positive = strategy working. If CapEx remains high and FCF stays negative = RED FLAG.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>❌ Case 3: Struggling Retailer - FCF Collapse</h3>
+                    <span class="case-badge risk">🔴 RED - CASH BURN</span>
+                    
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <div style="margin: 5px 0;"><strong>OCF:</strong> $30M (declining)</div>
+                        <div style="margin: 5px 0;"><strong>CapEx:</strong> $50M (deferred → suddenly spike)</div>
+                        <div style="margin: 5px 0;"><strong>FCF:</strong> -$20M (NEGATIVE)</div>
+                        <div style="margin: 5px 0;"><strong>Trend:</strong> FCF worsening 3+ years</div>
+                        <div style="margin: 5px 0;"><strong>NI/OCF:</strong> 1.3 (working capital issue)</div>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>Red Flag Assessment:</strong></p>
+                    <p>🔴 Unlike Amazon (growth investment with evident ROI potential), this retailer's negative FCF is from operational deterioration. OCF declining, CapEx deferred (aging stores), no clear path to positive FCF.</p>
+                    <p style="margin-top: 10px;"><strong>Risk:</strong> Will need debt or equity raise to fund operations. Equity destruction likely.</p>
+                </div>
+
+                <div class="case-study">
+                    <h3>✅ Case 4: Software Company - High-Quality Recurring FCF</h3>
+                    <span class="case-badge excellent">🟢 GREEN - SUSTAINABLE</span>
+                    
+                    <div style="margin-top: 15px; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <div style="margin: 5px 0;"><strong>OCF:</strong> $150M (strong)</div>
+                        <div style="margin: 5px 0;"><strong>CapEx:</strong> $30M (20% of OCF)</div>
+                        <div style="margin: 5px 0;"><strong>FCF:</strong> $120M (excellent)</div>
+                        <div style="margin: 5px 0;"><strong>FCF Margin:</strong> 24% (very high)</div>
+                        <div style="margin: 5px 0;"><strong>Business Model:</strong> SaaS recurring revenue</div>
+                        <div style="margin: 5px 0;"><strong>Trend:</strong> FCF growing 10+ years</div>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>Why HIGH QUALITY:</strong></p>
+                    <p>🟢 SaaS business model = recurring revenue = predictable FCF. Low CapEx needs (cloud infrastructure leverage). FCF growing consistently. This is the kind of FCF Buffett loves: predictable, growing, backed by moat (customer switching costs).</p>
+                </div>
+            </div>
+
+            <!-- TAB 9: DOMANDE -->
+            <div id="questions" class="section">
+                <h2>❓ 7 Domande Critiche per FCF</h2>
+
+                <div class="card">
+                    <h3>1. FCF è positivo ogni anno o volatile?</h3>
+                    <p style="color: #666;"><em>Perché: Positivo ogni anno = business model sano; volatile = ciclico o problematico</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>2. FCF cresce con revenue o in lag?</h3>
+                    <p style="color: #666;"><em>Perché: Parallel growth = quality; lagging = working capital or CapEx intensity</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>3. NI è backed da cash (NI/OCF 0.8-1.0)?</h3>
+                    <p style="color: #666;"><em>Perché: NI puede be manipulated; OCF è reale. Divergenza = red flag</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>4. FCF Margin è sano (>5-10%)?</h3>
+                    <p style="color: #666;"><em>Perché: Rivela cash conversion efficiency. Basso margin = capital intensive o inefficiente</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>5. CapEx è maintenance o growth deferred?</h3>
+                    <p style="color: #666;"><em>Perché: Deferred maintenance = future FCF risk. Growth CapEx = test ROI next 3-5 years</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>6. FCF Yield è attraente (>3-5%)?</h3>
+                    <p style="color: #666;"><em>Perché: Alta yield = valutazione cheap. Bassa yield = overpriced unless growth high</em></p>
+                </div>
+
+                <div class="card">
+                    <h3>7. Se dovessi scalare business 50%, quanto CapEx servirebbe?</h3>
+                    <p style="color: #666;"><em>Perché: Asset-light (basso CapEx) = moat forte. Asset-heavy (alto CapEx) = rischio</em></p>
+                </div>
+
+                <div class="question-box" style="margin-top: 20px;">
+                    <strong>💡 Meta-Question:</strong><br>
+                    "Preferisci un'azienda con NI $100M e FCF $50M, o NI $80M e FCF $90M?" <br>
+                    <span style="color: #666; font-size: 0.9em; margin-top: 10px; display: block;">Risposta: La seconda. FCF è il vero profitto. La prima ha problemi working capital nascosti.</span>
+                </div>
+            </div>
+
+            <!-- TAB 10: PROGRESS -->
+            <div id="progress" class="section">
+                <h2>📋 Study Tracker - FCF Mastery</h2>
+
+                <div class="progress-tracker">
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Definizione FCF</strong> - Formula, significato, Buffett wisdom<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>FCF Benchmarks</strong> - Margin, Yield, Quality thresholds<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>4 Red Flags Principali</strong> - Negative FCF, NI divergence, CapEx issues, one-time items<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Appreso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>6 Step di Analisi</strong> - Framework completo FCF<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Praticato</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>OCF vs CapEx Components</strong> - La relazione fondamentale<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Praticato</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Calcolatore FCF Interactive</strong> - Tool per calcoli<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟩 Disponibile</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>Quality Assessment Test</strong> - High vs. Low quality signals<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 Letto</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status done">✓</div>
+                        <div>
+                            <strong>4 Casi Reali</strong> - Apple, Amazon, Retailer, Software<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 Letto</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status learning">⚠</div>
+                        <div>
+                            <strong>7 Domande Critiche</strong> - Verifica comprensione<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: 🟨 In corso</span>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-status todo">○</div>
+                        <div>
+                            <strong>Esercizio Full</strong> - Analizzare vera company FCF<br>
+                            <span style="color: #666; font-size: 0.9em;">Status: ⬜ Da fare</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3>🎯 Prossimi Step Consigliati</h3>
+                    <ol style="margin-left: 20px;">
+                        <li style="margin: 10px 0;">Completa 7 domande (rispondi con parole tue)</li>
+                        <li style="margin: 10px 0;">Usa calcolatore su 3-5 aziende reali</li>
+                        <li style="margin: 10px 0;">Integra ROE + FCF (Metrica 1 + 2) per comprensione holistica</li>
+                        <li style="margin: 10px 0;">Passa a <strong>Metrica 3: Gross Margin</strong> - "Pricing Power & Moat"</li>
+                        <li style="margin: 10px 0;">Completa Tier 1 (Business Quality 10 metriche)</li>
+                    </ol>
+                </div>
+
+                <div class="card highlight success" style="margin-top: 20px;">
+                    <h3>✅ FCF Mastery Checkpoint</h3>
+                    <p><strong>Sei 🟩 Praticato quando:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Calcoli FCF manualmente da OCF e CapEx</li>
+                        <li>Identifichi red flags in 3 minuti</li>
+                        <li>Comprendi differenza NI vs. FCF vs. OCF</li>
+                        <li>Assessed CapEx maintenance vs. growth</li>
+                        <li>Puoi rispondere 7 domande critiche</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Sei ⭐ Masterizzato quando:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Insegni FCF analysis a colleghi</li>
+                        <li>Analizzi company in 10 minuti</li>
+                        <li>Distingui sustainable da temporary FCF</li>
+                        <li>Integri ROE + FCF + altre metriche Tier 1</li>
+                        <li>Predici future FCF con confidenza</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p><strong>💰 FCF Dashboard Interattivo</strong> | Framework Buffett | Metrica #2 Tier 1</p>
+            <p style="margin-top: 10px; color: #999;">Dashboard completa per studio di Free Cash Flow</p>
+            <p style="margin-top: 10px; color: #999;">Hai completato: Metrica 1 (ROE) + Metrica 2 (FCF) | Prossimo: Metrica 3 (Gross Margin) | Tier 1 Business Quality (40%)</p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+            const buttons = document.querySelectorAll('.nav-tabs button');
+            buttons.forEach(b => b.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function calculateFCF() {
+            const ocf = parseFloat(document.getElementById('ocf').value);
+            const capex = parseFloat(document.getElementById('capex').value);
+
+            if (!ocf || !capex) {
+                alert('Inserisci valori validi');
+                return;
+            }
+
+            const fcf = ocf - capex;
+            const capexRatio = (capex / ocf * 100).toFixed(2);
+            let rating = '';
+
+            if (fcf > ocf * 0.5) {
+                rating = '🟢 ECCELLENTE (FCF > 50% OCF)';
+            } else if (fcf > ocf * 0.3) {
+                rating = '🟢 BUONO (FCF 30-50% OCF)';
+            } else if (fcf > 0) {
+                rating = '🟡 ADEGUATO (FCF > 0)';
+            } else {
+                rating = '🔴 RED FLAG (FCF < 0)';
+            }
+
+            document.getElementById('fcfValue').textContent = fcf.toFixed(2) + ' €M';
+            document.getElementById('fcfRating').textContent = rating;
+            document.getElementById('capexRatio').textContent = capexRatio + '%';
+            document.getElementById('fcfResult').classList.add('show');
+        }
+
+        function calculateFCFMetrics() {
+            const fcf = parseFloat(document.getElementById('fcf_metric').value);
+            const revenue = parseFloat(document.getElementById('revenue_fcf').value);
+            const marketcap = parseFloat(document.getElementById('marketcap').value);
+            const ni = parseFloat(document.getElementById('ni_fcf').value);
+
+            if (!fcf || !revenue || !marketcap || !ni) {
+                alert('Inserisci tutti i valori');
+                return;
+            }
+
+            const fcfMargin = (fcf / revenue * 100).toFixed(2);
+            const fcfYield = (fcf / marketcap * 100).toFixed(2);
+            const fcfNiRatio = (fcf / ni).toFixed(2);
+
+            document.getElementById('fcfMargin').textContent = fcfMargin + '%';
+            document.getElementById('fcfYield').textContent = fcfYield + '%';
+            document.getElementById('fcfNiRatio').textContent = fcfNiRatio + '×';
+
+            let analysis = '';
+            if (fcfMargin > 15) {
+                analysis += '<strong>✅ STRONG FCF MARGIN</strong> (>15%) - Excellent cash conversion<br>';
+            } else if (fcfMargin > 5) {
+                analysis += '<strong>🟡 MODERATE FCF MARGIN</strong> (5-15%) - Adequate<br>';
+            } else {
+                analysis += '<strong>🔴 WEAK FCF MARGIN</strong> (<5%) - Concerning capital intensity<br>';
+            }
+
+            if (fcfYield > 5) {
+                analysis += '<strong>✅ ATTRACTIVE FCF YIELD</strong> (>5%) - Good valuation<br>';
+            } else if (fcfYield > 3) {
+                analysis += '<strong>🟡 FAIR FCF YIELD</strong> (3-5%) - Moderate valuation<br>';
+            } else {
+                analysis += '<strong>🔴 LOW FCF YIELD</strong> (<3%) - Expensive<br>';
+            }
+
+            if (fcfNiRatio >= 0.8 && fcfNiRatio <= 1.2) {
+                analysis += '<strong>✅ QUALITY EARNINGS</strong> - FCF/NI ratio healthy';
+            } else if (fcfNiRatio > 1.2) {
+                analysis += '<strong>🟡 CAUTION</strong> - FCF exceeds NI (conservative or low CapEx)';
+            } else {
+                analysis += '<strong>⚠️ WATCH</strong> - NI > FCF (high CapEx or working capital issues)';
+            }
+
+            document.getElementById('fcfAnalysis').innerHTML = analysis;
+            document.getElementById('metricsResult').classList.add('show');
+        }
+    </script>
+</body>
+</html>

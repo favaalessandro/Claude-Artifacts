@@ -195,11 +195,20 @@
             }
         }
     
-        .kpi-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; overflow-y: auto; }
+        /* KPI Analysis Modal with Metric Selector */
+        .kpi-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; overflow-y: auto; }
         .kpi-modal-overlay.active { display: block; }
-        .kpi-modal-content { position: relative; width: 95%; max-width: 1400px; margin: 20px auto; background: white; border-radius: 12px; overflow: hidden; }
-        .kpi-modal-close { position: fixed; top: 20px; right: 30px; width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; z-index: 10001; }
-        .kpi-iframe { width: 100%; height: 90vh; border: none; }
+        .kpi-modal-header { position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 15px 20px; z-index: 10002; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .kpi-modal-title { color: white; font-size: 1.3em; font-weight: bold; margin-bottom: 10px; text-align: center; }
+        .kpi-metric-selector { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 5px 0; }
+        .kpi-metric-btn { padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s ease; background: rgba(255,255,255,0.2); color: white; }
+        .kpi-metric-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        .kpi-metric-btn.active { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 4px 15px rgba(240,147,251,0.4); }
+        .kpi-modal-content { position: relative; width: 100%; max-width: 100%; margin-top: 120px; background: white; min-height: calc(100vh - 120px); }
+        .kpi-modal-close { position: fixed; top: 15px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.2); border: none; border-radius: 50%; color: white; font-size: 20px; cursor: pointer; z-index: 10003; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .kpi-modal-close:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+        .kpi-iframe { width: 100%; height: calc(100vh - 120px); border: none; }
+        @media (max-width: 768px) { .kpi-metric-btn { padding: 6px 12px; font-size: 0.75em; } .kpi-modal-header { padding: 10px 15px; } .kpi-modal-content { margin-top: 140px; } .kpi-iframe { height: calc(100vh - 140px); } }
     </style>
 </head>
 <body>
@@ -1654,13 +1663,39 @@
             });
         });
     
-        function openKPIAnalysis() { var m=document.getElementById('kpiModal'); var i=document.getElementById('kpiIframe'); i.src='roe-dashboard.html'; m.classList.add('active'); document.body.style.overflow='hidden'; }
-        function closeKPIAnalysis(e) { if(e)e.stopPropagation(); var m=document.getElementById('kpiModal'); var i=document.getElementById('kpiIframe'); m.classList.remove('active'); i.src=''; document.body.style.overflow='auto'; }
-        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeKPIAnalysis(); });
+        // Metric file mapping
+        var metricFiles = {
+            1: 'metric-01-roe.html', 2: 'metric-02-fcf.html', 3: 'metric-03-gross-margin.html',
+            4: 'metric-04-roa.html', 5: 'metric-05-cfo.html', 6: 'metric-06-operating-margin.html',
+            7: 'metric-07-revenue.html', 8: 'metric-08-revenue-growth.html', 9: 'metric-09-net-income.html',
+            10: 'metric-10-ebitda.html', 11: 'metric-11-gross-profit.html', 12: 'metric-12-operating-income.html'
+        };
+        function openKPIAnalysis() { var m=document.getElementById('kpiModal'); m.classList.add('active'); document.body.style.overflow='hidden'; loadMetric(1, document.querySelector('.kpi-metric-btn')); }
+        function loadMetric(num, btn) { var i=document.getElementById('kpiIframe'); i.src=metricFiles[num]; document.querySelectorAll('.kpi-metric-btn').forEach(function(b){b.classList.remove('active');}); if(btn) btn.classList.add('active'); }
+        function closeKPIAnalysis(e) { if(e) e.stopPropagation(); var m=document.getElementById('kpiModal'); var i=document.getElementById('kpiIframe'); m.classList.remove('active'); i.src=''; document.body.style.overflow='auto'; }
+        document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeKPIAnalysis(); if(document.getElementById('kpiModal').classList.contains('active')){ var btns=document.querySelectorAll('.kpi-metric-btn'); var idx=Array.from(btns).findIndex(function(b){return b.classList.contains('active');}); if(e.key==='ArrowRight' && idx<btns.length-1) btns[idx+1].click(); else if(e.key==='ArrowLeft' && idx>0) btns[idx-1].click(); }});
     </script>
 
+    <!-- KPI Analysis Modal with Metric Selector -->
     <div id="kpiModal" class="kpi-modal-overlay" onclick="closeKPIAnalysis(event)">
-        <button class="kpi-modal-close" onclick="closeKPIAnalysis(event)">&times;</button>
+        <div class="kpi-modal-header" onclick="event.stopPropagation()">
+            <button class="kpi-modal-close" onclick="closeKPIAnalysis(event)">&times;</button>
+            <div class="kpi-modal-title">TIER 1 - Business Quality Metrics (1-12)</div>
+            <div class="kpi-metric-selector">
+                <button class="kpi-metric-btn active" onclick="loadMetric(1, this)">#1 ROE</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(2, this)">#2 FCF</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(3, this)">#3 Gross Margin</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(4, this)">#4 ROA</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(5, this)">#5 CFO</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(6, this)">#6 Op. Margin</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(7, this)">#7 Revenue</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(8, this)">#8 Rev. Growth</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(9, this)">#9 Net Income</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(10, this)">#10 EBITDA</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(11, this)">#11 Gross Profit</button>
+                <button class="kpi-metric-btn" onclick="loadMetric(12, this)">#12 Op. Income</button>
+            </div>
+        </div>
         <div class="kpi-modal-content" onclick="event.stopPropagation()">
             <iframe id="kpiIframe" class="kpi-iframe" src=""></iframe>
         </div>

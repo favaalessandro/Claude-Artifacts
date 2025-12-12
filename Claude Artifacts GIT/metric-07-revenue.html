@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Metric 7: Revenue - Dashboard Interattivo</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-green-400: rgba(74, 222, 128, 1);
+            --color-green-500: rgba(34, 197, 94, 1);
+            --color-blue-400: rgba(96, 165, 250, 1);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .metric-score {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge.green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--color-green-500);
+        }
+
+        .badge.yellow {
+            background: rgba(230, 129, 97, 0.15);
+            color: var(--color-orange-500);
+        }
+
+        .badge.red {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-red-500);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .framework-step {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+        }
+
+        .framework-step h4 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .framework-step p {
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .example-box {
+            background: var(--color-gray-200);
+            border-left: 4px solid var(--color-blue-400);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: var(--color-text);
+        }
+
+        .red-flag {
+            background: rgba(192, 21, 47, 0.08);
+            border-left: 4px solid var(--color-red-500);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            color: var(--color-text);
+        }
+
+        .red-flag strong {
+            color: var(--color-red-500);
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .scoring-table th,
+        .scoring-table td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .scoring-table th {
+            background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+            color: white;
+            font-weight: 600;
+        }
+
+        .scoring-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scoring-table tr:hover {
+            background: rgba(33, 128, 141, 0.05);
+        }
+
+        .question-list {
+            list-style: none;
+        }
+
+        .question-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .question-list li strong {
+            color: var(--color-text);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .question-list li:last-child {
+            border-bottom: none;
+        }
+
+        .scenario {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .scenario-title {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .scenario-desc {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .assessment {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--color-border);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .interactive-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+            background: var(--color-background);
+            font-family: var(--font-family-base);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            background: var(--color-gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .result-score {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-size: 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .key-insight {
+            background: rgba(33, 128, 141, 0.08);
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .key-insight strong {
+            color: var(--color-primary);
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .tab-btn {
+                border-bottom: 1px solid var(--color-border);
+                border-right: none;
+            }
+
+            .tab-btn.active {
+                border-bottom-color: var(--color-primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📊 Metrica 7: Revenue</h1>
+            <p><strong>Quality, Recurrence & Predictability</strong></p>
+            <p>La fondazione di ogni business: non solo la dimensione, ma la qualità, ricorrenza e prevedibilità dei ricavi</p>
+            <div class="metric-score">
+                <strong>Tier 1 - Business Quality (40% weight)</strong>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="overview">Panoramica</button>
+            <button class="tab-btn" data-tab="definition">Definizione & Formula</button>
+            <button class="tab-btn" data-tab="red-flags">Red Flags ⚠️</button>
+            <button class="tab-btn" data-tab="framework">Framework Analisi</button>
+            <button class="tab-btn" data-tab="scoring">Scoring</button>
+            <button class="tab-btn" data-tab="questions">Domande Chiave</button>
+            <button class="tab-btn" data-tab="scenarios">Scenari Reali</button>
+            <button class="tab-btn" data-tab="calculator">Calcolatore Interattivo</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">📌 Perché la Metrica 7 (Revenue) Importa</h2>
+
+                <div class="key-insight">
+                    <strong>Principio Buffett:</strong> "Preferisco $1 miliardo di ricavi ricorrenti e prevedibili a $2 miliardi di ricavi volatili e incerti". Non è la dimensione assoluta che conta, ma la QUALITÀ, RICORRENZA e PREVEDIBILITÀ dei ricavi.
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🎯 Fondazione del Business</div>
+                        <div class="card-value">
+                            Senza ricavi, non c'è business. I ricavi determinano tutto:
+                            <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                                <li>Redditività operativa</li>
+                                <li>Generazione di cash flow</li>
+                                <li>Valore degli investimenti</li>
+                                <li>Sostenibilità a lungo termine</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💎 Qualità vs. Quantità</div>
+                        <div class="card-value">
+                            <strong>Non tutto il ricavo è uguale:</strong><br>
+                            <span style="color: var(--color-text-secondary);">
+                                $1B ricorrente (SaaS) >> $1B volatile (contratti progettuali)
+                            </span><br><br>
+                            La qualità dei ricavi determina:
+                            <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                                <li>Prevedibilità futura</li>
+                                <li>Forza del moat competitivo</li>
+                                <li>Capacità di investimento</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔄 Ricorrenza = Oro</div>
+                        <div class="card-value">
+                            <strong>Tipi di ricavi (dal migliore al peggiore):</strong>
+                            <div style="margin-top: 10px;">
+                                <span class="badge green">Subscription</span> Ricorrente, prevedibile<br>
+                                <span class="badge green">Repeat Business</span> Clienti fedeli<br>
+                                <span class="badge yellow">Long-term Contracts</span> Pluriennali<br>
+                                <span class="badge red">One-Time</span> Non ricorrente<br>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📊 Composizione Ricavi</div>
+                        <div class="card-value">
+                            <strong>Fattori di qualità:</strong><br>
+                            ✅ Ricorrenti (70%+): Altamente prevedibili<br>
+                            ✅ Diversificati: Nessun cliente > 5%<br>
+                            ✅ Con Pricing Power: Margini crescenti<br>
+                            ✅ Secular Tailwinds: Mercato in crescita
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔑 4 Dimensioni Critiche di Revenue Quality</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">1️⃣ Ricorrenza</div>
+                        <div class="card-value">
+                            <strong>% di ricavi ricorrenti:</strong><br>
+                            <span style="color: var(--color-green-500);">70%+ Ricorrenti</span> = Modello eccellente<br>
+                            <span style="color: var(--color-orange-500);">50-70% Ricorrenti</span> = Modello buono<br>
+                            <span style="color: var(--color-red-500);"><30% Ricorrenti</span> = Modello rischioso<br><br>
+                            <strong>Esempi:</strong><br>
+                            • Microsoft: 85%+ subscription 🟢<br>
+                            • Amazon: 80% AWS sub, 40% retail 🟢🟡<br>
+                            • Consulenza: 20% contratti ricorrenti 🔴
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">2️⃣ Concentrazione Clienti</div>
+                        <div class="card-value">
+                            <strong>Top customer % di ricavi:</strong><br>
+                            <span style="color: var(--color-green-500);"><5%</span> = Eccellente<br>
+                            <span style="color: var(--color-green-500);">5-10%</span> = Buono<br>
+                            <span style="color: var(--color-orange-500);">10-20%</span> = Attenzione<br>
+                            <span style="color: var(--color-red-500);">>20%</span> = Rischio concentrazione<br><br>
+                            <strong>Top 5 clienti:</strong><br>
+                            <span style="color: var(--color-green-500);"><20%</span> = Diversificato<br>
+                            <span style="color: var(--color-red-500);">>50%</span> = Concentrato, rischioso
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">3️⃣ Pricing Power</div>
+                        <div class="card-value">
+                            <strong>Capacità di aumentare prezzi:</strong><br><br>
+                            ✅ Prezzo +5%, volume stabile<br>
+                            = Pricing power forte (moat)<br><br>
+                            ⚠️ Prezzo +1%, volume -5%<br>
+                            = Pricing power debole (commodity)<br><br>
+                            <strong>Indicatore:</strong><br>
+                            Aumenti di prezzo che si mantengono nel tempo senza perdita di volumi = moat
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">4️⃣ Trend e Crescita</div>
+                        <div class="card-value">
+                            <strong>Direzione e stabilità:</strong><br>
+                            <span style="color: var(--color-green-500);">Crescita 15%+/anno</span> = Eccellente<br>
+                            <span style="color: var(--color-green-500);">Crescita 5-15%/anno</span> = Buono<br>
+                            <span style="color: var(--color-orange-500);">Piatto/Maturo</span> = Accettabile<br>
+                            <span style="color: var(--color-red-500);">Calo 3+ anni</span> = Red flag<br><br>
+                            <strong>Trend storico:</strong><br>
+                            Plot 10 anni di ricavi = indica sostenibilità
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: DEFINITION -->
+        <div id="definition" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📐 Definizione Formale & Componenti</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">Revenue: Definizione Semplice</div>
+                    <div class="card-value">
+                        <strong>Revenue = Totale del denaro ricevuto da vendita di prodotti e servizi</strong><br><br>
+                        È il primo numero nel Conto Economico. Da qui partono tutti gli altri calcoli:
+                        <div class="example-box">
+Revenue
+- COGS (Cost of Goods Sold)
+= Gross Profit
+- Operating Expenses (SG&A, R&D)
+= Operating Income (EBIT)
+- Interest & Taxes
+= Net Income
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">📊 Composizione Revenue</div>
+                        <div class="card-value">
+                            <strong>Breakdown fondamentale:</strong><br><br>
+                            🔹 <strong>Prodotti</strong> (hardware)<br>
+                            Caratteristiche: Una volta e basta<br><br>
+                            🔹 <strong>Servizi</strong> (consulenza, manutenzione)<br>
+                            Caratteristiche: Spesso uno-tantum<br><br>
+                            🔹 <strong>Subscription/SaaS</strong><br>
+                            Caratteristiche: Ricorrenti, mensili/annuali<br><br>
+                            🔹 <strong>Licensing</strong><br>
+                            Caratteristiche: Royalties, recurring<br><br>
+                            🔹 <strong>Advertising</strong><br>
+                            Caratteristiche: Variabile con volumi
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🌍 Segmentazione Revenue</div>
+                        <div class="card-value">
+                            <strong>Dove viene il denaro?</strong><br><br>
+                            ✓ <strong>Per Geografia:</strong><br>
+                            • USA, Europa, Asia, Emerging Markets<br>
+                            • Concentrazione geografica = rischio politico<br><br>
+                            ✓ <strong>Per Segmento Cliente:</strong><br>
+                            • Enterprise, Mid-Market, SMB, Consumer<br><br>
+                            ✓ <strong>Per Tipo di Cliente:</strong><br>
+                            • Fornitori, Partner, Clienti finali<br><br>
+                            ✓ <strong>Per Linea di Prodotto:</strong><br>
+                            • Prodotto A (50%), Prodotto B (50%)
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⏰ Timeline Revenue Recognition</div>
+                        <div class="card-value">
+                            <strong>Quando viene conteggiato il ricavo?</strong><br><br>
+                            <span style="color: var(--color-text-secondary); font-size: 13px;">
+                                Principio IFRS 15 (Revenue from Contracts with Customers):
+                            </span><br><br>
+                            <strong>Accrual Basis:</strong><br>
+                            • Quando il cliente ha l'obbligo di pagare<br>
+                            • NON quando il denaro è ricevuto<br>
+                            • Rischio: Receivables che non si convertono<br><br>
+                            <strong>Cash Basis:</strong><br>
+                            • Quando il denaro è effettivamente ricevuto<br>
+                            • Più conservatore, migliore per analisi
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔍 Metriche Derivate</div>
+                        <div class="card-value">
+                            <strong>Cosa possiamo calcolare da Revenue?</strong><br><br>
+                            • <strong>Revenue Growth %</strong><br>
+                            = (Revenue questo anno - anno scorso) / anno scorso<br><br>
+                            • <strong>Revenue Per Customer</strong><br>
+                            = Revenue / Numero clienti<br><br>
+                            • <strong>Revenue Per Employee</strong><br>
+                            = Revenue / Numero dipendenti<br><br>
+                            • <strong>Revenue Retention Rate</strong><br>
+                            = (Revenue clienti attuali) / (Revenue anno scorso)<br><br>
+                            • <strong>Net Revenue Retention (NRR)</strong><br>
+                            = Retention + Expansion / Churn
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RED FLAGS -->
+        <div id="red-flags" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">⚠️ Red Flags & Segnali di Problemi</h2>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #1: Revenue Crescente ma Clienti Decrescenti</strong><br>
+                    Se il numero di clienti cala ma i ricavi salgono, significa che stai aumentando i prezzi per compensare. Questo è <strong>insostenibile nel lungo termine</strong> - non puoi aumentare prezzi infinitamente senza perdere clienti.
+                    <div class="example-box">
+Esempio: Editore stampa
+- Revenue: $2B (crescita +2%)
+- Numero clienti: -8% anno
+- Pricing: Aumentato prezzi del 10%
+→ Insostenibile; clienti continueranno a scappare
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #2: Revenue da Una-Due Fonti (Altissima Concentrazione)</strong><br>
+                    Se il 50%+ dei ricavi viene da 1-5 clienti, il rischio è <strong>enorme</strong>. La perdita di un cliente significa crollo dei ricavi e della valutazione.
+                    <div class="example-box">
+Soglie di allarme:
+- Top customer > 20% di revenue: Pericolo concentrazione
+- Top 5 customers > 50% di revenue: Altissimo rischio
+- Top 10 customers > 70% di revenue: Business fragile
+
+Effetto sulla valutazione: Sconto 30-50% per concentration risk
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #3: Revenue Ricorrente in Calo (Churn Elevato)</strong><br>
+                    Se il numero di clienti subscription/attivi in calo, il business è in declino strutturale, indipendentemente dai numeri totali.
+                    <div class="example-box">
+Metrica: Net Revenue Retention (NRR)
+- NRR > 110%: Crescita tramite expansion 🟢 Eccellente
+- NRR 100-110%: Stabile con crescita minima 🟡 Accettabile
+- NRR < 100%: Churn > Expansion 🔴 Problematico
+- NRR < 90%: Declino strutturale 🔴 Evitare
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #4: Ricavi Gonfiati da One-Time Items</strong><br>
+                    Se la crescita di revenue viene principalmente da operazioni una tantum (vendita divisione, settlement, acquisizione di clienti tramite M&A), il ricavo sottostante è in realtà piatto o in calo.
+                    <div class="example-box">
+Esempio: Consulenza
+- Reported Revenue: $500M (+15% YoY)
+- One-time project: $50M (10% di crescita)
+- Recurring revenue actual: $450M (-5% YoY)
+→ Business sottostante in calo, mascherato da one-time items
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #5: Revenue Crescente ma Numero di Ordini/Transazioni Calante</strong><br>
+                    Stesso problema di #1: Aumenti di prezzo che mascherano volume decline. Insostenibile.
+                    <div class="example-box">
+Esempio: E-commerce
+- Revenue: +10% YoY
+- Numero di ordini: -8% YoY
+- AOV (Average Order Value): +19%
+→ Clienti comprano meno volte, compensato da prezzi più alti
+→ Insostenibile; clienti scapperanno
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #6: Revenue Altamente Concentrato Geograficamente</strong><br>
+                    Se l'80%+ dei ricavi viene da un singolo paese, il rischio politico/normativo è altissimo.
+                    <div class="example-box">
+Concentrazione geografica rischiosa:
+- 80%+ da una geografia: Rischio elevato 🔴
+- 60-80% da una geografia: Rischio moderato 🟡
+- Distribuito 3+ geografie: Rischio mitigato 🟢
+
+Effetto: Sconto di valutazione 20-40% per concentration
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #7: Revenue da Clienti che Non Rinnovano</strong><br>
+                    Per business subscription/SaaS, il tasso di churn è critico. Se i clienti non rinnovano, il business declina.
+                    <div class="example-box">
+Customer Churn Rates:
+- < 5% annual churn: Eccellente (sticky business) 🟢
+- 5-10% annual churn: Buono 🟢
+- 10-20% annual churn: Preoccupante 🟡
+- > 20% annual churn: Critico 🔴
+
+Esempio SaaS:
+- 100 clienti, 15% churn = perde 15 clienti/anno
+- Growth deve superare 15% solo per stare fermo
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #8: Ricavi che Crescono ma Non Convertono a Cash</strong><br>
+                    Se revenue ricorre ma Days Sales Outstanding (DSO) sta salendo, il cliente sta pagando sempre più lentamente. Possibile segnale che i clienti sono in difficoltà.
+                    <div class="example-box">
+Days Sales Outstanding (DSO) Analysis:
+- Receivables / (Revenue / 365)
+- Se DSO cresce da 30 giorni a 60 giorni:
+  → Clienti pagano il doppio del tempo
+  → Segnale di stress finanziario client
+  → Red flag: Clienti in difficoltà
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #9: Revenue Diversificato Oggi ma Concentrato Domani</strong><br>
+                    Trend di concentrazione: Se il top 5 customers % di revenue sta CRESCENDO nel tempo, significa che stai perdendo clienti piccoli e diventando dipendente da grandi clienti. Red flag.
+                    <div class="example-box">
+Concentrazione Trend:
+- 2022: Top 5 customers = 20% di revenue
+- 2023: Top 5 customers = 25% di revenue (crescita concentrazione)
+- 2024: Top 5 customers = 30% di revenue
+
+→ Trend di deterioramento; clienti piccoli in fuga
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #10: Ricavi che Crescono con Costi Ancora Più Veloci</strong><br>
+                    Revenue cresce al 10%, ma SG&A cresce al 20%. Il margine operativo si sta contraendo. La crescita non è redditizia.
+                    <div class="example-box">
+Growth Quality Check:
+- Revenue growth: +10% YoY
+- Operating expense growth: +20% YoY
+→ Margine operativo si contrae
+→ Inefficiency; crescita non sostenibile
+
+Better Case: Revenue +10%, OpEx flat o -5%
+→ Operating leverage; crescita sostenibile
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔍 Checklist Red Flags Rapida</h2>
+                
+                <div class="card">
+                    <div class="card-title">Domande a cui Rispondere "SÌ" = Red Flag</div>
+                    <div class="card-value">
+                        <div style="list-style: none; padding-left: 0;">
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Il top cliente è > 20% dei ricavi?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Numero di clienti in calo mentre ricavi stabili/crescenti?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Churn rate > 15% annuale?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> >20% dei ricavi da one-time items?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Revenue concentrata > 70% in una geografia?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> DSO (Days Sales Outstanding) in aumento?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Numero di ordini/transazioni in calo?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Ricavi crescono ma cash flow declina?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> SG&A cresce più veloce di revenue?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> NRR (Net Revenue Retention) < 100%?
+                            </div>
+                        </div>
+                        <p style="margin-top: 20px; color: var(--color-red-500); font-weight: 600;">
+                            🚨 Più di 3 "SÌ" = Problema serio. Più di 5 "SÌ" = Evitare investimento.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: FRAMEWORK -->
+        <div id="framework" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🔧 7-Step Framework Analisi Revenue</h2>
+
+                <div class="framework-step">
+                    <h4>Step 1️⃣: Analizzare Dimensione Assoluta e Trend di Crescita</h4>
+                    <p><strong>Cosa fare:</strong> Plot revenue per 10 anni; calcola growth rate annuale medio.</p>
+                    <p><strong>Cosa cercare:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>📈 Crescita 15%+/anno per 5+ anni = forte business</li>
+                        <li>📊 Flat/maturo = accettabile se redditizio</li>
+                        <li>📉 Calo 3+ anni di fila = red flag (declino strutturale)</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Microsoft
+Revenue 10 anni: $60B (2010) → $220B (2024)
+Growth medio: ~10% CAGR
+Trend: Consistente crescita ogni anno
+Assessment: Positivo - crescita stabile e prevedibile
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 2️⃣: Valutare Ricorrenza e Predictability</h4>
+                    <p><strong>Cosa fare:</strong> Breakdownare revenue in componenti ricorrenti vs. one-time.</p>
+                    <p><strong>Metriche chiave:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Subscription/Recurring Revenue %: Quanto è ricorrente?</li>
+                        <li>Repeat Customer Revenue: Quanti clienti tornano?</li>
+                        <li>Net Revenue Retention (NRR): Crescita da clienti existing?</li>
+                        <li>Churn Rate: Quanti clienti perdi ogni anno?</li>
+                    </ul>
+                    <div class="example-box">
+Benchmark di Qualità:
+70%+ Ricorrente = Eccellente (Microsoft 85%, Salesforce 90%)
+50-70% Ricorrente = Buono (Amazon AWS 80%, Retail 40%)
+<30% Ricorrente = Rischioso (Project-based consulting, Construction)
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 3️⃣: Analizzare Concentrazione Clienti</h4>
+                    <p><strong>Cosa fare:</strong> Calcolare % di ricavi da Top Customer, Top 5, Top 10.</p>
+                    <p><strong>Soglie di rischio:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Top customer > 20% = Rischio concentrazione 🔴</li>
+                        <li>Top 5 customers > 50% = Altissimo rischio 🔴</li>
+                        <li>Top customer < 5% = Diversificato ✅ Eccellente</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Microsoft vs. Piccolo contractor
+Microsoft: 100M clienti, top customer < 0.01% → Diversificato 🟢
+Contractor: Top 3 clienti = 60% revenue → Concentrato 🔴
+
+Valutazione: Microsoft valutato premium; Contractor con sconto
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 4️⃣: Valutare Pricing Power</h4>
+                    <p><strong>Cosa fare:</strong> Analizzare storico di aumenti di prezzo e impatto su volume.</p>
+                    <p><strong>Test empirico:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>✅ Prezzo +5%, volume stabile = STRONG pricing power (MOAT)</li>
+                        <li>🟡 Prezzo +3%, volume -2% = MODERATE pricing power</li>
+                        <li>❌ Prezzo +1%, volume -5% = WEAK pricing power (Commodity)</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Apple vs. Generico retail
+Apple: Raised prices 10% YoY × 5 years, volume stable
+→ Pricing power eccezionale (brand moat)
+
+Generico Retailer: Try to raise prices 2%, lose 8% volume
+→ No pricing power (commodity competition)
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 5️⃣: Analizzare Diversificazione Geografica</h4>
+                    <p><strong>Cosa fare:</strong> Breakdownare revenue per geografia.</p>
+                    <p><strong>Checklist:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>% USA, Europa, Asia, Emerging Markets</li>
+                        <li>Concentrazione singola paese > 70% = Rischio 🔴</li>
+                        <li>Diversificato 3+ geografie = Safer ✅</li>
+                        <li>Crescita da mercati emerging = Positivo se stabile</li>
+                    </ul>
+                    <div class="example-box">
+Diversificazione geografica:
+Too Concentrated: 85% USA, 15% Canada → Geopolitical risk
+Well Balanced: 35% USA, 30% Europe, 20% Asia, 15% Emerging → Safer
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 6️⃣: Comprendere Composizione Revenue (Mix Quality)</h4>
+                    <p><strong>Cosa fare:</strong> Breakdownare per product line, margin profile, customer type.</p>
+                    <p><strong>Cosa cercare:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Trend verso higher-margin products? ✅ Positivo</li>
+                        <li>Trend verso lower-margin? ❌ Negativo</li>
+                        <li>Enterprise growing, SMB stable/declining? ✅ Mix improving</li>
+                        <li>Subscription growing, one-time declining? ✅ Quality improving</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Software company
+2022: 60% licensing, 40% services/support
+2024: 75% subscription, 25% consulting
+→ Mix improving: More recurring, less one-time
+→ Quality of revenue increasing
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 7️⃣: Identificare Secular Trends a Supporto</h4>
+                    <p><strong>Cosa fare:</strong> Valutare macro trends che supportano o ostacolano crescita.</p>
+                    <p><strong>Tailwinds (Positivi) 📈:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Cloud adoption → Cloud companies benefit</li>
+                        <li>Aging population → Healthcare benefits</li>
+                        <li>Digital transformation → Software, IT services benefit</li>
+                        <li>E-commerce growth → Payment processors, logistics benefit</li>
+                    </ul>
+                    <p style="margin-top: 12px;"><strong>Headwinds (Negativi) 📉:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Print media decline → Traditional publishers hurt</li>
+                        <li>Shift from fossil fuels → Oil companies challenged</li>
+                        <li>Automation → Manual labor jobs at risk</li>
+                    </ul>
+                    <div class="example-box">
+Best Case: Recurring revenue + Strong secular tailwind
+Example: Cloud software in 2024 (AI adoption tailwind)
+= Compounding machine
+
+Worst Case: One-time revenue + Secular headwind
+Example: Print media (declining industry)
+= Declining business
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCORING -->
+        <div id="scoring" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📊 Scoring Guidelines - Come Valutare</h2>
+
+                <p style="margin-bottom: 20px; color: var(--color-text-secondary); line-height: 1.8;">
+                    Usa questa tabella per assegnare un punteggio a un business basato sulla qualità dei ricavi. Ogni dimensione ha un peso e un punteggio (0-2 punti).
+                </p>
+
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Metrica Revenue</th>
+                            <th>Assessment ✅</th>
+                            <th>Score</th>
+                            <th>Qualità Business</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>% Ricavi Ricorrenti</strong></td>
+                            <td>>80% ricorrente</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Eccellente</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>50-80% ricorrente</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Buono</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>30-50% ricorrente</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Moderato</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><30% ricorrente</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Rischioso</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Growth Rate</strong></td>
+                            <td>15%+ per anno</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Crescita salutare</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>5-15% per anno</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Crescita moderata</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Piatto o in calo</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Maturo/Declino</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Top 5 Customers</strong></td>
+                            <td><20% di revenue</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Diversificato</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>20-50% di revenue</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Moderata concentrazione</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>>50% di revenue</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Rischio elevato</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Pricing Power</strong></td>
+                            <td>Evidente (prezzi +5%, volume stabile)</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Defensible</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Moderato (prezzi +3%, volume -2%)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Competitivo</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Debole (prezzi +1%, volume -5%)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Commodity</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Diversificazione Geografia</strong></td>
+                            <td>Distribuito su 3+ regioni</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Rischio mitigato</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Concentrato 70%+ una regione</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Rischio geopolitico</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Secular Trends</strong></td>
+                            <td>Tailwind positivo (mercato crescente)</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Favorevole</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Neutro o misto</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Stabile</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Headwind (mercato declinante)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Sfavorevole</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="key-insight" style="margin-top: 30px;">
+                    <strong>Come calcolare il punteggio totale:</strong><br>
+                    Somma i punti da tutte le categorie, max 14 punti.<br>
+                    <br>
+                    <strong>12-14 punti = 🟢 Green (Eccellente revenue quality)</strong><br>
+                    <strong>8-11 punti = 🟡 Yellow (Buona revenue quality, watch per red flags)</strong><br>
+                    <strong>5-7 punti = 🟡 Yellow (Accettabile, ma problemi)</strong><br>
+                    <strong><5 punti = 🔴 Red (Evitare, revenue quality poor)</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: QUESTIONS -->
+        <div id="questions" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">❓ 10 Domande Chiave per Analisi Revenue</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">Domande Fondamentali</div>
+                    <ul class="question-list">
+                        <li>
+                            <strong>1. Che % di revenue è ricorrente (subscription, repeat business)?</strong><br>
+                            Perché: Ricorrente = prevedibile e sostenibile; one-time = volatile<br>
+                            Azione: Breakdownare revenue per tipo; cercare tendenza verso più ricorrente
+                        </li>
+
+                        <li>
+                            <strong>2. Quanti clienti ha l'azienda e quale % viene da Top 5?</strong><br>
+                            Perché: Concentrazione cliente = rischio enorme (perdita cliente = crollo revenue)<br>
+                            Azione: Calcolare Top Customer %, Top 5 %; cercare diversificazione
+                        </li>
+
+                        <li>
+                            <strong>3. Quale è il tasso di churn (quanti clienti perdi ogni anno)?</strong><br>
+                            Perché: Churn > 20% significa business instabile; churn < 5% significa sticky<br>
+                            Azione: Per SaaS, cercare churn < 5%; calcolare NRR (net revenue retention)
+                        </li>
+
+                        <li>
+                            <strong>4. L'azienda può aumentare prezzi senza perdere volumi?</strong><br>
+                            Perché: Pricing power = moat; ability to pass through inflation = sustainable<br>
+                            Azione: Analizzare storico di price increases; osservare impatto su volume
+                        </li>
+
+                        <li>
+                            <strong>5. La crescita di revenue è organica o da acquisizioni?</strong><br>
+                            Perché: Organic growth = moat interno; growth da M&A = temporary boost<br>
+                            Azione: Separare revenue growth organico da inorganico; cercare organic growth
+                        </li>
+
+                        <li>
+                            <strong>6. Come è distribuita revenue per geografia?</strong><br>
+                            Perché: Concentrazione geografica = rischio geopolitico/normativo<br>
+                            Azione: Cercare distribuzione 3+ geografie; evitare >70% singolo paese
+                        </li>
+
+                        <li>
+                            <strong>7. Qual è la composizione di revenue per linea di prodotto/servizio?</strong><br>
+                            Perché: Mix verso high-margin prodotti = qualità revenue migliorante<br>
+                            Azione: Tracciare trend composizione; cercare shift verso prodotti migliori
+                        </li>
+
+                        <li>
+                            <strong>8. Che secular trends supportano o ostacolano questa revenue?</strong><br>
+                            Perché: Tailwind = crescita free; headwind = lotta contro corrente<br>
+                            Azione: Identificare macro trends; preferire aziende con tailwind
+                        </li>
+
+                        <li>
+                            <strong>9. Revenue cresce ma numero di clienti cala (o volumi calano)?</strong><br>
+                            Perché: Crescita da prezzo alone è insostenibile senza volume growth<br>
+                            Azione: Tracciare revenue vs. numero clienti; cercare allineamento
+                        </li>
+
+                        <li>
+                            <strong>10. Revenue ricorrente convertiti effettivamente in cash (DSO)?</strong><br>
+                            Perché: Revenue contabile ≠ cash ricevuto; crescente DSO = clienti in stress<br>
+                            Azione: Calcolare DSO (Receivables / Revenue × 365); cercare stabilità/calo
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCENARIOS -->
+        <div id="scenarios" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">💼 Scenari Reali & Case Studies</h2>
+
+                <div class="scenario">
+                    <div class="scenario-title">📱 Caso 1: Microsoft - Revenue Quality Eccezionale</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Annual Revenue: ~$220B | Growth: 15%/year | Tier: Tier-1 Tech<br><br>
+                        <strong>Ricorrenza:</strong> 85%+ subscription-based (Office 365, Azure, Game Pass, etc.)<br>
+                        <strong>Clienti:</strong> Milioni di clienti globali; nessuno > 0.1% di revenue<br>
+                        <strong>Pricing Power:</strong> Aumenta prezzi cloud 5-10%/anno senza perdita di volume<br>
+                        <strong>Diversificazione:</strong> 45% USA, 55% internazionale (ben distribuito)<br>
+                        <strong>Trend:</strong> Revenue consistently growing; NRR > 120% (expansion da clienti existing)<br><br>
+                        <strong>Assessment:</strong>
+                    </div>
+                    <div class="assessment">
+                        🟢 GREEN (2/2 pts) - Eccezionale revenue quality
+                        <br>Ricorrente ✅ | Diversificato ✅ | Pricing Power ✅ | Crescita stabile ✅
+                        <br><strong>Veredicto:</strong> Miglior case study di revenue quality. Prevedibilità 10+ anni. Moat durabile.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">☁️ Caso 2: Amazon - Ricavi Misti (AWS+ Retail)</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Annual Revenue: ~$575B | Growth: 10-15%/year | Tier: Tier-1 E-commerce + Cloud<br><br>
+                        <strong>Ricorrenza - AWS (15% revenue, 70% margin):</strong> 80%+ subscription = eccellente<br>
+                        <strong>Ricorrenza - Retail (45% revenue, 10% margin):</strong> 30-40% repeat = moderato<br>
+                        <strong>Clienti:</strong> Centinaia di milioni; top 100 clienti < 10% revenue = diversificato<br>
+                        <strong>Pricing Power:</strong> AWS strong (can raise prices), Retail weak (competitive)<br>
+                        <strong>Diversificazione:</strong> 50% USA, 50% internazionale<br>
+                        <strong>Trend:</strong> AWS growing faster (25%+); Retail slower (5%)<br><br>
+                        <strong>Assessment:</strong>
+                    </div>
+                    <div class="assessment">
+                        🟢 GREEN (2/2 pts) - Buona revenue quality, fonte diversa
+                        <br>AWS eccellente + Retail accettabile = portfolio balance
+                        <br><strong>Veredicto:</strong> AWS è vero moat; Retail è utility/volume. Overall buona qualità.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">🥤 Caso 3: Coca-Cola - Ricavi Ricorrenti Stabili</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Annual Revenue: ~$45B | Growth: Flat to 2-3%/year | Tier: Tier-1 Consumer Staples<br><br>
+                        <strong>Ricorrenza:</strong> Repeat business (consumers buy regularly) = 95%+ ricorrente<br>
+                        <strong>Clienti:</strong> Miliardi di consumatori, milioni di retail outlets; diversificato<br>
+                        <strong>Pricing Power:</strong> Can raise prices 3-5%/year; volumi stabili (pricing power eccezionale)<br>
+                        <strong>Diversificazione:</strong> 30% North America, 70% internazionale (mondiale)<br>
+                        <strong>Trend:</strong> Ricavi flat ma margini expanding (pricing power dominante)<br><br>
+                        <strong>Assessment:</strong>
+                    </div>
+                    <div class="assessment">
+                        🟢 GREEN (2/2 pts) - Eccellente revenue quality
+                        <br>Ricorrente ✅ | Diversificato ✅ | Pricing Power Straordinaria ✅
+                        <br><strong>Veredicto:</strong> Non cresce volume, cresce prezzi. Moat brand straordinario. Revenue prevedibile 30+ anni.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">🚗 Caso 4: Tesla - Ricavi Crescenti ma Limitato Repeat</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Annual Revenue: ~$80B | Growth: 25%+/year | Tier: High-Growth Auto + Energy<br><br>
+                        <strong>Ricorrenza:</strong> Limitata (auto purchases infrequent); Service revenue growing<br>
+                        <strong>Clienti:</strong> Centinaia di migliaia (cars); milioni (energy storage)<br>
+                        <strong>Pricing Power:</strong> Can raise prices in premium EV segment; limited competition<br>
+                        <strong>Diversificazione:</strong> 25% USA, 75% internazionale<br>
+                        <strong>Trend:</strong> Growing 25%+ ma dipendente da new customer acquisition, non repeat<br><br>
+                        <strong>Assessment:</strong>
+                    </div>
+                    <div class="assessment">
+                        🟡 YELLOW (1/2 pts) - Revenue crescente ma con caveats
+                        <br>Crescita forte ✅ | Diversificato ✅ | Ma: Limitato repeat ❌
+                        <br><strong>Veredicto:</strong> Crescita reale ma dipendente da mercato EV. Se mercato rallenta, crescita crolla. Monitorare churn (clienti che non tornano).
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">💻 Caso 5: Impresa Software Concentrata (Lumpy Revenue)</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Annual Revenue: $500M | Growth: 8%/year average (volatile) | Tier: Enterprise Software<br><br>
+                        <strong>Ricorrenza:</strong> 60% subscription, ma large deals affect timing<br>
+                        <strong>Clienti:</strong> 100 enterprise customers; Top 5 = 40% di revenue (CONCENTRATO)<br>
+                        <strong>Concentrazione:</strong> Top customer = 12% revenue (singolo cliente rischio)<br>
+                        <strong>Lumpy Revenue:</strong> Trimestri variano: Q1 $150M, Q2 $90M, Q3 $95M, Q4 $165M<br>
+                        <strong>Growth:</strong> Large deal closures anno determinano risultato (imprevedibile)<br><br>
+                        <strong>Assessment:</strong>
+                    </div>
+                    <div class="assessment">
+                        🟡 YELLOW (1/2 pts) - Ricavi crescenti ma imprevedibili e concentrati
+                        <br>Crescita presente ✅ | Ma: Concentrazione ❌ | Lumpy ❌
+                        <br><strong>Veredicto:</strong> Evitare. Revenue imprevedibile, concentrazione cliente altissima. Perdita single cliente = disastro. Valutazione con sconto 30-40% per concentration risk.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">📰 Caso 6: Editore Stampa - Declino Strutturale Mascherato</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        Annual Revenue: $2B (calo da $3B cinque anni fa) | Growth: -5% to -10%/year | Tier: Declining Media<br><br>
+                        <strong>Ricorrenza:</strong> Subscriptions declining; advertising declining più veloce<br>
+                        <strong>Clienti:</strong> Subscriber base shrinking every year<br>
+                        <strong>Pricing:</strong> Tentando aumenti prezzi per compensare calo volumi (insostenibile)<br>
+                        <strong>Concentrazione:</strong> Top advertisers = 30% revenue (concentrazione crescente)<br>
+                        <strong>Trend:</strong> Revenue declining 5-10%/anno × 5 anni = structural decline<br><br>
+                        <strong>Assessment:</strong>
+                    </div>
+                    <div class="assessment">
+                        🔴 RED (0/2 pts) - Pessima revenue quality
+                        <br>Declino strutturale ❌ | Concentrazione crescente ❌ | Pricing power debole ❌
+                        <br><strong>Veredicto:</strong> EVITARE. Business in decline terminale. Nessun moat. Ricavi continueranno a crollare. No margin of safety.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CALCULATOR -->
+        <div id="calculator" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🧮 Calcolatore Interattivo Revenue Quality Score</h2>
+
+                <div class="interactive-section">
+                    <div class="form-group">
+                        <label>1️⃣ Qual è la % di ricavi ricorrenti?</label>
+                        <select id="recurring" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">80%+ ricorrente</option>
+                            <option value="2">50-80% ricorrente</option>
+                            <option value="1">30-50% ricorrente</option>
+                            <option value="0"><30% ricorrente</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2️⃣ Top 5 clienti che % dei ricavi sono?</label>
+                        <select id="concentration" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2"><20% (diversificato)</option>
+                            <option value="1">20-50% (moderato)</option>
+                            <option value="0">>50% (concentrato)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3️⃣ Qual è il growth rate annuale?</label>
+                        <select id="growth" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">15%+ per anno</option>
+                            <option value="1">5-15% per anno</option>
+                            <option value="0">Piatto o calo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4️⃣ Qual è il churn rate (per SaaS)?</label>
+                        <select id="churn" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2"><5% annuale (eccellente)</option>
+                            <option value="1">5-15% annuale (buono)</option>
+                            <option value="0">>15% annuale (problema)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>5️⃣ L'azienda ha pricing power evident?</label>
+                        <select id="pricing" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Sì, prezzo +5%, volume stabile</option>
+                            <option value="1">Moderato, prezzo +3%, volume -2%</option>
+                            <option value="0">No, prezzo +1%, volume -5%</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>6️⃣ Diversificazione geografica</label>
+                        <select id="geography" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Distribuito su 3+ regioni</option>
+                            <option value="0">Concentrato >70% una regione</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>7️⃣ Secular trends supportano la crescita?</label>
+                        <select id="tailwind" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Sì, mercato crescente (tailwind)</option>
+                            <option value="1">Neutro o misto</option>
+                            <option value="0">No, mercato declinante (headwind)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" onclick="calculateScore()">📊 Calcola Score</button>
+
+                    <div id="resultBox" class="result-box" style="display: none;">
+                        <div class="result-score" id="scoreValue"></div>
+                        <div class="result-text" id="scoreAssessment"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📈 Guida Interpretazione Score</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🟢 12-14 punti: Eccellente</div>
+                        <div class="card-value">
+                            <strong>Revenue quality superiore</strong><br>
+                            ✅ Ricavi ricorrenti e prevedibili<br>
+                            ✅ Clienti diversificati<br>
+                            ✅ Pricing power evidente<br>
+                            ✅ Secular tailwinds<br><br>
+                            <strong>Caratteristiche:</strong> SaaS companies, Subscription businesses, Market leaders
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 8-11 punti: Buono</div>
+                        <div class="card-value">
+                            <strong>Revenue quality accettabile</strong><br>
+                            ✅ Alcuni ricavi ricorrenti<br>
+                            ⚠️ Concentrazione moderata<br>
+                            ✅ Crescita presente<br><br>
+                            <strong>Caratteristiche:</strong> Mature companies, Mixed business models, Fase di transizione
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 5-7 punti: Accettabile</div>
+                        <div class="card-value">
+                            <strong>Revenue quality mediocre</strong><br>
+                            ⚠️ Ricavi principalmente one-time<br>
+                            ⚠️ Concentrazione cliente elevata<br>
+                            ⚠️ Crescita incerta<br><br>
+                            <strong>Azione:</strong> Watch carefully per deterioramento
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 <5 punti: Povero</div>
+                        <div class="card-value">
+                            <strong>Revenue quality scadente</strong><br>
+                            ❌ Revenue volatile e imprevedibile<br>
+                            ❌ Altissima concentrazione cliente<br>
+                            ❌ No pricing power<br><br>
+                            <strong>Azione:</strong> EVITARE
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TAB NAVIGATION
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active from all
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                // Add active to clicked
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // CALCULATOR FUNCTION
+        function calculateScore() {
+            const recurring = parseInt(document.getElementById('recurring').value) || 0;
+            const concentration = parseInt(document.getElementById('concentration').value) || 0;
+            const growth = parseInt(document.getElementById('growth').value) || 0;
+            const churn = parseInt(document.getElementById('churn').value) || 0;
+            const pricing = parseInt(document.getElementById('pricing').value) || 0;
+            const geography = parseInt(document.getElementById('geography').value) || 0;
+            const tailwind = parseInt(document.getElementById('tailwind').value) || 0;
+
+            const totalScore = recurring + concentration + growth + churn + pricing + geography + tailwind;
+
+            const resultBox = document.getElementById('resultBox');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreAssessment = document.getElementById('scoreAssessment');
+
+            if (totalScore > 0) {
+                resultBox.style.display = 'block';
+                scoreValue.textContent = `Punteggio: ${totalScore}/14`;
+
+                let assessment = '';
+                let color = '';
+
+                if (totalScore >= 12) {
+                    assessment = '🟢 ECCELLENTE - Revenue Quality Superiore<br>Ricavi ricorrenti, prevedibili, diversificati. Azienda con moat duraturo. Ideale per investimento long-term.';
+                    color = 'green';
+                } else if (totalScore >= 8) {
+                    assessment = '🟡 BUONO - Revenue Quality Accettabile<br>Ricavi per lo più buoni con alcuni warning signals. Monitor per deterioramento.';
+                    color = 'orange';
+                } else if (totalScore >= 5) {
+                    assessment = '🟡 ACCETTABILE - Revenue Quality Mediocre<br>Problemi evidenti. Analisi più profonda necessaria. Consider alternative.';
+                    color = 'orange';
+                } else {
+                    assessment = '🔴 POVERO - Revenue Quality Scadente<br>Significativi red flags. EVITARE investimento.';
+                    color = 'red';
+                }
+
+                scoreAssessment.innerHTML = assessment;
+            }
+        }
+    </script>
+</body>
+</html>

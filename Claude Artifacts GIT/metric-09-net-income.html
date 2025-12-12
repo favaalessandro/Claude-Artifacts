@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Metrica 9: Net Income - Dashboard Interattivo</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-green-400: rgba(74, 222, 128, 1);
+            --color-green-500: rgba(34, 197, 94, 1);
+            --color-blue-400: rgba(96, 165, 250, 1);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .metric-score {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge.green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--color-green-500);
+        }
+
+        .badge.yellow {
+            background: rgba(230, 129, 97, 0.15);
+            color: var(--color-orange-500);
+        }
+
+        .badge.red {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-red-500);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .framework-step {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+        }
+
+        .framework-step h4 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .framework-step p {
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .example-box {
+            background: var(--color-gray-200);
+            border-left: 4px solid var(--color-blue-400);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: var(--color-text);
+        }
+
+        .red-flag {
+            background: rgba(192, 21, 47, 0.08);
+            border-left: 4px solid var(--color-red-500);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            color: var(--color-text);
+        }
+
+        .red-flag strong {
+            color: var(--color-red-500);
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .scoring-table th,
+        .scoring-table td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .scoring-table th {
+            background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+            color: white;
+            font-weight: 600;
+        }
+
+        .scoring-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scoring-table tr:hover {
+            background: rgba(33, 128, 141, 0.05);
+        }
+
+        .question-list {
+            list-style: none;
+        }
+
+        .question-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .question-list li strong {
+            color: var(--color-text);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .question-list li:last-child {
+            border-bottom: none;
+        }
+
+        .scenario {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .scenario-title {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .scenario-desc {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .assessment {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--color-border);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .interactive-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+            background: var(--color-background);
+            font-family: var(--font-family-base);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            background: var(--color-gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .result-score {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-size: 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .key-insight {
+            background: rgba(33, 128, 141, 0.08);
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .key-insight strong {
+            color: var(--color-primary);
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, rgba(33,128,141,0.08), rgba(33,128,141,0.04));
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .metric-box strong {
+            color: var(--color-primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .tab-btn {
+                border-bottom: 1px solid var(--color-border);
+                border-right: none;
+            }
+
+            .tab-btn.active {
+                border-bottom-color: var(--color-primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📊 Metrica 9: Net Income (Utile Netto)</h1>
+            <p><strong>Quality, Predictability & Cash Conversion</strong></p>
+            <p>Come la qualità dell'utile netto, la prevedibilità e la conversione a cash rivelano la vera sostenibilità del business</p>
+            <div class="metric-score">
+                <strong>Tier 1 - Business Quality (40% weight)</strong>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="overview">Panoramica</button>
+            <button class="tab-btn" data-tab="definition">Definizione & Formula</button>
+            <button class="tab-btn" data-tab="red-flags">Red Flags ⚠️</button>
+            <button class="tab-btn" data-tab="framework">7-Step Framework</button>
+            <button class="tab-btn" data-tab="quality-dimensions">5 Dimensioni Qualità</button>
+            <button class="tab-btn" data-tab="quality-checks">Quality Checks</button>
+            <button class="tab-btn" data-tab="scoring">Scoring</button>
+            <button class="tab-btn" data-tab="case-studies">Case Studies</button>
+            <button class="tab-btn" data-tab="calculator">Calcolatore</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">📌 Perché Net Income Quality Importa (Buffett Principle)</h2>
+
+                <div class="key-insight">
+                    <strong>Warren Buffett:</strong> "Earnings can be manipulated. Find the real earnings - the cash that the business generates. Real earnings = Operating Cash Flow. Reported net income = often fiction. Quality of earnings > Quantity of earnings."
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🎯 Net Income Non È Solo Un Numero</div>
+                        <div class="card-value">
+                            <strong>Tutti gli utili netti sono uguali?</strong> NO!<br><br>
+                            Company A: $100M utile netto = $110M cash flow ✅<br>
+                            Company B: $100M utile netto = $50M cash flow 🔴<br><br>
+                            Stessa utile netto, completamente diversa qualità. La differenza è nei DETTAGLI:
+                            <ul style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary);">
+                                <li>One-time items mascherano il vero earnings</li>
+                                <li>Working capital changes distorcono conversion</li>
+                                <li>Accounting policies mascherano qualità</li>
+                                <li>Share dilution nasconde vero EPS growth</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💡 La Vera Qualità dell'Utile</div>
+                        <div class="card-value">
+                            <strong>Buffett insegna: Qualità = Cash Conversion</strong><br><br>
+                            Se $100M utile netto = $100M cash flow 🟢<br>
+                            Se $100M utile netto = $50M cash flow 🔴<br>
+                            Se $100M utile netto = $150M cash flow 🟢<br><br>
+                            <strong>Domanda chiave:</strong><br>
+                            Questo utile può essere speso (reinvestito) senza danneggiare il business? Se sì = qualità alta. Se no = qualità bassa.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📈 Utile Netto Sostenibile</div>
+                        <div class="card-value">
+                            <strong>Utile netto di alta qualità:</strong><br>
+                            ✅ Prevedibile (Non volatile)<br>
+                            ✅ Ricorrente (Non one-time)<br>
+                            ✅ Convertibile a cash (CFO/NI ~1.0)<br>
+                            ✅ Crescente (Organicamente)<br>
+                            ✅ Marginalmente sostenibile<br><br>
+                            <strong>Utile netto di bassa qualità:</strong><br>
+                            ❌ Volatile (Unpredictable)<br>
+                            ❌ One-time dependent<br>
+                            ❌ Poor cash conversion<br>
+                            ❌ Declining or plateau<br>
+                            ❌ Margin compression
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚖️ Earnings vs. Cash Flow</div>
+                        <div class="card-value">
+                            <strong>Buffett Golden Rule:</strong><br>
+                            "Earnings can lie. Cash doesn't."<br><br>
+                            <strong>Perché la differenza:</strong><br>
+                            • Revenue recognition (quando registri, non quando ricevi)<br>
+                            • Working capital changes (inventory, receivables, payables)<br>
+                            • One-time items (non-operational gains/losses)<br>
+                            • Depreciation/amortization (non-cash expense)<br><br>
+                            <strong>Verifica:</strong><br>
+                            NI/CFO ratio = 0.9-1.1 = Healthy
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔑 5 Segnali Critici di Net Income Quality</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">1️⃣ NI/CFO Ratio (Earnings Quality)</div>
+                        <div class="card-value">
+                            <strong>Misura:</strong> NI ÷ CFO<br><br>
+                            <span class="badge green">Eccellente: >1.0</span><br>
+                            NI inferiore a cash flow = conservative<br><br>
+                            <span class="badge green">Buono: 0.9-1.0</span><br>
+                            NI ~CFO = normal business<br><br>
+                            <span class="badge yellow">Adeguato: 0.8-0.9</span><br>
+                            Slight working capital drag<br><br>
+                            <span class="badge red">Povero: <0.8</span><br>
+                            Major quality issue
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">2️⃣ One-Time Items Impact</div>
+                        <div class="card-value">
+                            <strong>Identifica gains/charges non-operational:</strong><br><br>
+                            Asset sales, litigation settlements, accounting changes<br><br>
+                            <span class="badge green">Ottimo: <2% di NI</span><br>
+                            <span class="badge yellow">Accettabile: 2-10%</span><br>
+                            <span class="badge red">Red flag: >10%</span><br><br>
+                            <strong>Verifica:</strong><br>
+                            Se one-time items >10%, adjusted NI sarà significativamente diverso da reported
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">3️⃣ Earnings Volatility</div>
+                        <div class="card-value">
+                            <strong>Varianza annuale:</strong><br><br>
+                            <span class="badge green">Prevedibile: ±5%</span><br>
+                            Puoi forecaster con confidence<br><br>
+                            <span class="badge yellow">Accettabile: ±10-15%</span><br>
+                            Normale varianza ciclica<br><br>
+                            <span class="badge red">Volatile: >20%</span><br>
+                            Unpredictable, risky<br><br>
+                            Buffett: "I want boring earnings, not exciting ones"
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">4️⃣ Net Margin Sustainability</div>
+                        <div class="card-value">
+                            <strong>Margin stability:</strong><br><br>
+                            <strong>Trend positivo:</strong> 10% → 11% → 12%<br>
+                            = sustainable pricing power ✅<br><br>
+                            <strong>Trend negativo:</strong> 12% → 10% → 8%<br>
+                            = eroding moat 🔴<br><br>
+                            <strong>Verifica:</strong><br>
+                            Paragona a peers. Above peer average? Sostenibile?
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">5️⃣ EPS Growth Quality</div>
+                        <div class="card-value">
+                            <strong>EPS growth da:</strong><br><br>
+                            🟢 Operational profitability<br>
+                            = Vero earnings growth<br><br>
+                            🟡 Buyback share reduction<br>
+                            = Financial engineering<br><br>
+                            🔴 Dilution from options<br>
+                            = Deteriorating<br><br>
+                            <strong>Verifica:</strong><br>
+                            EPS growth > NI growth? Share dilution is occurring
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: DEFINITION -->
+        <div id="definition" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📐 Definizione Formale & Formula</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">Net Income: Definizione</div>
+                    <div class="card-value">
+                        <strong>Net Income (Utile Netto) = Revenue - All Expenses</strong><br><br>
+                        Formalmente:<br>
+                        <strong>NI = Revenue - COGS - OpEx - Interest - Taxes - Other</strong><br><br>
+                        Dove:<br>
+                        • Revenue = Ricavi totali<br>
+                        • COGS = Costo del venduto<br>
+                        • OpEx = Operating expenses (SG&A, R&D)<br>
+                        • Interest = Interessi sul debito<br>
+                        • Taxes = Tasse sul reddito<br>
+                        • Other = Otros items, gains/losses<br><br>
+                        <strong>Semplice esempio:</strong><br>
+                        Revenue $1,000 - COGS $600 - OpEx $200 - Interest $50 - Taxes $75 = NI $75
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">📊 Key Quality Metrics</div>
+                        <div class="card-value">
+                            <strong>NI/CFO Ratio</strong><br>
+                            Earnings quality indicator<br>
+                            = NI ÷ OCF<br><br>
+                            <strong>Net Profit Margin</strong><br>
+                            = NI ÷ Revenue × 100<br><br>
+                            <strong>EPS (Earnings per Share)</strong><br>
+                            = NI ÷ Shares Outstanding<br><br>
+                            <strong>Adjusted NI</strong><br>
+                            = NI ± one-time items<br>
+                            = "Normalized" earnings
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔍 Interpretazione Quality Levels</div>
+                        <div class="card-value">
+                            <strong>Exceptional (2.0):</strong><br>
+                            NI recurring, predictable, high quality<br>
+                            Margin >12%, CFO>NI<br><br>
+                            <strong>Strong (1.5):</strong><br>
+                            NI mostly recurring, consistent<br>
+                            Margin 10-12%, CFO~NI<br><br>
+                            <strong>Good (1.0):</strong><br>
+                            Mix recurring/one-time, stable<br>
+                            Margin 8-10%, CFO~0.9×NI<br><br>
+                            <strong>Fair (0.5):</strong><br>
+                            Volatile, cyclical<br>
+                            Margin 5-8%, CFO~0.7×NI<br><br>
+                            <strong>Poor (0.0):</strong><br>
+                            Declining, unpredictable<br>
+                            Margin <5%, CFO<0.6×NI
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⏰ Adjusted vs. Reported</div>
+                        <div class="card-value">
+                            <strong>Reported NI:</strong><br>
+                            Quello nel 10-K<br>
+                            Includes one-time items<br><br>
+                            <strong>Adjusted NI:</strong><br>
+                            Reported ± one-time items<br>
+                            = "Core" earnings<br><br>
+                            <strong>Quando divergono:</strong><br>
+                            Adjusted >> Reported = quality issue<br>
+                            Reported >> Adjusted = one-time gain boost<br><br>
+                            <strong>Use adjusted for valuation</strong>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💰 Why Quality Matters</div>
+                        <div class="card-value">
+                            <strong>High quality NI:</strong><br>
+                            = Predictable, recurring earnings<br>
+                            = Supports premium valuation<br>
+                            = Sustainable business<br><br>
+                            <strong>Low quality NI:</strong><br>
+                            = Unpredictable, volatile earnings<br>
+                            = Discount valuation required<br>
+                            = Risky business<br><br>
+                            <strong>Buffett: "Quality is worth paying premium for"</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RED FLAGS -->
+        <div id="red-flags" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">⚠️ 10 Red Flags di Net Income Quality Deterioration</h2>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #1: NI Growing, but CFO Stagnant or Declining</strong><br>
+                    Company reports NI +15% but Operating Cash Flow flat/down. Classic sign of earnings manipulation or working capital issues. NI can be faked; CFO reveals truth.
+                    <div class="example-box">
+Segnale negativo:
+NI: +15% YoY
+CFO: +2% YoY
+NI/CFO ratio: Declining from 0.95 to 0.75
+
+Interpretazione: Earnings quality deteriorating
+Cause possibili:
+1. Revenue recognition before cash collection (aggressive sales)
+2. Inventory building (cash tied up)
+3. Accounts payable stretch (paying suppliers later)
+4. Accruals increasing (non-cash accounting gains)
+
+Azione: Investigate working capital changes; discount NI by 30-50%
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #2: Large One-Time Items Masking Declining Core Earnings</strong><br>
+                    Reported NI strong, but driven by asset sales, litigation settlements, or accounting changes. Underlying operations declining. Next year item goes away and NI craters.
+                    <div class="example-box">
+Segnale negativo:
+Reported NI: $100M
+One-time items: +$40M gain (asset sale)
+Adjusted NI: $60M (true operations)
+
+YoY: Adjusted NI -10% (operations declining)
+
+Interpretazione: One-time items masking deterioration
+Azione: Use adjusted NI for valuation; expect NI decline next year when item expires
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #3: Net Margin Declining While Peers' Margins Expanding</strong><br>
+                    Company's NI margin compressing while competitors' margins stable/improving. Sign of losing competitive position, unable to maintain pricing or control costs.
+                    <div class="example-box">
+Segnale negativo:
+Company NI margin: 12% → 10% → 8% (declining -2pp/yr)
+Peer average: 11% → 12% → 13% (improving +1pp/yr)
+
+Divergence widening: Gap was -1pp, now -5pp
+
+Interpretazione: Company losing competitive advantage
+Azione: AVOID - structural moat erosion evident
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #4: EPS Growth Driven by Buybacks, Not Earnings Growth</strong><br>
+                    EPS rising but actual NI flat. Growth entirely from reducing share count. When buyback ends or share dilution resumes, growth evaporates.
+                    <div class="example-box">
+Segnale negativo:
+NI: Flat ($50M every year)
+EPS: Growing 5% annually
+Share count: Declining 5% annually (from buybacks)
+
+Fake growth: EPS up, but actual earnings flat
+
+Azione: Use adjusted EPS = NI/fully-diluted shares; compare to NI growth
+Red flag: If EPS > NI growth rate, it's artificial
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #5: Negative Cash Conversion for 2+ Years</strong><br>
+                    Company generating accounting earnings but negative operating cash flow. Money is leaving the business despite reported profits. Highly unsustainable.
+                    <div class="example-box">
+Segnale negativo:
+Year 1: NI +$50M, CFO -$10M (NI/CFO negative!)
+Year 2: NI +$60M, CFO -$20M (worsening)
+
+Interpretazione: Completely unsustainable
+Cause: Inventory buildup, receivables not collecting, massive CapEx
+
+Azione: AVOID entirely - business burning cash
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #6: Accounting Policy Changes Boosting Earnings</strong><br>
+                    Company changes depreciation method, revenue recognition, or warranty provisions and suddenly earnings pop. No operational improvement—just accounting engineering.
+                    <div class="example-box">
+Segnale negativo:
+Company changes depreciation from 5yr to 10yr
+Effect: Annual depreciation $10M → $5M
+NI jumps $5M (no operational improvement!)
+
+Interpretazione: Pure accounting gimmick
+Azione: Recalculate under old policy; beware of management credibility
+
+Pro-tip: Check 10-K footnotes for accounting changes
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #7: Earnings Growth Without Revenue Growth</strong><br>
+                    Revenue flat, but earnings growing. Unsustainable—either one-time items or margin compression unseen. Eventually hits floor.
+                    <div class="example-box">
+Segnale negativo:
+Revenue: +2% (flat/slow)
+NI: +12% (much faster)
+Margin: Expanding sharply
+
+Interpretazione: Unsustainable divergence
+Cause: Cost-cutting (damaging future), one-time items, or margin inflation
+
+Azione: Verify margin expansion is sustainable or temporary
+Red flag: If expansion from R&D cuts, future competitiveness damaged
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #8: Earnings Highly Volatile Year-to-Year</strong><br>
+                    NI swinging 20%+ annually. Cyclical or unpredictable business. Can't forecast earnings with confidence. Higher risk, lower valuation multiple justified.
+                    <div class="example-box">
+Segnale negativo:
+NI trend: $100M → $60M → $120M → $75M → $110M
+Volatility: ±30% range unpredictable
+
+Interpretazione: Cyclical or operationally unstable
+Azione: Use average normalized earnings; apply risk discount
+
+Buffett would avoid: "I want boring, predictable earnings"
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #9: EPS Declining Despite Growing Profits</strong><br>
+                    NI growing but EPS declining. Share dilution from stock options or convertible bonds exceeding earnings growth. Hidden destruction.
+                    <div class="example-box">
+Segnale negativo:
+NI: +10% growing
+EPS: -3% declining
+Share count: +13% (massive dilution from options/conversions)
+
+Interpretazione: Management destroying shareholder value
+Azione: Calculate fully-diluted share count; penalize valuation for dilution
+
+Red flag: Share count should decline from buybacks, not increase
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #10: Adjusted NI >> Reported NI (Recurring Charges Not "Adjustments")</strong><br>
+                    Management shows "adjusted earnings" 50%+ higher than reported. Suggests one-time charges recurring. Beware of management credibility and true earnings power.
+                    <div class="example-box">
+Segnale negativo:
+Reported NI: $50M
+Adjusted NI (per management): $80M
+Difference: 60% higher!
+
+Red flag: If charges recurring, are they truly "one-time"?
+
+Azione: Use reported earnings; view management adjustments skeptically
+Better: Calculate own adjustments based on 10-K disclosed items
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔍 Quick Red Flags Checklist</h2>
+                
+                <div class="card">
+                    <div class="card-title">Domande a cui Rispondere "SÌ" = Red Flag</div>
+                    <div class="card-value">
+                        <div style="list-style: none; padding-left: 0;">
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> NI cresce ma CFO cala/stagna?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> One-time items >10% di NI?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> NI margin declinando vs. peer margin stabile/growing?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> EPS growing faster than NI (buyback only)?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Negative CFO per 2+ anni?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Accounting changes che boost earnings?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Revenue flat pero earnings growing 10%+?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> NI volatility >20% annually?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> EPS declining while NI growing?
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <input type="checkbox"> Adjusted NI >>Reported NI (recurring)?
+                            </div>
+                        </div>
+                        <p style="margin-top: 20px; color: var(--color-red-500); font-weight: 600;">
+                            🚨 Più di 2 "SÌ" = Problema serio. Più di 4 "SÌ" = EVITARE investimento.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: FRAMEWORK -->
+        <div id="framework" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🔧 7-Step Framework: Analisi Net Income Quality</h2>
+
+                <div class="framework-step">
+                    <h4>Step 1️⃣: Calcolare Net Profit Margin (NPM) & Trend</h4>
+                    <p><strong>Cosa fare:</strong> Calcola NI/Revenue per 10 anni; traccia trend.</p>
+                    <p><strong>Formula:</strong> NPM = (Net Income / Revenue) × 100</p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Trends positivi: Growing margins indicano pricing power</li>
+                        <li>Trends negativi: Declining margins indicano competitive pressure</li>
+                        <li>Volatility: Wild swings indicano cyclical/unstable business</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Apple
+NI: $100B, Revenue: $380B = 26% NPM
+Trend: 22% (5yr ago) → 26% (now) = Expanding margin ✅
+
+Interpretazione: Pricing power growing, moat strengthening
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 2️⃣: Verificare Cash Conversion (NI vs. CFO)</h4>
+                    <p><strong>Cosa fare:</strong> Confronta Net Income a Operating Cash Flow; calcola NI/CFO ratio.</p>
+                    <p><strong>Benchmarks:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>>1.0 = Eccellente (CFO>NI, conservative accounting)</li>
+                        <li>0.9-1.0 = Sano (CFO~NI, normal)</li>
+                        <li>0.8-0.9 = Adeguato (some working capital drag)</li>
+                        <li"><0.8 = Red flag (quality issue, accruals problem)</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Microsoft
+NI: $90B, CFO: $100B = NI/CFO ratio 0.90
+Interpretazione: 🟢 Healthy - CFO exceeds NI (conservative, quality high)
+
+Esempio: Energy Company
+NI: $50B, CFO: $25B = NI/CFO ratio 0.50
+Interpretazione: 🔴 Red flag - Only 50% converts to cash (working capital issues)
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 3️⃣: Identificare & Quantify One-Time Items</h4>
+                    <p><strong>Cosa fare:</strong> Estrarre dal 10-K tutti i non-recurring items (gains, charges, write-downs).</p>
+                    <p><strong>Categories:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Asset sales & divestitures (one-time gains)</li>
+                        <li>Restructuring charges (one-time costs)</li>
+                        <li>Impairments & write-downs (asset write-off)</li>
+                        <li>Tax benefits & changes (one-time boosts)</li>
+                        <li>Litigation settlements (one-time charges)</li>
+                    </ul>
+                    <div class="example-box">
+Esempio: Intel
+Reported NI: $5B
+One-time charges: -$3B (restructuring, write-downs)
+Adjusted NI: $8B
+
+Wait, what? Adjusted > Reported?
+This means: Core operations WORSE than reported
+Intel is using one-time charges to mask declining real earnings
+Red flag: Underlying business deteriorating faster than reported suggests
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 4️⃣: Calcolare Adjusted NI & Compare to Reported</h4>
+                    <p><strong>Cosa fare:</strong> Create normalized earnings by removing one-time items.</p>
+                    <p><strong>Formula:</strong> Adjusted NI = Reported NI - Gains + Charges</p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>If Adjusted >> Reported: One-time items masking problems (red flag)</li>
+                        <li>If Adjusted ~= Reported: Clean earnings (green flag)</li>
+                        <li>If Adjusted << Reported: One-time gains inflating reported (caution)</li>
+                    </ul>
+                    <div class="example-box">
+Scenario A: Clean earnings
+Reported NI: $100M
+One-time items: +$2M (small)
+Adjusted NI: $98M
+Difference: 2% ✅ Reported is reliable
+
+Scenario B: Inflated by gains
+Reported NI: $100M
+One-time gains: +$30M (large)
+One-time charges: -$10M
+Adjusted NI: $80M
+Difference: 20% down 🟡 Watch for recurrence
+
+Scenario C: Manipulated
+Reported NI: $50M
+One-time charges: -$20M
+Adjusted NI: $70M (HIGHER than reported!)
+Interpretation: Real operations much better than reported? NO
+This means: Charges are recurring/structural, not "one-time"
+Red flag: Management credibility damage 🔴
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 5️⃣: Assess Earnings Volatility & Predictability</h4>
+                    <p><strong>Cosa fare:</strong> Analizzare 10-year earnings history; calcola varianza.</p>
+                    <p><strong>Metrics:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Standard deviation of NI change YoY</li>
+                        <li>Coefficient of variation (σ/μ)</li>
+                        <li>Cyclicality analysis (economic sensitivity)</li>
+                    </ul>
+                    <div class="example-box">
+Predictable Company:
+NI: $50M (Yr1) → $55M (Yr2) → $60M (Yr3) → $65M (Yr4)
+Variance: ±3% only
+Buffett assessment: 🟢 Boring, predictable (what he wants)
+
+Volatile Company:
+NI: $100M → $50M → $150M → $30M → $120M
+Variance: ±40% highly unpredictable
+Buffett assessment: 🔴 Too risky to forecast, avoid
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 6️⃣: Benchmarking vs. Peer NI Quality</h4>
+                    <p><strong>Cosa fare:</strong> Confronta company's metrics a peers & industry average.</p>
+                    <p><strong>Compare:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Net Profit Margin (vs. peer average)</li>
+                        <li>NI/CFO ratio (vs. peer average)</li>
+                        <li>Earnings volatility (vs. peer patterns)</li>
+                        <li>One-time item frequency (vs. peers)</li>
+                    </ul>
+                    <div class="example-box">
+Sector average: 10% NI margin
+Company A: 12% (above peers = better quality)
+Company B: 8% (below peers = weaker quality)
+
+Interpretation:
+Company A margins 2pp above = pricing power/cost advantage
+Company B margins 2pp below = losing competitive position
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 7️⃣: Valutare Sostenibilità & Recurrence of NI</h4>
+                    <p><strong>Cosa fare:</strong> Assess whether current NI can be maintained long-term.</p>
+                    <p><strong>Questions to answer:</strong></p>
+                    <ul style="padding-left: 20px; color: var(--color-text-secondary); margin: 8px 0;">
+                        <li>Is NI driven by sustainable operations or temporary items?</li>
+                        <li>Can company maintain margins if competitive pressure increases?</li>
+                        <li>Is earnings growth from organic operations or acquisition?</li>
+                        <li>Is cash conversion sustainable or dependent on working capital timing?</li>
+                    </ul>
+                    <div class="example-box">
+Sustainable Assessment:
+✅ Apple NI: From moat-based operations, pricing power, ecosystem
+   Sustainability: 10+ years forward predictable
+
+❌ Intel NI (recent): From non-operational items, margin compression evident
+   Sustainability: Declining, can't maintain current levels
+
+🟡 Amazon NI: Improving but from AWS growth maturing
+   Sustainability: Need to monitor margin trends next 3-5 years
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: QUALITY DIMENSIONS -->
+        <div id="quality-dimensions" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🎯 5 Dimensioni della Net Income Quality</h2>
+
+                <div class="scenario">
+                    <div class="scenario-title">1️⃣ RECURRENCE - Ricorrente vs. One-Time</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Earnings da operazioni ricorrenti vs. one-time, non-repeatable items.<br><br>
+                        <strong>RICORRENTE (Alta qualità):</strong><br>
+                        • Subscription revenue (recurring by definition)<br>
+                        • Repeat customer revenue (customers buy regularly)<br>
+                        • Operating earnings from core business<br>
+                        • Structural moat driving earnings<br>
+                        Example: SaaS company earning $100M annually from 10,000 customers with 95% renewal rate<br><br>
+                        <strong>ONE-TIME (Bassa qualità):</strong><br>
+                        • Asset sales (one time only)<br>
+                        • Litigation settlements (non-operational)<br>
+                        • Gains from divestitures<br>
+                        • Tax benefits or accounting changes<br>
+                        Example: Company earning $100M but $40M is from selling a building (won't repeat)<br><br>
+                        <strong>Assessment:</strong><br>
+                        If one-time items <5% of NI = 🟢 High quality<br>
+                        If one-time items 5-10% = 🟡 Acceptable<br>
+                        If one-time items >10% = 🔴 Quality issue
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">2️⃣ CONVERSION - NI to Cash Flow Conversion</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Does reported NI convert to actual Operating Cash Flow?<br><br>
+                        <strong>EXCELLENT CONVERSION (NI/CFO >1.0):</strong><br>
+                        • CFO exceeds NI = More cash than accounting earnings<br>
+                        • Shows conservative accounting practices<br>
+                        • Company is better than reported earnings suggest<br>
+                        • Buffett's favorite: Real cash > reported earnings<br>
+                        Example: NI $100M but CFO $120M (company generates more cash than earnings suggest)<br><br>
+                        <strong>HEALTHY CONVERSION (NI/CFO 0.9-1.0):</strong><br>
+                        • CFO ~= NI = Normal business operations<br>
+                        • Acceptable working capital management<br>
+                        • Earnings quality good<br>
+                        Example: NI $100M, CFO $95M (normal)<br><br>
+                        <strong>POOR CONVERSION (NI/CFO <0.8):</strong><br>
+                        • CFO significantly less than NI<br>
+                        • Earnings quality highly suspect<br>
+                        • Either working capital drain or accruals problem<br>
+                        • Red flag for accounting manipulation<br>
+                        Example: NI $100M, CFO $60M (only 60% converts = quality issue)<br><br>
+                        <strong>Assessment:</strong><br>
+                        This is THE most important quality check. Never ignore CFO/NI ratio.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">3️⃣ STABILITY - Margin Stability & Predictability</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Can you predict next year's NI with confidence?<br><br>
+                        <strong>HIGHLY PREDICTABLE:</strong><br>
+                        • Net margin stable ±1-2% year-to-year<br>
+                        • Earnings grow at consistent rate<br>
+                        • Low earnings volatility (<5% annual variance)<br>
+                        • Can forecast 5 years out with confidence<br>
+                        Example: Company earning 15% margin for 10 years = you can predict future<br><br>
+                        <strong>MODERATELY PREDICTABLE:</strong><br>
+                        • Net margin swings ±2-5% year-to-year<br>
+                        • Some cyclicality but manageable<br>
+                        • Earnings volatility 5-15% annually<br>
+                        • Can forecast 2-3 years forward<br><br>
+                        <strong>UNPREDICTABLE:</strong><br>
+                        • Net margin swings >5% wildly<br>
+                        • Highly cyclical earnings<br>
+                        • Earnings volatility >15% annually<br>
+                        • Cannot forecast with confidence<br>
+                        Example: Oil company earnings $50B one year, $20B next year (highly unpredictable)<br><br>
+                        <strong>Assessment:</strong><br>
+                        Buffett: "I want boring earnings, not exciting ones"<br>
+                        Predictability => Premium valuation justified<br>
+                        Unpredictability => Discount valuation required
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">4️⃣ GROWTH - Quality of Earnings Growth</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Is NI growth from operations or artificial engineering?<br><br>
+                        <strong>ORGANIC GROWTH (Alta qualità):</strong><br>
+                        • NI growth from revenue growth + margin expansion<br>
+                        • Operational improvements driving earnings up<br>
+                        • Moat strengthening, pricing power increasing<br>
+                        • Sustainable for long-term<br>
+                        Example: NI grows 12%, revenue grows 10%, margin expands 100bp = organic quality<br><br>
+                        <strong>BUYBACK-DRIVEN (Mediocrità):</strong><br>
+                        • EPS grows due to share count reduction<br>
+                        • Actual NI flat or slowing<br>
+                        • Financial engineering, not operational improvement<br>
+                        • Not sustainable when buyback stops<br>
+                        Example: NI flat $50M but EPS grows 5% from share buyback reduction<br><br>
+                        <strong>ONE-TIME BOOSTED (Bassa qualità):</strong><br>
+                        • NI growth primarily from gains/accounting items<br>
+                        • Underlying operations flat or declining<br>
+                        • Not sustainable next year<br>
+                        Example: NI grows $100M → $150M but $40M is one-time gain; adjusted = $110M (only 10% growth)<br><br>
+                        <strong>Assessment:</strong><br>
+                        Always compare:<br>
+                        • NI growth rate vs. Revenue growth rate<br>
+                        • EPS growth rate vs. NI growth rate (dilution indicator)<br>
+                        • Organic growth vs. acquisition-driven growth
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">5️⃣ SUSTAINABILITY - Long-Term Durability</div>
+                    <div class="scenario-desc">
+                        <strong>Definizione:</strong> Can the company maintain/grow this NI for 10+ years?<br><br>
+                        <strong>DURABLE (Alta sostenibilità):</strong><br>
+                        • Moat-protected earnings (brand, switching costs, network effects)<br>
+                        • Pricing power defensible against competition<br>
+                        • Market tailwinds supporting growth<br>
+                        • No structural headwinds visible<br>
+                        Example: Apple earning high margins protected by ecosystem moat<br><br>
+                        <strong>MODERATE (Sostenibilità media):</strong><br>
+                        • Moat present but eroding slowly<br>
+                        • Competitive advantages defensible but not impregnable<br>
+                        • Mix of tailwinds and headwinds<br>
+                        Example: Microsoft facing competition but Windows/Office still dominant<br><br>
+                        <strong>AT RISK (Bassa sostenibilità):</strong><br>
+                        • Moat eroding visibly (margin compression evident)<br>
+                        • Facing disruptive competition<br>
+                        • Structural headwinds in industry<br>
+                        • NI likely to decline in next 3-5 years<br>
+                        Example: Print media company facing digital disruption (NI unsustainable)<br><br>
+                        <strong>Assessment:</strong><br>
+                        Ask: Can I confidently project this NI 5-10 years forward?<br>
+                        If YES = sustainable, pay premium<br>
+                        If NO = risky, apply discount or avoid
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: QUALITY CHECKS -->
+        <div id="quality-checks" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">✅ 8 Quality Checks per Verificare Net Income Reale</h2>
+
+                <div class="grid">
+                    <div class="metric-box">
+                        <strong>1️⃣ NI/CFO Ratio Acceptable?</strong>
+                        ✅ 0.9-1.1 ratio = healthy<br>
+                        ❌ <0.8 ratio = quality issue<br>
+                        ❌ >1.2 ratio for multiple years = accruals concerning
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>2️⃣ One-Time Items <5% of NI?</strong>
+                        ✅ Clean earnings <5% = high quality<br>
+                        🟡 5-10% items = acceptable<br>
+                        ❌ >10% = manipulated/unclear
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>3️⃣ NI Margin Stable or Growing?</strong>
+                        ✅ Margin expanding or stable = moat<br>
+                        🟡 Slight decline = watch<br>
+                        ❌ Declining 2+ years = red flag
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>4️⃣ NI Growth = Revenue Growth?</strong>
+                        ✅ Both growing ~10% = quality<br>
+                        ❌ NI +20% but Revenue +5% = unsustainable
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>5️⃣ EPS Growth > NI Growth?</strong>
+                        ✅ EPS growth from NI growth = organic<br>
+                        🟡 EPS from buyback = temporary<br>
+                        ❌ EPS declining despite NI growing = dilution
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>6️⃣ Margin Above Peer Average?</strong>
+                        ✅ 2-3pp above peers = competitive advantage<br>
+                        🟡 At peer average = adequate<br>
+                        ❌ Below peer average = weakness
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>7️⃣ Can Predict NI Confidently?</strong>
+                        ✅ Yes, volatility <5% = predictable<br>
+                        🟡 Moderate, volatility 5-15% = acceptable<br>
+                        ❌ No, volatility >15% = too risky
+                    </div>
+
+                    <div class="metric-box">
+                        <strong>8️⃣ Adjusted = Reported NI?</strong>
+                        ✅ <3% difference = clean earnings<br>
+                        🟡 3-10% difference = watch<br>
+                        ❌ >15% difference = quality issue
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCORING -->
+        <div id="scoring" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📊 Scoring Guidelines - Come Valutare</h2>
+
+                <p style="margin-bottom: 20px; color: var(--color-text-secondary); line-height: 1.8;">
+                    Usa questa tabella per assegnare un punteggio a Net Income quality basato su sustainability, cash conversion, e verification checks.
+                </p>
+
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Quality Dimension</th>
+                            <th>Assessment ✅</th>
+                            <th>Score</th>
+                            <th>Sustainability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>NI/CFO Ratio</strong></td>
+                            <td>0.9-1.1 (healthy)</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Cash conversion solid</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>0.8-0.9 (adequate)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Some working capital issues</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><0.8 (poor)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Quality issue, red flag</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>One-Time Items</strong></td>
+                            <td><5% of NI</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Clean, sustainable earnings</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>5-10% of NI</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Acceptable, watch for trends</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>>10% of NI</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Quality compromised</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>NI Margin Trend</strong></td>
+                            <td>Stable or expanding</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Moat intact or strengthening</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Slight decline 1-2pp</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Monitor for structural erosion</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Declining >2pp/yr</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Moat eroding, unsustainable</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>NI vs Revenue Growth</strong></td>
+                            <td>NI growth ≈ Revenue growth</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Profitable, scalable growth</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>NI growth > Revenue (1-3pp)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Margin expansion visible</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>NI growth >> Revenue (>3pp)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Unsustainable divergence</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>EPS Growth Quality</strong></td>
+                            <td>From NI growth (organic)</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Real shareholder value creation</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Mixed (NI + buyback)</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Some financial engineering</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>EPS declining (NI flat/up)</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Dilution destroying value</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Earnings Volatility</strong></td>
+                            <td>Stable ±3-5% annually</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Highly predictable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Moderate ±5-15% annually</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Moderately predictable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Volatile >15% annually</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Unpredictable, risky</td>
+                        </tr>
+                        <tr style="background: rgba(33,128,141,0.05);">
+                            <td><strong>Peer Comparison</strong></td>
+                            <td>Margin above peer avg</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Competitive advantage</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Margin at peer average</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Adequate, no advantage</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Margin below peers</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Competitive weakness</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="key-insight" style="margin-top: 30px;">
+                    <strong>Come calcolare il punteggio totale:</strong><br>
+                    Somma i punti da tutte le categorie, max 14 punti.<br>
+                    <br>
+                    <strong>12-14 punti = 🟢 Green (Eccellente net income quality)</strong><br>
+                    <strong>8-11 punti = 🟡 Yellow (Buona quality, watch per warning signs)</strong><br>
+                    <strong>5-7 punti = 🟡 Yellow (Accettabile, ma qualche rischio)</strong><br>
+                    <strong><5 punti = 🔴 Red (Earnings quality compromised o unstable)</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CASE STUDIES -->
+        <div id="case-studies" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">💼 6 Case Studies Reali - Net Income Quality Analysis</h2>
+
+                <div class="scenario">
+                    <div class="scenario-title">📱 Caso 1: Apple - Exceptional Earnings Quality</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        NI: $100B | NI Margin: 26% | One-Time: 1% | NI/CFO: 1.1 | Volatility: ±4%<br><br>
+                        <strong>Dettagli:</strong>
+                        • NI margin stable 24-27% for 5+ years<br>
+                        • CFO exceeds NI consistently (1.0-1.2 ratio)<br>
+                        • One-time items negligible (<1%)<br>
+                        • Earnings growth from operations + pricing power<br>
+                        • Highly predictable: Can forecast 5 years out<br><br>
+                        <strong>Quality Dimensions:</strong><br>
+                        ✅ Recurrence: Operational earnings, recurring subscription<br>
+                        ✅ Conversion: CFO >NI (exceptional)<br>
+                        ✅ Stability: ±4% volatility (boring, predictable)<br>
+                        ✅ Growth: Organic, margin expanding<br>
+                        ✅ Sustainability: Moat-protected, durable
+                    </div>
+                    <div class="assessment">
+                        🟢🟢 GREEN (14/14 pts) - Exceptional earnings quality
+                        <br>This is what Buffett seeks: Clean, predictable, sustainable earnings backed by strong moat. Highest confidence in future earnings. Premium valuation justified.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">☁️ Caso 2: Microsoft - High-Quality Growing Earnings</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        NI: $90B | NI Margin: 34% | One-Time: 2% | NI/CFO: 1.12 | Volatility: ±5%<br><br>
+                        <strong>Dettagli:</strong>
+                        • NI margin expanding 30% → 34% (Azure cloud driving)<br>
+                        • CFO exceeds NI (excellent cash conversion)<br>
+                        • One-time items minimal, mostly from cloud accounting<br>
+                        • EPS growth from NI growth (organic, not buyback)<br>
+                        • Predictable even with growth trajectory<br><br>
+                        <strong>Quality Dimensions:</strong><br>
+                        ✅ Recurrence: Cloud subscription revenue (recurring)<br>
+                        ✅ Conversion: CFO 1.12× NI (exceptional)<br>
+                        ✅ Stability: ±5% volatility despite margin expansion<br>
+                        ✅ Growth: Sustainable from cloud moat<br>
+                        ✅ Sustainability: Long-term cloud growth runway
+                    </div>
+                    <div class="assessment">
+                        🟢 GREEN (13/14 pts) - High-quality, growing earnings
+                        <br>Rare combination: High margins, margin expansion, cash conversion, and organic growth. Azure moat provides long-term earnings visibility. Excellent investment quality.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">🚙 Caso 3: Tesla - Volatile Earnings, Margin Pressure</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        NI: $15B (volatile) | NI Margin: 10-15% | One-Time: 3% | NI/CFO: 0.9 | Volatility: ±25%<br><br>
+                        <strong>Dettagli:</strong>
+                        • NI margin highly volatile due to pricing swings<br>
+                        • Competitive pricing pressure evident<br>
+                        • One-time items modest (credits, tax items)<br>
+                        • CFO/NI ratio acceptable but declining<br>
+                        • EPS growth inconsistent with NI (very volatile)<br>
+                        • Hard to forecast earnings 2-3 years out<br><br>
+                        <strong>Quality Dimensions:</strong><br>
+                        🟡 Recurrence: High volume but pricing volatile<br>
+                        🟡 Conversion: Acceptable but working capital issues visible<br>
+                        🔴 Stability: ±25% volatility (unpredictable)<br>
+                        🟡 Growth: Present but margin pressure concerning<br>
+                        🟡 Sustainability: Competitive position uncertain
+                    </div>
+                    <div class="assessment">
+                        🟡 YELLOW (8/14 pts) - Volatile, risky earnings quality
+                        <br>High growth but earnings extremely unpredictable. Margin pressure from EV competition. Cannot forecast with confidence. Lower valuation multiple justified. Better viewed as growth play than on earnings quality.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">🏭 Caso 4: Intel - Declining Quality, One-Time Charges</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        NI: $2B (was $13B) | NI Margin: 3% (was 20%) | One-Time: 18% | NI/CFO: 0.65 | Volatility: ±30%<br><br>
+                        <strong>Dettagli:</strong>
+                        • NI margin collapsed 20% → 3% (structural)<br>
+                        • One-time charges substantial ($3B+ annually)<br>
+                        • Adjusted NI much higher than reported (charges recurring)<br>
+                        • CFO/NI ratio poor (0.65) indicating quality issues<br>
+                        • Share dilution significant despite buybacks<br>
+                        • Competitive position visibly eroding (AMD, competition)<br><br>
+                        <strong>Quality Dimensions:</strong><br>
+                        🔴 Recurrence: Charges recurring, not truly "one-time"<br>
+                        🔴 Conversion: Poor CFO/NI ratio (0.65)<br>
+                        🔴 Stability: Highly volatile, unpredictable<br>
+                        🔴 Growth: Declining, margin compression evident<br>
+                        🔴 Sustainability: Moat eroding, competitive disadvantage
+                    </div>
+                    <div class="assessment">
+                        🔴 RED (3/14 pts) - Poor earnings quality, deteriorating
+                        <br>Combination of: severe margin compression, one-time charges masking underlying deterioration, poor cash conversion, capital allocation failures. Buffett would avoid. Business quality declining; normalized earnings far below reported. High risk.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">💊 Caso 5: Procter & Gamble - Boring, Reliable Earnings</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        NI: $16B | NI Margin: 11-12% | One-Time: 2% | NI/CFO: 1.05 | Volatility: ±3%<br><br>
+                        <strong>Dettagli:</strong>
+                        • NI margin rock-solid 11-12% for 10+ years<br>
+                        • One-time items minimal and consistent<br>
+                        • CFO slightly exceeds NI (conservative)<br>
+                        • EPS growth modest 5-6% annually (organic)<br>
+                        • Dividend history 130+ years (capital allocation clarity)<br>
+                        • Can forecast 10 years out with confidence<br><br>
+                        <strong>Quality Dimensions:</strong><br>
+                        ✅ Recurrence: Repeat consumer business (highly recurring)<br>
+                        ✅ Conversion: CFO > NI (excellent)<br>
+                        ✅ Stability: ±3% volatility (boring, predictable)<br>
+                        🟡 Growth: Slow but sustainable (mature business)<br>
+                        ✅ Sustainability: Moat-protected consumer brands
+                    </div>
+                    <div class="assessment">
+                        🟢 GREEN (12/14 pts) - Boring, exceptional quality
+                        <br>Textbook Buffett investment: Predictable earnings, strong moat, consistent dividend. Lower growth but unmatched quality and reliability. Worth premium valuation for earnings predictability and sustainability.
+                    </div>
+                </div>
+
+                <div class="scenario">
+                    <div class="scenario-title">⚡ Caso 6: Cyclical Manufacturing - Highly Volatile</div>
+                    <div class="scenario-desc">
+                        <strong>Profilo:</strong><br>
+                        NI: $50B (volatile) | NI Margin: 8-20% | One-Time: 5% | NI/CFO: 0.8 | Volatility: ±35%<br><br>
+                        <strong>Dettagli:</strong>
+                        • NI margin swings wildly with economic cycle<br>
+                        • Boom years: 20% margin, Downturn: 5% margin<br>
+                        • One-time charges every 3-5 years (restructuring)<br>
+                        • CFO often lags NI in downturn (inventory issues)<br>
+                        • EPS highly volatile, can decline 50% in recession<br>
+                        • Cannot predict next year's earnings reliably<br><br>
+                        <strong>Quality Dimensions:</strong><br>
+                        🔴 Recurrence: Commodity-like, cycle-dependent<br>
+                        🟡 Conversion: Works in boom, fails in bust<br>
+                        🔴 Stability: ±35% volatility (unpredictable)<br>
+                        🔴 Growth: Cyclical, not durable<br>
+                        🟡 Sustainability: Dependent on economic cycle
+                    </div>
+                    <div class="assessment">
+                        🟡 YELLOW (5/14 pts) - Cyclical, low quality
+                        <br>Highly volatile earnings dependent on economic cycle. Cannot forecast with confidence. Valuation must use normalized cycle-average earnings with significant discount. Better only as deep-value play with contrarian thesis.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CALCULATOR -->
+        <div id="calculator" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🧮 Calcolatore Interattivo Net Income Quality Score</h2>
+
+                <div class="interactive-section">
+                    <div class="form-group">
+                        <label>1️⃣ Qual è il NI/CFO ratio?</label>
+                        <select id="conversion" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Eccellente: 0.9-1.1</option>
+                            <option value="1">Accettabile: 0.8-0.9 oppure 1.1-1.2</option>
+                            <option value="0">Povero: <0.8 oppure >1.2</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2️⃣ One-time items sono quale % di NI?</label>
+                        <select id="onetime" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Eccellente: <5%</option>
+                            <option value="1">Accettabile: 5-10%</option>
+                            <option value="0">Povero: >10%</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3️⃣ NI margin trend?</label>
+                        <select id="margin" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Stable or expanding</option>
+                            <option value="1">Slight decline 1-2pp</option>
+                            <option value="0">Declining >2pp/year</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4️⃣ NI growth vs. Revenue growth?</label>
+                        <select id="nigrowth" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">NI ~Revenue growth (both same pace)</option>
+                            <option value="1">NI growth 1-3pp higher than revenue</option>
+                            <option value="0">NI growth >3pp higher (diverging)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>5️⃣ EPS growth quality?</label>
+                        <select id="eps" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">From NI growth (organic)</option>
+                            <option value="1">Mixed (NI + buyback)</option>
+                            <option value="0">EPS declining despite NI stable/up</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>6️⃣ Margin vs. peer average?</label>
+                        <select id="peer" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Above peer average (advantage)</option>
+                            <option value="1">At peer average (adequate)</option>
+                            <option value="0">Below peer average (weakness)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>7️⃣ Earnings volatility?</label>
+                        <select id="volatility" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Stable ±3-5% annually (predictable)</option>
+                            <option value="1">Moderate ±5-15% annually</option>
+                            <option value="0">Volatile >15% annually (unpredictable)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" onclick="calculateScore()">📊 Calcola Score</button>
+
+                    <div id="resultBox" class="result-box" style="display: none;">
+                        <div class="result-score" id="scoreValue"></div>
+                        <div class="result-text" id="scoreAssessment"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📈 Guida Interpretazione Score</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🟢 12-14 punti: Eccellente</div>
+                        <div class="card-value">
+                            <strong>Net income quality eccezionale</strong><br>
+                            ✅ Ricorrente, sostenibile<br>
+                            ✅ Profittevole, cash-backed<br>
+                            ✅ Prevedibile, boring<br>
+                            ✅ Moat-protected<br><br>
+                            <strong>Significato:</strong> Vero business quality, non manipolato. Buffett benchmark.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 8-11 punti: Buono</div>
+                        <div class="card-value">
+                            <strong>Net income quality accettabile</strong><br>
+                            ✅ Crescita presente<br>
+                            ⚠️ Alcuni warning signs<br>
+                            ✅ Trend generalmente positivo<br><br>
+                            <strong>Significato:</strong> Good business, watch for deterioration.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 5-7 punti: Accettabile</div>
+                        <div class="card-value">
+                            <strong>Net income quality mediocre</strong><br>
+                            ⚠️ Crescita lenta o volatile<br>
+                            ⚠️ Cash conversion issues<br>
+                            ⚠️ Margini pressured<br><br>
+                            <strong>Azione:</strong> Monitor closely per deterioramento.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 <5 punti: Povero</div>
+                        <div class="card-value">
+                            <strong>Net income quality scadente</strong><br>
+                            ❌ Declino o one-time dependent<br>
+                            ❌ Poor cash conversion<br>
+                            ❌ Losing competitive position<br><br>
+                            <strong>Azione:</strong> EVITARE investimento.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TAB NAVIGATION
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // CALCULATOR
+        function calculateScore() {
+            const conversion = parseInt(document.getElementById('conversion').value) || 0;
+            const onetime = parseInt(document.getElementById('onetime').value) || 0;
+            const margin = parseInt(document.getElementById('margin').value) || 0;
+            const nigrowth = parseInt(document.getElementById('nigrowth').value) || 0;
+            const eps = parseInt(document.getElementById('eps').value) || 0;
+            const peer = parseInt(document.getElementById('peer').value) || 0;
+            const volatility = parseInt(document.getElementById('volatility').value) || 0;
+
+            const totalScore = conversion + onetime + margin + nigrowth + eps + peer + volatility;
+            const resultBox = document.getElementById('resultBox');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreAssessment = document.getElementById('scoreAssessment');
+
+            if (totalScore > 0) {
+                resultBox.style.display = 'block';
+                scoreValue.textContent = `Punteggio: ${totalScore}/14`;
+
+                let assessment = '';
+                if (totalScore >= 12) {
+                    assessment = '🟢🟢 ECCELLENTE - Net Income Quality Superiore<br>Earnings ricorrente, sostenibile, profittevole. Business quality non manipolato. Buffett benchmark. Merita valutazione premium.';
+                } else if (totalScore >= 8) {
+                    assessment = '🟡 BUONO - Net Income Quality Accettabile<br>Earnings solido con trend positivo. Watch per warning signs, ma fondamentalmente sano. Valutazione fair.';
+                } else if (totalScore >= 5) {
+                    assessment = '🟡 ACCETTABILE - Net Income Quality Mediocre<br>Earnings presente ma con problemi. Cash conversion issues, margin pressure. Monitor strettamente. Risk: Deterioramento.';
+                } else {
+                    assessment = '🔴 POVERO - Net Income Quality Scadente<br>Declino strutturale, one-time dependent, poor cash conversion. EVITARE investimento. Business quality compromessa.';
+                }
+
+                scoreAssessment.innerHTML = assessment;
+            }
+        }
+    </script>
+</body>
+</html>

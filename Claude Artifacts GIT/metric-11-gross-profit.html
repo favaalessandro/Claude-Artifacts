@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Metrica 11: Gross Profit & Operating Leverage - Dashboard Interattivo</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-indigo-400: rgba(129, 140, 248, 1);
+            --color-indigo-500: rgba(99, 102, 241, 1);
+            --color-indigo-600: rgba(79, 70, 229, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-green-400: rgba(74, 222, 128, 1);
+            --color-green-500: rgba(34, 197, 94, 1);
+            --color-blue-400: rgba(96, 165, 250, 1);
+            --color-blue-500: rgba(59, 130, 246, 1);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-indigo-500);
+            --color-primary-hover: var(--color-indigo-600);
+            --color-border: rgba(99, 102, 241, 0.2);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--color-indigo-500), var(--color-indigo-600));
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .metric-score {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge.green {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--color-green-500);
+        }
+
+        .badge.yellow {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--color-orange-600);
+        }
+
+        .badge.red {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-red-500);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .framework-step {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 6px;
+        }
+
+        .framework-step h4 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .framework-step p {
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .example-box {
+            background: var(--color-gray-200);
+            border-left: 4px solid var(--color-blue-400);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            color: var(--color-text);
+        }
+
+        .red-flag {
+            background: rgba(192, 21, 47, 0.08);
+            border-left: 4px solid var(--color-red-500);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            color: var(--color-text);
+        }
+
+        .red-flag strong {
+            color: var(--color-red-500);
+        }
+
+        .key-insight {
+            background: rgba(99, 102, 241, 0.08);
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .key-insight strong {
+            color: var(--color-primary);
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .scoring-table th,
+        .scoring-table td {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .scoring-table th {
+            background: linear-gradient(135deg, var(--color-indigo-500), var(--color-indigo-600));
+            color: white;
+            font-weight: 600;
+        }
+
+        .scoring-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scoring-table tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .question-list {
+            list-style: none;
+        }
+
+        .question-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .question-list li strong {
+            color: var(--color-text);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .question-list li:last-child {
+            border-bottom: none;
+        }
+
+        .interactive-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--color-text);
+            background: var(--color-background);
+            font-family: var(--font-family-base);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            background: var(--color-gray-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .result-score {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-size: 14px;
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(99,102,241,0.04));
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .metric-box strong {
+            color: var(--color-primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .tab-btn {
+                border-bottom: 1px solid var(--color-border);
+                border-right: none;
+            }
+
+            .tab-btn.active {
+                border-bottom-color: var(--color-primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📊 Metrica 11: Gross Profit & Operating Leverage</h1>
+            <p><strong>The "Pie" Size & Operating Leverage Engine - The Foundation of Value Creation</strong></p>
+            <p>Come il profitto lordo assoluto (in dollari) e la crescita rivelano la capacità di un business di generare valore attraverso il leverage operativo</p>
+            <div class="metric-score">
+                <strong>Tier 2 - Financial Strength (25% weight)</strong>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="overview">Panoramica</button>
+            <button class="tab-btn" data-tab="definition">Definizioni & Formule</button>
+            <button class="tab-btn" data-tab="pie-concept">Il Concetto della "Pie"</button>
+            <button class="tab-btn" data-tab="operating-leverage">Operating Leverage</button>
+            <button class="tab-btn" data-tab="analysis">Framework Analisi</button>
+            <button class="tab-btn" data-tab="red-flags">Red Flags</button>
+            <button class="tab-btn" data-tab="scoring">Scoring & Assessment</button>
+            <button class="tab-btn" data-tab="case-studies">Case Studies</button>
+            <button class="tab-btn" data-tab="calculator">Calcolatore</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">📌 Perché il Gross Profit (in Dollari) è Critico</h2>
+
+                <div class="key-insight">
+                    <strong>Warren Buffett:</strong> "Gross profit è il 'pie' disponibile per il management per distribuire tra spese operative, tasse e profitti. Un business con una 'pie' grande e crescente ha lo spazio per investire in crescita (R&D, marketing) mantenendo profittabilità. Quando il gross profit cresce più velocemente delle spese operative, il magic accade: il 'pie' rotola giù per la collina, accumulando più 'neve' (profitti) Man mano che cresce. Questo è operating leverage—il vero creatore di valore."
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🍰 La "Pie" è Reale, Non la Percentuale</div>
+                        <div class="card-value">
+                            <strong>Metrica Critica: Gross Profit in Dollari Assoluti</strong><br>
+                            Non è la percentuale di gross margin (quella è Metrica 3).<br>
+                            È l'importo in dollari: RICAVI − COGS = GROSS PROFIT DOLLARS<br><br>
+                            <strong>Perché è diverso:</strong><br>
+                            Una piccola azienda con 50% gross margin ma $50M ricavi = $25M pie<br>
+                            Una grande azienda con 40% gross margin ma $1B ricavi = $400M pie<br><br>
+                            La grande azienda ha una pie 16x più grande per investire in crescita, R&D, espansione.<br><br>
+                            <strong>La domanda chiave:</strong><br>
+                            Il business sta creando una pie sempre più grande? Abbastanza grande da sostenere crescita futura?
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚙️ Operating Leverage - Il Magic Multiplier</div>
+                        <div class="card-value">
+                            <strong>Definizione: Quando la "Pie" Cresce Più Veloce delle Spese</strong><br><br>
+                            Scenario Perfetto:<br>
+                            Gross Profit +10% anno<br>
+                            Operating Expenses +5% anno<br>
+                            = Operating Leverage esponenziale<br><br>
+                            <strong>Effetto Domino:</strong><br>
+                            Year 1: GP $100M, OpEx $60M, Operating Income $40M<br>
+                            Year 2: GP $110M, OpEx $63M, Operating Income $47M<br>
+                            → Profitto è salito del 17.5%! (Non solo 10%)<br><br>
+                            La "neve" rotola giù e accumula più "neve" mentre cresce.<br>
+                            <strong>Questo è dove nascono gli extraordinari ritorni.</strong>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚠️ Quando il Gross Profit Non Cresce</div>
+                        <div class="card-value">
+                            <strong>Red Flag #1: Gross Profit Stagnant</strong><br>
+                            Business crescendo il fatturato ma non il profitto lordo (in $)<br>
+                            Significa: Pressione di prezzo o COGS inflazione<br>
+                            Indicatore: Azienda perdendo pricing power<br><br>
+                            <strong>Red Flag #2: Gross Profit Declining</strong><br>
+                            Ancora peggio—fatturato stabile ma GP in calo<br>
+                            Significa: Pricing power completamente perso<br>
+                            Verdict: Moat eroding; avoid<br><br>
+                            <strong>Red Flag #3: Negative Operating Leverage</strong><br>
+                            GP +5% ma OpEx +8%<br>
+                            Significa: Expenses crescendo più veloce che revenue<br>
+                            Verdict: Business diventando meno profittevole con scale
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🎯 La Visione d'Insieme</div>
+                        <div class="card-value">
+                            <strong>Le Tre Domande Critiche:</strong><br><br>
+                            1. <strong>Gross Profit Cresce?</strong><br>
+                            Check: 10Y CAGR positivo e accelerante<br><br>
+                            2. <strong>Cresce Più Veloce di Revenue?</strong><br>
+                            Check: Margin expansion (pricing power)<br><br>
+                            3. <strong>Operating Expenses Crescono Più Lentamente?</strong><br>
+                            Check: Operating leverage working<br><br>
+                            Se SÌ a tutte tre = snowball effect → extraordinary shareholder value
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔑 5 Dimensioni Critiche di Gross Profit Quality</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">1️⃣ Absolute Dollar Growth</div>
+                        <div class="card-value">
+                            <strong>Metrica: Gross Profit 10Y CAGR</strong><br><br>
+                            <span class="badge green">Eccellente: >15% CAGR</span><br>
+                            Azienda creando pie massive e crescenti<br><br>
+                            <span class="badge yellow">Buono: 10-15% CAGR</span><br>
+                            Healthy growth in absolute dollars<br><br>
+                            <span class="badge red">Scarso: <10% CAGR</span><br>
+                            Minimal profit growth; stagnation risk
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">2️⃣ Growth vs. Revenue</div>
+                        <div class="card-value">
+                            <strong>Comparazione Critica: GP CAGR vs. Revenue CAGR</strong><br><br>
+                            <strong>GP CAGR > Revenue CAGR</strong><br>
+                            Margin expansion; pricing power; excellent<br><br>
+                            <strong>GP CAGR = Revenue CAGR</strong><br>
+                            Margin stable; acceptable<br><br>
+                            <strong>GP CAGR < Revenue CAGR</strong><br>
+                            Margin compression; pricing pressure; red flag
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">3️⃣ Operating Leverage</div>
+                        <div class="card-value">
+                            <strong>Il Test Finale: OpEx vs. Gross Profit Growth</strong><br><br>
+                            Ideal: GP +12%, OpEx +6% = leverage 2:1<br>
+                            → Extra $6M flows to operating income<br><br>
+                            Problematic: GP +8%, OpEx +8% = no leverage<br>
+                            → Proportional scaling, no efficiency gain<br><br>
+                            Red Flag: GP +5%, OpEx +10% = negative leverage<br>
+                            → Business becoming less profitable with scale
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">4️⃣ Per-Unit Economics</div>
+                        <div class="card-value">
+                            <strong>Scale Should Improve Unit Profitability</strong><br><br>
+                            For Product: GP per unit increasing = scale benefits<br>
+                            For Service: GP per customer increasing = moat strengthening<br><br>
+                            Red Flag: GP $ growing but per-unit GP declining<br>
+                            = Volume growth masking deterioration<br><br>
+                            Test: GP per customer/unit stable or improving?
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">5️⃣ Cash Conversion Validation</div>
+                        <div class="card-value">
+                            <strong>Does GP Convert to Operating Income & Cash?</strong><br><br>
+                            <span class="badge green">Healthy</span><br>
+                            GP +15% → OI +15% → CFO +14%<br>
+                            Real, sustainable growth<br><br>
+                            <span class="badge red">Fake</span><br>
+                            GP +15% → OI +8% → CFO +3%<br>
+                            OpEx eating profits; cash not following<br><br>
+                            <strong>Red Flag:</strong> GP growing but CFO/FCF declining
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: DEFINITION -->
+        <div id="definition" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📐 Definizioni Formali & Formule</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">Gross Profit: Definizione</div>
+                    <div class="card-value">
+                        <strong>Gross Profit = Revenue − Cost of Goods Sold (COGS)</strong><br><br>
+                        <strong>Significato:</strong><br>
+                        L'importo in dollari assoluto disponibile dopo pagare i costi diretti per creare/vendere i prodotti.<br><br>
+                        <strong>Esempio Semplice:</strong><br>
+                        Revenue: $1,000 (vendite totali)<br>
+                        COGS: $600 (materiali, manodopera diretta, manufacturing)<br>
+                        = Gross Profit: $400<br><br>
+                        Questo $400 è la "pie" disponibile per:<br>
+                        • Spese di marketing e vendita<br>
+                        • R&D e innovazione<br>
+                        • Amministrazione<br>
+                        • Interessi sul debito<br>
+                        • Tasse<br>
+                        • Profitto netto per azionisti
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">💰 Gross Profit (Dollari Assoluti)</div>
+                        <div class="card-value">
+                            <strong>Formula:</strong><br>
+                            Gross Profit = Revenue − COGS<br><br>
+                            <strong>Cosa Misura:</strong><br>
+                            Importo in $ disponibile dopo costi diretti<br><br>
+                            <strong>Significato del Trend:</strong><br>
+                            • Crescente = pie che si espande<br>
+                            • Stagnante = pie non crescendo<br>
+                            • Decrescente = pie che si restringe<br><br>
+                            <strong>IMPORTANTE:</strong><br>
+                            Questo è ASSOLUTO, non percentuale
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📈 Gross Profit CAGR</div>
+                        <div class="card-value">
+                            <strong>Formula:</strong><br>
+                            CAGR = (Ending Value / Beginning Value)^(1/years) − 1<br><br>
+                            <strong>Cosa Misura:</strong><br>
+                            Tasso di crescita annuale composto del gross profit su 10 anni<br><br>
+                            <strong>Benchmark:</strong><br>
+                            • >15% CAGR: Eccezionale<br>
+                            • 10-15%: Buono<br>
+                            • 5-10%: Accettabile<br>
+                            • <5%: Concernente<br><br>
+                            <strong>Interpretazione:</strong><br>
+                            Più alta è la CAGR, più grande la pie sta crescendo
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚙️ Operating Leverage</div>
+                        <div class="card-value">
+                            <strong>Formula (Implicit):</strong><br>
+                            Operating Leverage = OI Growth / GP Growth<br><br>
+                            <strong>Cosa Misura:</strong><br>
+                            Quanto il profitto operativo cresce vs. gross profit<br><br>
+                            <strong>Scenario Ideale:</strong><br>
+                            GP +10%, OI +15% = 1.5x leverage<br>
+                            (Ogni $1 di GP growth genera $1.50 OI growth)<br><br>
+                            <strong>Red Flag:</strong><br>
+                            GP +10%, OI +5% = 0.5x leverage<br>
+                            (Operating expenses eroding gains)
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">💹 Gross Profit Growth Comparison</div>
+                        <div class="card-value">
+                            <strong>Comparison: GP Growth vs. Revenue Growth</strong><br><br>
+                            <strong>If GP grows faster than Revenue:</strong><br>
+                            = Margin expansion<br>
+                            = Pricing power increasing<br>
+                            = Excellent sign<br><br>
+                            <strong>If GP grows at same pace:</strong><br>
+                            = Margin stable<br>
+                            = Acceptable<br><br>
+                            <strong>If GP grows slower than Revenue:</strong><br>
+                            = Margin compression<br>
+                            = Pricing power eroding<br>
+                            = Red flag
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: PIE CONCEPT -->
+        <div id="pie-concept" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🍰 Il Concetto della "Pie" Spiegato</h2>
+
+                <div class="key-insight">
+                    <strong>Buffett's Farmer Metaphor:</strong> Immagina di essere un contadino. Raccolti i tuoi raccolti (revenue), devi pagare i semi, la manodopera, i fertilizzanti (costi diretti = COGS). Ciò che rimane? La tua "pie"—il gross profit. Questo è ciò che hai disponibile per pagare l'affitto (spese operative), tasse, e infine il tuo profitto. Un business con una "pie" grande ha più flessibilità. Un business con una "pie" che cresce? Può investire di più in ricerca, marketing, expansion—senza sacrificare profitti. Ecco il magic.
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 INSEGNAMENTO CRITICO: Pie Size ≠ Margin Percentage</strong><br><br>
+                    Company A: 50% Gross Margin su $50M revenue = $25M pie<br>
+                    Company B: 35% Gross Margin su $500M revenue = $175M pie<br><br>
+                    Quale azienda è migliore? Company B—a pie 7x più grande!<br>
+                    Anche con margin inferiore, può investire in crescita, R&D, expansion senza preoccupazioni.<br><br>
+                    <strong>Lesson:</strong> Quando guardi le formule finanziarie, guarda sia la percentuale CHE il valore assoluto.
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">📊 La "Pie" Semplice Visually</div>
+                        <div class="card-value">
+                            Immagina una torta:
+                            <div class="example-box">
+Year 1:
+Revenue (Total Sales): $100
+COGS (Direct Costs): $60
+Gross Profit (The Pie): $40
+  
+Year 2:
+Revenue: $120 (+20%)
+COGS: $70 (+16.7%)
+Gross Profit (Bigger Pie): $50 (+25%)
+                            </div>
+                            La pie cresce più veloce della revenue—questo è margin expansion!
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🎯 Cosa Puoi Fare Con Una Pie Grande</div>
+                        <div class="card-value">
+                            <strong>Small Pie ($25M):</strong> Limited options<br>
+                            • Can't afford big R&D investment<br>
+                            • Limited marketing budget<br>
+                            • Hard to expand internationally<br><br>
+                            <strong>Medium Pie ($100M):</strong> Growing flexibility<br>
+                            • Can invest in innovation<br>
+                            • Can expand to new markets<br>
+                            • Can build competitive advantages<br><br>
+                            <strong>Large Pie ($400M):</strong> Massive optionality<br>
+                            • Invest heavily without sacrificing profits<br>
+                            • Acquire competitors<br>
+                            • Dominate markets through innovation
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🌍 Why Pie Size Matters for Investors</div>
+                        <div class="card-value">
+                            <strong>Investment Perspective:</strong><br><br>
+                            A small company with amazing ideas but small pie<br>
+                            = Limited capacity to execute<br><br>
+                            A large company with decent ideas and huge pie<br>
+                            = Can dominate through scale and investment<br><br>
+                            <strong>Example:</strong><br>
+                            Startup: Brilliant AI company, 60% margin, $5M revenue = $3M pie<br>
+                            Can't afford top talent, can't do big marketing<br><br>
+                            Microsoft: 71% margin, $200B revenue = $142B pie<br>
+                            Can buy talent, dominate markets, innovate relentlessly<br><br>
+                            Scale matters enormously for execution
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">⚡ The Snowball Effect in Action</div>
+                        <div class="card-value">
+                            <strong>Year 1 (Start):</strong><br>
+                            Pie: $100M, Growth: 5%<br><br>
+                            <strong>Year 2:</strong><br>
+                            Pie: $105M (+$5M new), Growth still 5%<br><br>
+                            <strong>Year 3:</strong><br>
+                            Pie: $110.25M (+$5.25M new)<br>
+                            But Operating Leverage kicks in<br><br>
+                            <strong>Years 4-10:</strong><br>
+                            Pie rolling down the hill, getting bigger<br>
+                            Accumulating more "snow" (profits) each year<br><br>
+                            <strong>Result:</strong><br>
+                            Operating Income growing 2x, 3x as fast as pie<br>
+                            Shareholder value compounding extraordinarily<br><br>
+                            <strong>This is the magic Buffett is talking about.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: OPERATING LEVERAGE -->
+        <div id="operating-leverage" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">⚙️ Operating Leverage - The Profitability Multiplier</h2>
+
+                <div class="key-insight">
+                    <strong>Definition:</strong> Operating leverage occurs when gross profit grows faster than operating expenses. The result: profits grow disproportionately to revenue. This is the most powerful driver of shareholder value in business.
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🟢 Excellent Operating Leverage</div>
+                        <div class="card-value">
+                            <strong>Scenario: GP Growing, OpEx Stable</strong><br>
+                            Year 1: GP $100M, OpEx $60M, Operating Income $40M<br>
+                            Year 2: GP $120M, OpEx $61M, Operating Income $59M<br>
+                            Operating Leverage: +47.5%!<br><br>
+                            Interpretation:<br>
+                            • GP grew 20%<br>
+                            • OpEx barely grew (1%)<br>
+                            • Operating Income grew 47.5%<br><br>
+                            This is exponential value creation!
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 Moderate Operating Leverage</div>
+                        <div class="card-value">
+                            <strong>Scenario: GP and OpEx Growing, GP Faster</strong><br>
+                            Year 1: GP $100M, OpEx $60M, Operating Income $40M<br>
+                            Year 2: GP $115M, OpEx $66M, Operating Income $49M<br>
+                            Operating Leverage: +22.5%<br><br>
+                            Interpretation:<br>
+                            • GP growing 15%<br>
+                            • OpEx growing 10%<br>
+                            • Operating Income growing 22.5%<br><br>
+                            Good, but not as powerful as scenario 1
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 No Operating Leverage (Proportional)</div>
+                        <div class="card-value">
+                            <strong>Scenario: GP and OpEx Growing at Same Rate</strong><br>
+                            Year 1: GP $100M, OpEx $60M, Operating Income $40M<br>
+                            Year 2: GP $110M, OpEx $66M, Operating Income $44M<br>
+                            Operating Leverage: +10% (same as GP!)<br><br>
+                            Interpretation:<br>
+                            • GP growing 10%<br>
+                            • OpEx growing 10%<br>
+                            • Operating Income growing 10%<br><br>
+                            Linear scaling—no leverage working
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴🔴 Negative Operating Leverage</div>
+                        <div class="card-value">
+                            <strong>Scenario: GP and OpEx Growing, OpEx Faster</strong><br>
+                            Year 1: GP $100M, OpEx $60M, Operating Income $40M<br>
+                            Year 2: GP $105M, OpEx $70M, Operating Income $35M<br>
+                            Operating Leverage: -12.5%!<br><br>
+                            Interpretation:<br>
+                            • GP growing 5%<br>
+                            • OpEx growing 16.7%<br>
+                            • Operating Income DECLINING<br><br>
+                            Disaster—leverage working backwards
+                        </div>
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 Why Operating Leverage Is CRITICAL</strong><br><br>
+                    Operating leverage is where exceptional returns come from. A business with:<br>
+                    • Growing gross profit<br>
+                    • Stable or slowly growing operating expenses<br>
+                    • Strong operating leverage<br><br>
+                    ...will compound shareholder value at extraordinary rates. This is what separates extraordinary companies from ordinary ones. Without operating leverage, even growing businesses deliver mediocre returns to shareholders.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: ANALYSIS -->
+        <div id="analysis" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🔧 5-Step Framework: Analyzing Gross Profit Quality</h2>
+
+                <div class="framework-step">
+                    <h4>Step 1️⃣: Calculate Absolute Gross Profit & Track 10-Year Trend</h4>
+                    <p><strong>Cosa fare:</strong> Compute GP in dollari e analizzare il growth rate</p>
+                    <p><strong>Formula:</strong> Gross Profit = Revenue − COGS</p>
+                    <p><strong>Calculate 10Y CAGR:</strong> (End Value / Start Value)^(1/10) − 1</p>
+                    <p><strong>Benchmark Target:</strong> GP CAGR > 10% è excellent; <5% è concerning</p>
+                    <div class="example-box">
+Esempio: Microsoft
+Year 2013: Revenue $77.8B, COGS $24B, GP = $53.8B
+Year 2023: Revenue $212B, COGS $64B, GP = $148B
+10Y CAGR: (148/53.8)^(1/10) − 1 = 10.7% ✅
+
+Assessment: Healthy GP growth; pie growing steadily
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 2️⃣: Compare GP Growth to Revenue Growth (Margin Test)</h4>
+                    <p><strong>Cosa fare:</strong> Calcola GP CAGR vs. Revenue CAGR per vedere se le margini si stanno espandendo</p>
+                    <p><strong>Ideal Scenario:</strong> GP CAGR > Revenue CAGR (margin expansion)</p>
+                    <p><strong>Concerning Scenario:</strong> GP CAGR < Revenue CAGR (margin compression)</p>
+                    <div class="example-box">
+Confronto: Apple vs. Declining Company
+
+Apple:
+  Revenue CAGR: 8%
+  GP CAGR: 12%
+  → GP growing 4pp faster = margin expansion 🟢
+
+Declining Company:
+  Revenue CAGR: 10%
+  GP CAGR: 6%
+  → GP growing slower = pricing pressure 🔴
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 3️⃣: Assess Operating Leverage (OpEx vs. GP Growth)</h4>
+                    <p><strong>Cosa fare:</strong> Analizzare se le spese operative crescono più lentamente del gross profit</p>
+                    <p><strong>The Formula:</strong> Operating Leverage = Operating Income Growth / Gross Profit Growth</p>
+                    <p><strong>Ideal:</strong> OpEx growing 50% slower than GP (2:1 leverage)</p>
+                    <div class="example-box">
+Operating Leverage Test:
+
+Excellent Company:
+  GP: $100M → $120M (+20%)
+  OpEx: $60M → $66M (+10%)
+  OI: $40M → $54M (+35%)
+  → Operating leverage 1.75x! 🟢
+
+Stagnant Company:
+  GP: $100M → $110M (+10%)
+  OpEx: $60M → $66M (+10%)
+  OI: $40M → $44M (+10%)
+  → No leverage, proportional scaling 🟡
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 4️⃣: Verify Cash Conversion (GP → Operating Income → Cash)</h4>
+                    <p><strong>Cosa fare:</strong> Assicurarsi che il profitto lordo si converta in reddito operativo e flusso di cassa reale</p>
+                    <p><strong>Red Flag:</strong> GP crescente ma OI stagnante o CFO decrescente</p>
+                    <div class="example-box">
+Reality Check:
+
+Quality Company:
+  GP: +15% YoY
+  Operating Income: +15% YoY ✅
+  Operating Cash Flow: +14% YoY ✅
+  Free Cash Flow: +12% YoY ✅
+  → Real, sustainable growth
+
+Trouble Sign:
+  GP: +15% YoY
+  Operating Income: +8% YoY (OpEx eating gains)
+  Operating Cash Flow: +3% YoY 🔴
+  Free Cash Flow: Negative 🔴
+  → Cash not following profits; working capital or quality issues
+                    </div>
+                </div>
+
+                <div class="framework-step">
+                    <h4>Step 5️⃣: Assess Unit Economics & Per-Customer GP Trend</h4>
+                    <p><strong>Cosa fare:</strong> Verifica se il gross profit per unità/cliente sta migliorando o peggiorando</p>
+                    <p><strong>For Product Companies:</strong> GP $ / Units Sold</p>
+                    <p><strong>For Service Companies:</strong> GP $ / Number of Customers</p>
+                    <p><strong>Red Flag:</strong> GP $ crescente ma per-unità GP decrescente (volume play insostenibile)</p>
+                    <div class="example-box">
+Unit Economics:
+
+Healthy (Stable Unit GP):
+  Year 1: 100K customers, $100M GP → $1,000 per customer
+  Year 5: 500K customers, $500M GP → $1,000 per customer
+  → Same unit economics at 5x scale; excellent repeatability ✅
+
+Deteriorating (Declining Unit GP):
+  Year 1: 50 stores, $200M GP → $4M per store
+  Year 5: 150 stores, $450M GP → $3M per store
+  → Profit declining per location; new stores less profitable 🔴
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RED FLAGS -->
+        <div id="red-flags" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">⚠️ 8 Red Flags nel Gross Profit Analysis</h2>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #1: Gross Profit Growing Much Slower Than Revenue</strong><br>
+                    GP CAGR 5%, Revenue CAGR 15% = Margin compression<br>
+                    Indica: Pricing power perduta o COGS inflazione<br>
+                    Verdict: Moat eroding; business losing competitive advantage
+                    <div class="example-box">
+Segnale negativo:
+Year 1: Revenue $100M, GP $40M (40% margin)
+Year 5: Revenue $202M, GP $66M (32.7% margin)
+Revenue +15% CAGR, GP only +10.5% CAGR
+Interpretation: Company had to cut prices to grow
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #2: Gross Profit Stagnant While Revenue Growing</strong><br>
+                    GP flat, Revenue +10% = Margin compression; pricing pressure<br>
+                    Indica: Competitive pricing war won by customers, not company<br>
+                    Verdict: Unsustainable; business cannibbalizing itself
+                    <div class="example-box">
+Segnale negativo:
+Year 1: Revenue $100M, GP $40M
+Year 5: Revenue $150M, GP $40M
+Revenue +8.5% CAGR, GP 0% CAGR
+Company growing revenue but not making more profit = terrible business
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #3: Gross Profit Declining While Revenue Stable/Growing</strong><br>
+                    Peggio del flag #2—profitto lordo assolutamente calante<br>
+                    Indica: Business model breaking down<br>
+                    Verdict: EVITA completamente
+                    <div class="example-box">
+Segnale negativo:
+Revenue: $100M → $100M → $100M (stable)
+GP: $45M → $40M → $35M (declining)
+Company losing ability to be profitable even at same revenue level
+This is business deterioration
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #4: Operating Expenses Growing Faster Than Gross Profit</strong><br>
+                    GP +8%, OpEx +12% = Negative operating leverage<br>
+                    Indica: Business scaling inefficiently<br>
+                    Verdict: Leverage working backwards; business becoming less profitable
+                    <div class="example-box">
+Segnale negativo:
+GP growth: +10% YoY
+OpEx growth: +15% YoY
+Operating Income: -5% YoY
+Company growing but becoming less profitable. Unsustainable.
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #5: Gross Profit Growing But Operating Income Declining</strong><br>
+                    GP +15% ma OI −5% = Severe OpEx problem<br>
+                    Indica: Management lost control of cost structure<br>
+                    Verdict: Major warning sign; profit growth illusion
+                    <div class="example-box">
+Segnale negativo:
+Year 1: GP $100M, OpEx $60M, OI $40M
+Year 2: GP $115M, OpEx $125M, OI negative!
+OpEx exploded despite GP growth; worse than proportional scaling
+Management crisis.
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #6: Gross Profit Growth From One-Time Items (Asset Sales)</strong><br>
+                    GP higher because company divested unprofitable division<br>
+                    Indica: True underlying business deteriorating<br>
+                    Verdict: False improvement; core business weakening
+                    <div class="example-box">
+Segnale negativo:
+Company divests low-margin business unit
+Reported GP improves, but underlying revenue declining
+Revenue: $500M → $400M (−20%)
+GP: $150M → $140M (−7%, looks better than revenue drop!)
+False signal—core business worse than it appears
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #7: Gross Profit Per Unit/Customer Declining</strong><br>
+                    GP $ growing but per-unit GP falling = Unsustainable volume play<br>
+                    Indica: Company forced to lower prices per unit to drive volume<br>
+                    Verdict: Business becoming less profitable at scale
+                    <div class="example-box">
+Segnale negativo:
+Year 1: 100K units, $100M GP → $1,000 per unit
+Year 5: 300K units, $250M GP → $833 per unit
+Volume growing but unit profitability declining 20%
+Company sacrificing margin for volume; can't sustain forever
+                    </div>
+                </div>
+
+                <div class="red-flag">
+                    <strong>🚨 RED FLAG #8: GP Growing But CFO Stagnant or Declining</strong><br>
+                    GP +12%, CFO +2% = Working capital consuming cash<br>
+                    Indica: Cash conversion broken; receivables/inventory problem<br>
+                    Verdict: Profit growth illusory; real cash generation weak
+                    <div class="example-box">
+Segnale negativo:
+Gross Profit: +15% YoY
+Operating Cash Flow: +3% YoY (much slower!)
+Free Cash Flow: Declining
+Interpretation: Company shows growing profits but can't convert to cash
+Working capital growing faster than profits; unsustainable
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SCORING -->
+        <div id="scoring" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📊 Scoring Guidelines & Assessment Framework</h2>
+
+                <table class="scoring-table">
+                    <thead>
+                        <tr>
+                            <th>Dimensione Qualità</th>
+                            <th>Valutazione ✅</th>
+                            <th>Punteggio</th>
+                            <th>Significato</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GP Growth (10Y CAGR)</strong></td>
+                            <td>>15% CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Exceptional; pie growing fast</td>
+                        </tr>
+                        <tr style="background: rgba(99,102,241,0.05);">
+                            <td></td>
+                            <td>10-15% CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Excellent; healthy growth</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>5-10% CAGR</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Acceptable; moderate growth</td>
+                        </tr>
+                        <tr style="background: rgba(99,102,241,0.05);">
+                            <td></td>
+                            <td><5% CAGR</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Poor; minimal growth</td>
+                        </tr>
+                        <tr>
+                            <td><strong>GP vs. Revenue Growth</strong></td>
+                            <td>GP CAGR > Revenue CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Margin expansion; pricing power</td>
+                        </tr>
+                        <tr style="background: rgba(99,102,241,0.05);">
+                            <td></td>
+                            <td>GP CAGR ≈ Revenue CAGR</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Stable margins; acceptable</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>GP CAGR < Revenue CAGR</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Margin compression; red flag</td>
+                        </tr>
+                        <tr style="background: rgba(99,102,241,0.05);">
+                            <td><strong>Operating Leverage</strong></td>
+                            <td>OpEx CAGR < 50% of GP CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Exceptional leverage (2:1)</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>OpEx CAGR = 75% of GP CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Healthy leverage (1.3:1)</td>
+                        </tr>
+                        <tr style="background: rgba(99,102,241,0.05);">
+                            <td></td>
+                            <td>OpEx CAGR ≈ GP CAGR</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>No leverage; proportional</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>OpEx CAGR > GP CAGR</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Negative leverage; disaster</td>
+                        </tr>
+                        <tr style="background: rgba(99,102,241,0.05);">
+                            <td><strong>CFO Conversion</strong></td>
+                            <td>CFO CAGR ≈ GP CAGR</td>
+                            <td>🟢 Green (2 pts)</td>
+                            <td>Real growth; cash backing</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>CFO CAGR = 70-90% of GP CAGR</td>
+                            <td>🟡 Yellow (1 pt)</td>
+                            <td>Acceptable; some WC issues</td>
+                        </tr>
+                        <tr style="background: rgba(99,102,241,0.05);">
+                            <td></td>
+                            <td>CFO CAGR << GP CAGR</td>
+                            <td>🔴 Red (0 pts)</td>
+                            <td>Red flag; cash not following</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="key-insight" style="margin-top: 30px;">
+                    <strong>Come calcolare il punteggio totale:</strong><br>
+                    Somma i punti da tutte le categorie, max 12 punti.<br>
+                    <br>
+                    <strong>10-12 punti = 🟢 Green (Eccellente Gross Profit Quality)</strong><br>
+                    Pie growing fast, margin expanding, leverage strong, cash backing real<br>
+                    <br>
+                    <strong>7-9 punti = 🟡 Yellow (Buona Qualità, Watch)</strong><br>
+                    Acceptable growth, some leverage, monitor trends<br>
+                    <br>
+                    <strong>4-6 punti = 🟡 Yellow (Mediocre, Rischi Evidenti)</strong><br>
+                    Slow GP growth, margin pressure, weak leverage<br>
+                    <br>
+                    <strong><4 punti = 🔴 Red (Gross Profit Quality Compromessa)</strong><br>
+                    Poor growth, negative leverage, red flags evident. AVOID.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CASE STUDIES -->
+        <div id="case-studies" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">💼 4 Case Studies Reali - Gross Profit Analysis</h2>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">💻 Caso 1: Microsoft - Exceptional Gross Profit Quality</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        GP 10Y CAGR: 16% | Revenue 10Y CAGR: 10%<br>
+                        GP Margin: 71% (stable) | OpEx CAGR: 8%<br><br>
+                        <strong>Analisi:</strong><br>
+                        • GP crescendo 1.6x faster than revenue (margin expansion)<br>
+                        • OpEx growing only 8% while GP grows 16% (operating leverage 2:1!)<br>
+                        • Every additional $10B in GP, only $5B goes to OpEx<br>
+                        • Rest flows to operating income (extraordinary value creation)<br><br>
+                        <strong>Verdetto:</strong> 🟢🟢 GREEN (12/12 pts)<br>
+                        Textbook operating leverage. Gross profit is engine driving value. Business compounding: revenue grows, profit grows faster, leverage multiplies. This is Buffett's "snowball."
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">🍎 Caso 2: Apple - Gross Profit with Margin Expansion</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        GP 10Y CAGR: 12% | Revenue 10Y CAGR: 8%<br>
+                        GP Margin: 40% → 45% (expanding) | OpEx CAGR: 5%<br><br>
+                        <strong>Analisi:</strong><br>
+                        • GP growing 1.5x faster than revenue<br>
+                        • Margin expanding from 40% to 45% (pricing power evident)<br>
+                        • OpEx discipline maintained (5% CAGR vs. 12% GP CAGR)<br>
+                        • Operating leverage working; most GP growth flows to OI<br><br>
+                        <strong>Verdetto:</strong> 🟢🟢 GREEN (12/12 pts)<br>
+                        Strong operating leverage with margin expansion. Gross profit and pricing power both improving. Textbook Buffett quality.
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">🏪 Caso 3: Declining Retailer - Gross Profit Stagnation</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        GP 10Y CAGR: 2% | Revenue 10Y CAGR: 5%<br>
+                        GP Margin: 35% → 28% (declining) | OpEx CAGR: 4%<br><br>
+                        <strong>Analisi:</strong><br>
+                        • Revenue growing 5% but GP only 2% (margin compression)<br>
+                        • Margin declining from 35% to 28% (pricing power lost)<br>
+                        • OpEx not declining (no cost control)<br>
+                        • No operating leverage; instead, proportional OpEx growth consuming gains<br><br>
+                        <strong>Verdetto:</strong> 🔴 RED (2/12 pts)<br>
+                        Poor gross profit growth. Margin compression indicates competitive pressure. No leverage working. Business deteriorating. AVOID.
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-title">📱 Caso 4: Amazon - High GP Growth, Strategic Reinvestment</div>
+                    <div class="card-value">
+                        <strong>Profilo:</strong><br>
+                        GP 10Y CAGR: 18% | Revenue 10Y CAGR: 25%<br>
+                        GP Margin: 45% (stable) | OpEx CAGR: 22%<br><br>
+                        <strong>Analisi:</strong><br>
+                        • GP growing 18% (excellent absolute growth)<br>
+                        • But revenue growing 25% (slight margin compression)<br>
+                        • OpEx growing 22% (almost as fast as revenue; deliberate reinvestment)<br>
+                        • Most GP growth reinvested in infrastructure, AWS, R&D (intentional strategy)<br><br>
+                        <strong>Verdetto:</strong> 🟡 YELLOW (7/12 pts)<br>
+                        Good gross profit growth, but strategic tradeoff. Amazon deliberately not capturing operating leverage—reinvesting for future dominance. Question: Will reinvestment eventually create leverage in AWS and infrastructure?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CALCULATOR -->
+        <div id="calculator" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🧮 Calcolatore Interattivo - Gross Profit Quality Score</h2>
+
+                <div class="interactive-section">
+                    <div class="form-group">
+                        <label>1️⃣ Quale è il Gross Profit CAGR (10 anni)?</label>
+                        <input type="number" id="gpCagr" placeholder="es: 12" style="width: 100px;">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);"> (10-year compound growth)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2️⃣ Quale è il Revenue CAGR (10 anni)?</label>
+                        <input type="number" id="revenueCagr" placeholder="es: 8">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);"> (10-year revenue growth)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>3️⃣ Quale è il Operating Expense CAGR?</label>
+                        <input type="number" id="opexCagr" placeholder="es: 5">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);"> (expense growth rate)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4️⃣ Quale è il Operating Cash Flow CAGR?</label>
+                        <input type="number" id="cfoCagr" placeholder="es: 12">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);"> (cash generation growth)</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>5️⃣ Trend della Gross Profit Margin (ultimi 3 anni)?</label>
+                        <select id="marginTrend" onchange="calculateScore()">
+                            <option value="">Seleziona...</option>
+                            <option value="2">Expanding (migliorando) ✅</option>
+                            <option value="1">Stable (stabile)</option>
+                            <option value="0">Declining (peggiorando) 🔴</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" onclick="calculateGPScore()">📊 Calcola Score</button>
+
+                    <div id="resultBox" class="result-box" style="display: none;">
+                        <div class="result-score" id="scoreValue"></div>
+                        <div class="result-text" id="scoreAssessment"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">📈 Guida Interpretazione Score</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">🟢 10-12 punti: Eccellente</div>
+                        <div class="card-value">
+                            <strong>GROSS PROFIT QUALITY ECCEZIONALE</strong><br>
+                            ✅ Pie crescendo veloce (>15% CAGR)<br>
+                            ✅ Margin expanding o stable<br>
+                            ✅ Strong operating leverage<br>
+                            ✅ Cash backing real growth<br><br>
+                            <strong>Significato:</strong> Buffett-quality business. Gross profit è il vero engine di creazione di valore. Investimento con fiducia.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 7-9 punti: Buono</div>
+                        <div class="card-value">
+                            <strong>GROSS PROFIT QUALITY ACCETTABILE</strong><br>
+                            ✅ Pie crescendo (10-15% CAGR)<br>
+                            🟡 Margin stable<br>
+                            🟡 Some leverage evident<br>
+                            🟡 Monitor cash conversion<br><br>
+                            <strong>Significato:</strong> Good business, but watch for warning signs. Monitor margin and leverage trends carefully.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🟡 4-6 punti: Mediocre</div>
+                        <div class="card-value">
+                            <strong>GROSS PROFIT QUALITY MEDIOCRE</strong><br>
+                            🟡 Pie crescendo lentamente (<10% CAGR)<br>
+                            🟡 Margin pressured<br>
+                            🟡 Weak or absent leverage<br><br>
+                            <strong>Significato:</strong> Caution warranted. Competitive pressure evident. Deeper analysis needed.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">🔴 <4 punti: Scadente</div>
+                        <div class="card-value">
+                            <strong>GROSS PROFIT QUALITY SCADENTE</strong><br>
+                            🔴 Pie stagnant or declining<br>
+                            🔴 Margin collapsing<br>
+                            🔴 Negative leverage evident<br>
+                            🔴 Cash not following profits<br><br>
+                            <strong>Significato:</strong> AVOID. Gross profit is foundation; if it fails, entire business at risk.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TAB NAVIGATION
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // CALCULATOR FUNCTION
+        function calculateGPScore() {
+            const gpCagr = parseFloat(document.getElementById('gpCagr').value) || 0;
+            const revenueCagr = parseFloat(document.getElementById('revenueCagr').value) || 0;
+            const opexCagr = parseFloat(document.getElementById('opexCagr').value) || 0;
+            const cfoCagr = parseFloat(document.getElementById('cfoCagr').value) || 0;
+            const marginTrend = parseInt(document.getElementById('marginTrend').value) || 0;
+
+            let totalScore = 0;
+
+            // GP Growth Score
+            if (gpCagr > 15) totalScore += 2;
+            else if (gpCagr >= 10) totalScore += 2;
+            else if (gpCagr >= 5) totalScore += 1;
+
+            // GP vs Revenue Growth
+            if (gpCagr > revenueCagr) totalScore += 2;
+            else if (Math.abs(gpCagr - revenueCagr) <= 1) totalScore += 1;
+
+            // Operating Leverage
+            const leverageRatio = (opexCagr / gpCagr);
+            if (leverageRatio < 0.5) totalScore += 2;
+            else if (leverageRatio <= 0.75) totalScore += 2;
+            else if (leverageRatio < 1) totalScore += 1;
+
+            // CFO Conversion
+            if (Math.abs(cfoCagr - gpCagr) <= 2) totalScore += 2;
+            else if (cfoCagr >= (gpCagr * 0.7)) totalScore += 1;
+
+            // Margin Trend
+            totalScore += marginTrend;
+
+            const resultBox = document.getElementById('resultBox');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreAssessment = document.getElementById('scoreAssessment');
+
+            if (totalScore > 0) {
+                resultBox.style.display = 'block';
+                scoreValue.textContent = `Punteggio: ${totalScore}/12`;
+
+                let assessment = '';
+                if (totalScore >= 10) {
+                    assessment = '🟢🟢 ECCELLENTE - Gross Profit Quality Superiore<br>Pie crescendo veloce, margin expanding, operating leverage forte. Business compounding straordinariamente. Buffett-quality.';
+                } else if (totalScore >= 7) {
+                    assessment = '🟡 BUONO - Gross Profit Quality Accettabile<br>Pie cresce con crescita decente, leverage sano. Monitor trend, ma fondamentalmente sound.';
+                } else if (totalScore >= 4) {
+                    assessment = '🟡 MEDIOCRE - Gross Profit Quality Questionabile<br>Pie stagnant, leverage weak, margin pressure. Caution required.';
+                } else {
+                    assessment = '🔴 SCADENTE - Gross Profit Quality Compromessa<br>Pie declining or stagnant, negative leverage. AVOID investment.';
+                }
+
+                scoreAssessment.innerHTML = assessment;
+            }
+        }
+    </script>
+</body>
+</html>
